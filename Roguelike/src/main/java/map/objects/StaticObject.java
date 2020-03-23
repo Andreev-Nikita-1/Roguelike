@@ -1,0 +1,26 @@
+package map.objects;
+
+import map.Coord;
+import map.Damage;
+import map.LogicPixel;
+
+import java.util.Map;
+
+public abstract class StaticObject extends Object {
+    protected Map<Coord, LogicPixel> pixelSet;
+
+    @Override
+    public void act() {
+    }
+
+    @Override
+    public void takeDamage(Damage damage) {
+    }
+
+    @Override
+    public Map<Coord, LogicPixel> getPixels() {
+        return pixelSet;
+    }
+
+
+}

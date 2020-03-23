@@ -1,13 +1,16 @@
+package basicComponents;
+
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
+import renderer.Renderer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,17 +19,22 @@ import static java.lang.Thread.sleep;
 
 public abstract class Controller {
 
-    public static int x = 0;
-    public static int y = 0;
-
     private static SwingTerminalFrame terminal;
     private static WindowBasedTextGUI gui;
     private static Window mainWindow;
     private static GameplayComponent component;
 
-    static void initialize() throws IOException {
+    public static int getTerminalSizeX() {
+        return gui.getScreen().getTerminalSize().getColumns();
+    }
+
+    public static int getTerminalSizeY() {
+        return gui.getScreen().getTerminalSize().getRows();
+    }
+
+    public static void initialize() throws IOException {
         terminal = new SwingTerminalFrame("GAME",
-                new TerminalSize(100, 50),
+                new TerminalSize(60, 30),
                 null, null, null,
                 TerminalEmulatorAutoCloseTrigger.CloseOnExitPrivateMode);
 
@@ -40,26 +48,23 @@ public abstract class Controller {
     }
 
 
-    public static void run() throws IOException {
+    public static void run() {
+        try {
+            terminal.setVisible(true);
+            gui.getScreen().startScreen();
+            mainWindow.setComponent(component);
+            drawMainMenu();
 
-        terminal.setVisible(true);
-        gui.getScreen().startScreen();
-        drawMainMenu();
-
-        while (true) {
-            try {
+            while (true) {
                 sleep(10);
                 gui.updateScreen();
                 gui.processInput();
-            } catch (IOException | InterruptedException e) {
-                break;
             }
+        } catch (IOException | InterruptedException e) {
+
         }
     }
 
-    public static void drawMap() {
-        mainWindow.setComponent(component);
-    }
 
     public static void drawMainMenu() {
         ActionListDialogBuilder builder = new ActionListDialogBuilder();
@@ -74,3 +79,38 @@ public abstract class Controller {
     }
 
 }
+
+class GameplayComponent extends AbstractInteractableComponent<GameplayComponent> {
+
+
+    @Override
+    protected InteractableRenderer<GameplayComponent> createDefaultRenderer() {
+        return new MapRenderer();
+    }
+
+    @Override
+    protected Result handleKeyStroke(KeyStroke keyStroke) {
+        AppLogic.handleKeyStrokeOnMap(keyStroke);
+        return Result.HANDLED;
+    }
+}
+
+class MapRenderer implements InteractableRenderer<GameplayComponent> {
+
+    @Override
+    public TerminalPosition getCursorLocation(GameplayComponent component) {
+        return null;
+    }
+
+    @Override
+    public TerminalSize getPreferredSize(GameplayComponent component) {
+        return null;
+    }
+
+    @Override
+    public void drawComponent(TextGUIGraphics graphics, GameplayComponent component) {
+        Renderer.render(graphics);
+    }
+}
+
+

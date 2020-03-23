@@ -1,19 +1,22 @@
+package basicComponents;
+
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
+import renderer.Renderer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class AppLogic {
-    public static String MAIN_MENU_TITLE = "MENU";
-    public static List<MainMenuAction> mainMenuActions;
+    public static final String MAIN_WINDOW_TITLE = "GAME";
+    public static final String MAIN_MENU_TITLE = "MENU";
 
+
+    public static List<MainMenuAction> mainMenuActions;
     private static GameState gameState;
 
     public static void initialize() {
         mainMenuActions = new ArrayList<>(Arrays.asList(
-                MainMenuAction.continueGame,
                 MainMenuAction.newGame,
                 MainMenuAction.exit));
     }
@@ -22,25 +25,11 @@ public abstract class AppLogic {
         assert (gameState == GameState.ON_MAP);
         switch (keyStroke.getKeyType()) {
             case Escape:
-                System.out.println("kek");
                 gameState = GameState.IN_MENU;
                 Controller.drawMainMenu();
                 break;
-            case ArrowUp:
-                Controller.y--;
-                Controller.drawMap();
-                break;
-            case ArrowDown:
-                Controller.y++;
-                Controller.drawMap();
-                break;
-            case ArrowLeft:
-                Controller.x--;
-                Controller.drawMap();
-                break;
-            case ArrowRight:
-                Controller.x++;
-                Controller.drawMap();
+            default:
+                GameplayLogic.handleKeyStroke(keyStroke);
                 break;
         }
     }
@@ -48,15 +37,16 @@ public abstract class AppLogic {
     public static void applyContinueAction() {
         assert (gameState == GameState.IN_MENU);
         gameState = GameState.ON_MAP;
-        Controller.drawMap();
     }
 
     public static void applyNewGameAction() {
         assert (gameState == GameState.IN_MENU);
+        if (!mainMenuActions.contains(MainMenuAction.continueGame)) {
+            mainMenuActions.add(0, MainMenuAction.continueGame);
+        }
         gameState = GameState.ON_MAP;
-        Controller.x = 0;
-        Controller.y = 0;
-        Controller.drawMap();
+        Renderer.reset();
+        GameplayLogic.createMap();
     }
 
     public static void applyExitAction() {
@@ -87,9 +77,12 @@ public abstract class AppLogic {
             return action;
         }
     }
+
+    enum GameState {
+        IN_MENU, ON_MAP, IN_INVENTORY
+    }
+
 }
 
-enum GameState {
-    IN_MENU, ON_MAP, IN_INVENTORY
-}
+
 

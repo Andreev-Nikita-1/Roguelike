@@ -2,7 +2,7 @@ package map.objects;
 
 import map.Coord;
 import map.Damage;
-import basicComponents.MapOfFirmObjects;
+import map.MapOfObjects;
 import map.LogicPixel;
 import map.shapes.Shape;
 
@@ -12,6 +12,7 @@ import java.util.Map;
 
 public abstract class Object {
     protected Coord location;
+    protected Coord size;
     protected Shape shape;
 
     public void init(Coord coord, Shape shape) {
@@ -29,14 +30,14 @@ public abstract class Object {
     }
 
     public void shift(Coord shift) {
-        MapOfFirmObjects.detachObject(this);
+        MapOfObjects.detachObject(this);
         location.shift(shift);
-        MapOfFirmObjects.placeObject(this);
+        MapOfObjects.placeObject(this);
     }
 
     public abstract void act();
 
     public abstract void takeDamage(Damage damage);
 
-    public abstract Map<Coord, LogicPixel> getPixels();
+    public abstract Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown);
 }

@@ -18,9 +18,11 @@ public abstract class StaticObject extends Object {
     }
 
     @Override
-    public Map<Coord, LogicPixel> getPixels() {
+    public Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown) {
         return pixelSet;
     }
+
+    ;
 
 
 }

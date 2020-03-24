@@ -3,7 +3,7 @@ package basicComponents;
 import com.googlecode.lanterna.input.KeyStroke;
 import map.Coord;
 import map.Direction;
-import map.LogicPixel;
+import map.MapOfObjects;
 import map.objects.Background;
 import map.objects.HeroObject;
 import map.objects.Object;
@@ -21,9 +21,9 @@ public abstract class GameplayLogic {
     public static HeroObject heroObject = new HeroObject();
 
 
-    public static void createMap() {
+    public static void createMapLevel1() {
         objects = new ArrayList<>();
-        MapOfFirmObjects.initialize(100, 100);
+        MapOfObjects.initialize(1000, 1000);
         int[][] wallsArray = new int[11][11];
         for (int i = 0; i < 10; i++) {
             Arrays.fill(wallsArray[i], 0);
@@ -43,36 +43,38 @@ public abstract class GameplayLogic {
         wallsArray[5][7] = 1;
         wallsArray[5][8] = 1;
 
-        for (int i = 0; i < MapOfFirmObjects.xSize-11; i += 11) {
-            for (int j = 0; j < MapOfFirmObjects.ySize-11; j += 11) {
-                Walls walls = new Walls(new Coord(i, j), new CustomStaticShape(wallsArray), LogicPixel.DUNGEON_WALL);
+        Background.BackgroundType backgroundType = Background.BackgroundType.DUNGEON;
+
+        for (int i = 0; i < MapOfObjects.xSize - 11; i += 11) {
+            for (int j = 0; j < MapOfObjects.ySize - 11; j += 11) {
+                Walls walls = new Walls(new Coord(i, j), new CustomStaticShape(wallsArray), backgroundType);
                 objects.add(walls);
-                MapOfFirmObjects.placeObject(walls);
+                MapOfObjects.placeObject(walls);
             }
         }
-        Background background = new Background(Background.BackgroundType.DUNGEON);
+        Background background = new Background(backgroundType);
         objects.add(background);
-        MapOfFirmObjects.placeObject(background);
+        MapOfObjects.placeObject(background);
 
         heroObject.init(Coord.ZERO, Shape.SINGLE_PIXEL_SHAPE);
         objects.add(heroObject);
-        MapOfFirmObjects.placeObject(heroObject);
+        MapOfObjects.placeObject(heroObject);
 
         gameplayState = GameplayState.PLAYING;
     }
 
-    public static void handleKeyStroke(KeyStroke keyStroke) {
-        switch (keyStroke.getKeyType()) {
-            case ArrowUp:
+    public static void handleOption(GameplayOption option) {
+        switch (option) {
+            case MOVE_DOWN:
                 heroObject.move(Direction.DOWN);
                 break;
-            case ArrowDown:
+            case MOVE_UP:
                 heroObject.move(Direction.UP);
                 break;
-            case ArrowLeft:
+            case MOVE_LEFT:
                 heroObject.move(Direction.LEFT);
                 break;
-            case ArrowRight:
+            case MOVE_RIGHT:
                 heroObject.move(Direction.RIGHT);
                 break;
         }
@@ -81,6 +83,11 @@ public abstract class GameplayLogic {
 
     public enum GameplayState {
         NOT_STARTED, PLAYING, PAUSED
+    }
+
+    public enum GameplayOption {
+        MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
+        ATTACK_UP, ATTACK_DOWN, ATTACK_LEFT, ATTACK_RIGHT
     }
 
 }

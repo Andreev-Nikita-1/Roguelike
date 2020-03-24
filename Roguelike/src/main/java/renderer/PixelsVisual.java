@@ -3,50 +3,121 @@ package renderer;
 import com.googlecode.lanterna.TextColor;
 import map.LogicPixel;
 
+import static basicComponents.AppLogic.HERO_SYMBOL;
+
 public class PixelsVisual {
-    public static Renderer.PixelData getPixelData(LogicPixel pixel) {
+    public static Renderer.PixelData[] getPixelData(LogicPixel pixel) {
         switch (pixel) {
             case HERO:
-                return new Renderer.PixelData(10, 10, '+', COLOR10, null);
-
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 10, HERO_COLOR, 1, HERO_SYMBOL)
+                };
+            case LIGHT:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, 20, COLOR3, 0.2, ' ')
+                };
+            case DARKNESS_1:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, 20, TextColor.ANSI.BLACK, 0.5, ' ')
+                };
+            case DARKNESS_2:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, 20, TextColor.ANSI.BLACK, 0.9, ' ')
+                };
+            case DARKNESS_FULL:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, 20, TextColor.ANSI.BLACK, 1, ' ')
+                };
             case WATER_WALL:
-                return new Renderer.PixelData(1, 1, '#', COLOR5, COLOR17);
-            case WATER_BACKGROUND_EMPTY:
-                return new Renderer.PixelData(-10, -10, ' ', null, COLOR13);
-            case WATER_BACKGROUND_1:
-                return new Renderer.PixelData(-10, -10, '`', COLOR5, COLOR13);
-            case WATER_BACKGROUND_2:
-                return new Renderer.PixelData(-10, -10, '~', COLOR5, COLOR13);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 1, COLOR17, 1, '#'),
+                        new Renderer.PixelData(false, 0, COLOR5, 1, ' ')
+                };
 
-            case GRASS_WALL:
-                return new Renderer.PixelData(1, 1, 'A', COLOR12, COLOR4);
+            case WATER_BACKGROUND_EMPTY:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, -10, COLOR13, 1, ' ')
+                };
+            case WATER_BACKGROUND_1:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR5, 1, '`'),
+                        new Renderer.PixelData(false, -10, COLOR13, 1, ' ')
+                };
+            case WATER_BACKGROUND_2:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR5, 1, '~'),
+                        new Renderer.PixelData(false, -10, COLOR13, 1, ' ')
+                };
+
+            case GRASS_WALL_1:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 1, COLOR18, 1, '^'),
+                        new Renderer.PixelData(false, 0, COLOR4, 1, ' ')
+                };
+            case GRASS_WALL_2:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 1, COLOR11, 1, 'A'),
+                        new Renderer.PixelData(false, 0, COLOR4, 1, ' ')
+                };
             case GRASS_BACKGROUND_EMPTY:
-                return new Renderer.PixelData(-10, -10, '`', null, COLOR4);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, -10, COLOR4, 1, ' ')
+                };
             case GRASS_BACKGROUND_1:
-                return new Renderer.PixelData(-10, -10, '\"', TextColor.ANSI.GREEN, COLOR4);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, TextColor.ANSI.GREEN, 1, '`'),
+                        new Renderer.PixelData(false, -10, COLOR4, 1, ' ')
+                };
             case GRASS_BACKGROUND_2:
-                return new Renderer.PixelData(-10, -10, '`', TextColor.ANSI.GREEN, COLOR4);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, TextColor.ANSI.GREEN, 1, '\"'),
+                        new Renderer.PixelData(false, -10, COLOR4, 1, ' ')
+                };
 
             case SAND_WALL:
-                return new Renderer.PixelData(1, 1, '#', COLOR6, COLOR3);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 1, COLOR6, 1, '#'),
+                        new Renderer.PixelData(false, 0, COLOR3, 1, ' ')
+                };
             case SAND_BACKGROUND_EMPTY:
-                return new Renderer.PixelData(-10, -10, 'N', null, COLOR2);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, -10, COLOR2, 1, ' ')
+                };
             case SAND_BACKGROUND_1:
-                return new Renderer.PixelData(-10, -10, ',', COLOR12, COLOR2);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR12, 1, ','),
+                        new Renderer.PixelData(false, -10, COLOR2, 1, ' ')
+                };
             case SAND_BACKGROUND_2:
-                return new Renderer.PixelData(-10, -10, '+', COLOR12, COLOR2);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR12, 1, '+'),
+                        new Renderer.PixelData(false, -10, COLOR2, 1, ' ')
+                };
             case SAND_BACKGROUND_3:
-                return new Renderer.PixelData(-10, -10, 'N', COLOR3, COLOR2);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR3, 1, 'N'),
+                        new Renderer.PixelData(false, -10, COLOR2, 1, ' ')
+                };
 
             case DUNGEON_WALL:
-                return new Renderer.PixelData(1, 1, '*', TextColor.ANSI.RED, COLOR15);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 1, TextColor.ANSI.RED, 1, '*'),
+                        new Renderer.PixelData(false, 0, COLOR15, 1, ' ')
+                };
             case DUNGEON_BACKGROUND_EMPTY:
-                return new Renderer.PixelData(-10, -10, '`', null, COLOR14);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, -10, COLOR14, 1, ' ')
+                };
             case DUNGEON_BACKGROUND_1:
-                return new Renderer.PixelData(-10, -10, '-', COLOR15, COLOR14);
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR15, 1, '-'),
+                        new Renderer.PixelData(false, -10, COLOR14, 1, ' ')
+                };
             case DUNGEON_BACKGROUND_2:
-                return new Renderer.PixelData(-10, -10, '=', COLOR15, COLOR14);
-
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, -9, COLOR15, 1, '='),
+                        new Renderer.PixelData(false, -10, COLOR14, 1, ' ')
+                };
             default:
                 return null;
         }
@@ -69,4 +140,8 @@ public class PixelsVisual {
     static TextColor COLOR15 = new TextColor.RGB(204, 51, 0);
     static TextColor COLOR16 = new TextColor.RGB(0, 153, 255);
     static TextColor COLOR17 = new TextColor.RGB(255, 255, 255);
+    static TextColor COLOR18 = new TextColor.RGB(0, 100, 0);
+
+
+    static TextColor HERO_COLOR = COLOR7;
 }

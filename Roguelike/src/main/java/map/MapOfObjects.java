@@ -1,11 +1,11 @@
-package basicComponents;
+package map;
 
 import map.Coord;
 import map.objects.Object;
 
 import java.util.List;
 
-public abstract class MapOfFirmObjects {
+public abstract class MapOfObjects {
     public static int xSize;
     public static int ySize;
     private static Object[][] mapObjects;

@@ -7,11 +7,23 @@ import map.LogicPixel;
 import java.util.HashMap;
 
 public class Walls extends StaticObject {
-    public Walls(Coord coord, Shape shape, LogicPixel pixel) {
+    public Walls(Coord coord, Shape shape, Background.BackgroundType type) {
         init(coord, shape);
         pixelSet = new HashMap<>();
+        double[] weights = new double[0];
+        LogicPixel[] options = new LogicPixel[0];
+        switch (type) {
+            case GRASS:
+                weights = new double[]{0.5, 0.5};
+                options = new LogicPixel[]{LogicPixel.GRASS_WALL_1, LogicPixel.GRASS_WALL_2};
+                break;
+            case DUNGEON:
+                weights = new double[]{1};
+                options = new LogicPixel[]{LogicPixel.DUNGEON_WALL};
+                break;
+        }
         for (Coord c : getCoords()) {
-            pixelSet.put(c, pixel);
+            pixelSet.put(c, LogicPixel.generatePixel(weights, options));
         }
     }
 }

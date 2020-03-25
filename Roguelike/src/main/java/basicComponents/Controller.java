@@ -7,13 +7,11 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import renderer.Renderer;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -36,11 +34,10 @@ public abstract class Controller {
     }
 
     public static void initialize() throws IOException {
-        terminal = new SwingTerminalFrame("GAME",
-                new TerminalSize(100, 35),
+        terminal = new SwingTerminalFrame(AppLogic.MAIN_WINDOW_TITLE,
+                new TerminalSize(100, 30),
                 null, null, null,
                 TerminalEmulatorAutoCloseTrigger.CloseOnExitPrivateMode);
-
         TerminalScreen screen = new TerminalScreen(terminal);
         screen.setCursorPosition(null);
         gui = new MultiWindowTextGUI(screen, TextColor.ANSI.BLACK);
@@ -64,7 +61,7 @@ public abstract class Controller {
                 gui.processInput();
             }
         } catch (IOException | InterruptedException e) {
-
+            System.exit(0);
         }
     }
 
@@ -85,7 +82,7 @@ public abstract class Controller {
             builder.addAction(action.getName(), action.getAction());
         }
         DialogWindow dialog = builder.build();
-        dialog.setHints(Arrays.asList(Window.Hint.CENTERED));
+        dialog.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING));
         gui.addWindow(dialog);
     }
 

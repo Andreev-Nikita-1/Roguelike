@@ -13,21 +13,24 @@ import map.objects.StaticObject;
 
 import java.util.*;
 
+import static renderer.PixelsVisual.COLOR3;
+import static renderer.PixelsVisual.COLOR4;
+
 
 public class Renderer {
 
     private static PixelStack[][] pixelStacks;
-    private static boolean pixelStacksInitialized = false;
     private static TerminalCoord terminalCoord = new TerminalCoord();
 
-    public static void reset() {
-        pixelStacksInitialized = false;
-    }
+    public static double percent = 0;
 
     public static void render(TextGUIGraphics graphics) {
         switch (GameplayLogic.gameplayState) {
             case NOT_STARTED:
                 drawStartPicture(graphics);
+                break;
+            case MAP_GENERATING:
+                drawLoading(graphics, percent);
                 break;
             case PAUSED:
             case PLAYING:
@@ -37,11 +40,6 @@ public class Renderer {
     }
 
     private static void drawMap(TextGUIGraphics graphics) {
-
-        if (!pixelStacksInitialized) {
-            pixelStacksInitialize();
-        }
-
         int xSize = Math.min(Controller.getTerminalSizeX(), MapOfObjects.xSize);
         int ySize = Math.min(Controller.getTerminalSizeY(), MapOfObjects.ySize);
         Coord leftUp = terminalCoord.getLeftUp(xSize, ySize, new Coord(GameplayLogic.heroObject.getLocation()));
@@ -59,14 +57,25 @@ public class Renderer {
         }
     }
 
+    public static void fit() {
+        pixelStacksInitialize();
+        terminalCoord.setFrame(Math.min(Controller.getTerminalSizeX(), MapOfObjects.xSize),
+                Math.min(Controller.getTerminalSizeY(), MapOfObjects.ySize),
+                new Coord(GameplayLogic.heroObject.getLocation()));
+    }
+
     private static void pixelStacksInitialize() {
         pixelStacks = new PixelStack[MapOfObjects.xSize][MapOfObjects.ySize];
         for (int i = 0; i < MapOfObjects.xSize; i++) {
             for (int j = 0; j < MapOfObjects.ySize; j++) {
+                Renderer.percent = 0.6 + ((double) i * MapOfObjects.ySize + j) / (MapOfObjects.xSize * MapOfObjects.ySize) / 5;
                 pixelStacks[i][j] = new PixelStack();
             }
         }
-        for (Object object : GameplayLogic.objects) {
+
+        for (int i = 0; i < GameplayLogic.objects.size(); i++) {
+            Object object = GameplayLogic.objects.get(i);
+            Renderer.percent = 0.8 + (double) i / GameplayLogic.objects.size() / 5;
             if (object instanceof StaticObject) {
                 Map<Coord, LogicPixel> mappingPixels = object.getPixels(Coord.ZERO, new Coord(MapOfObjects.xSize, MapOfObjects.ySize));
                 for (Coord c : mappingPixels.keySet()) {
@@ -77,7 +86,11 @@ public class Renderer {
                 }
             }
         }
-        pixelStacksInitialized = true;
+        for (int i = 0; i < MapOfObjects.xSize; i++) {
+            for (int j = 0; j < MapOfObjects.ySize; j++) {
+                pixelStacks[i][j].fitStaticPixel();
+            }
+        }
     }
 
     private static void mergePixelsInsideFrame(int xSize, int ySize, int xLeftUp, int yLeftUp) {
@@ -105,14 +118,42 @@ public class Renderer {
     private static void drawStartPicture(TextGUIGraphics graphics) {
         for (int i = 0; i < Controller.getTerminalSizeX(); i++) {
             for (int j = 0; j < Controller.getTerminalSizeY(); j++) {
-                TextColor color1 = TextColor.ANSI.BLUE;
-                TextColor color2 = TextColor.ANSI.CYAN;
+                TextColor color1 = COLOR4;
+                TextColor color2 = COLOR3;
                 if ((i + j) % 2 == 0) {
                     color1 = color2;
                 }
                 graphics.setCharacter(i, j, new TextCharacter('#', color1, color2));
             }
         }
+    }
+
+    private static void drawLoading(TextGUIGraphics graphics, double percent) {
+        graphics.setBackgroundColor(TextColor.ANSI.BLACK);
+        graphics.fill(' ');
+        int xSize = Controller.getTerminalSizeX();
+        int ySize = Controller.getTerminalSizeY();
+        int percentInt = (int) (percent * 100 + 1);
+        String text = "CREATING MAP " + String.valueOf(percentInt) + "%";
+        if (percentInt <= 50) {
+            graphics.setBackgroundColor(new TextColor.RGB(0, 0, 0));
+            graphics.setForegroundColor(new TextColor.RGB(255, 255, 255));
+            int ind = (int) (percent * 32) + 1;
+            graphics.putString((int) (xSize / 2) - 8, (int) (ySize / 2), text.substring(0, ind));
+            graphics.setBackgroundColor(new TextColor.RGB(255, 255, 255));
+            graphics.setForegroundColor(new TextColor.RGB(0, 0, 0));
+            graphics.putString((int) (xSize / 2) - 8 + ind, (int) (ySize / 2), text.substring(ind));
+        } else if (percentInt <= 99) {
+            graphics.setBackgroundColor(new TextColor.RGB(0, 0, 0));
+            graphics.setForegroundColor(new TextColor.RGB(255, 255, 255));
+            int ind = (int) ((percent - 0.5) * 24);
+            graphics.putString((int) (xSize / 2) - 8 + ind, (int) (ySize / 2), text.substring(ind));
+        } else {
+            graphics.setBackgroundColor(new TextColor.RGB(0, 0, 0));
+            graphics.setForegroundColor(new TextColor.RGB(255, 255, 255));
+            graphics.putString((int) (xSize / 2) + 4, (int) (ySize / 2), "100%");
+        }
+
     }
 
     private static class TerminalCoord {
@@ -172,7 +213,7 @@ public class Renderer {
             heroPred = heroNew;
         }
 
-        private void setFrame(int newXSize, int newYSize, Coord heroLocation) {
+        public void setFrame(int newXSize, int newYSize, Coord heroLocation) {
             size = new Coord(newXSize, newYSize);
             treshold = new Coord((int) (trasholdCoeff * newXSize), (int) (trasholdCoeff * newYSize));
             heroPred = heroLocation;
@@ -216,10 +257,11 @@ public class Renderer {
             currentStack = new ArrayList<>(staticObjectsStack);
         }
 
+        public void fitStaticPixel() {
+            staticPixel = overlay(staticObjectsStack);
+        }
+
         public Pixel getPixel() {
-            if (staticPixel == null) {
-                staticPixel = overlay(staticObjectsStack);
-            }
             if (!changed) {
                 return staticPixel;
             } else {

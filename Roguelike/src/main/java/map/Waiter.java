@@ -3,7 +3,7 @@ package map;
 public class Waiter implements Runnable {
 
     public boolean ready = true;
-    public int delay;
+    private int delay;
 
     public Waiter(int delay) {
         this.delay = delay;

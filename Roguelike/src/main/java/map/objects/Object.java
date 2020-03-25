@@ -2,7 +2,6 @@ package map.objects;
 
 import basicComponents.GameplayLogic;
 import map.Coord;
-import map.Damage;
 import map.MapOfObjects;
 import map.LogicPixel;
 import map.shapes.Shape;
@@ -20,7 +19,9 @@ public abstract class Object {
     public void init(Coord coord, Shape shape) {
         location = new Coord(coord);
         this.shape = shape;
-        MapOfObjects.placeObject(this);
+        synchronized (mapLock) {
+            MapOfObjects.placeObject(this);
+        }
         GameplayLogic.objects.add(this);
     }
 
@@ -34,9 +35,11 @@ public abstract class Object {
     }
 
     public void shift(Coord shift) {
-        MapOfObjects.detachObject(this);
-        location.shift(shift);
-        MapOfObjects.placeObject(this);
+        synchronized (mapLock) {
+            MapOfObjects.detachObject(this);
+            location.shift(shift);
+            MapOfObjects.placeObject(this);
+        }
     }
 
     public void delete() {

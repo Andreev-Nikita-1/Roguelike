@@ -2,13 +2,13 @@ package basicComponents;
 
 import map.Coord;
 import map.Direction;
+import map.MapGenerator;
 import map.MapOfObjects;
 import map.objects.*;
 import map.objects.Object;
 import map.shapes.CustomStaticShape;
+import renderer.Renderer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,44 +17,32 @@ public abstract class GameplayLogic {
     public static List<Object> objects = new CopyOnWriteArrayList<>();
     public static HeroObject heroObject;
 
+    private static int xSize = 2000;
+    private static int ySize = 1000;
+
     public static String pauseLock = "PAUSE LOCK";
 
     public static void createMapLevel1() {
-
         objects = new CopyOnWriteArrayList<>();
-        MapOfObjects.initialize(500, 200);
-        int[][] wallsArray = new int[11][7];
-        for (int i = 0; i < 10; i++) {
-            Arrays.fill(wallsArray[i], 0);
-        }
+        gameplayState = GameplayState.MAP_GENERATING;
+        MapGenerator.forestGenerate(xSize, ySize);
+        Renderer.fit();
+        gameplayState = GameplayState.PLAYING;
+    }
 
-        wallsArray[5][4] = 1;
-        wallsArray[4][4] = 1;
-        wallsArray[3][4] = 1;
-        wallsArray[2][4] = 1;
-        wallsArray[6][4] = 1;
-        wallsArray[7][4] = 1;
-        wallsArray[8][4] = 1;
-        wallsArray[5][4] = 1;
-        wallsArray[5][3] = 1;
-        wallsArray[5][2] = 1;
-        wallsArray[5][5] = 1;
-        wallsArray[5][6] = 1;
+    public static void createMapLevel2() {
+        objects = new CopyOnWriteArrayList<>();
+        gameplayState = GameplayState.MAP_GENERATING;
+        MapGenerator.desertGenerate(xSize, ySize);
+        Renderer.fit();
+        gameplayState = GameplayState.PLAYING;
+    }
 
-        Background.BackgroundType backgroundType = Background.BackgroundType.DUNGEON;
-
-        for (int i = 0; i < MapOfObjects.xSize - 11; i += 11) {
-            for (int j = 0; j < MapOfObjects.ySize - 7; j += 7) {
-                Walls walls = new Walls(new Coord(i, j), new CustomStaticShape(wallsArray), backgroundType);
-//                if ((i / 11) %  == 2 && (j / 11) % 3 == 2) {
-                Swordsman swordsman1 = new Swordsman(i, j);
-//                }
-            }
-        }
-        Background background = new Background(backgroundType);
-        heroObject = new HeroObject(14, 14, 45);
-
-
+    public static void createMapLevel3() {
+        objects = new CopyOnWriteArrayList<>();
+        gameplayState = GameplayState.MAP_GENERATING;
+        MapGenerator.dungeonGenerate(xSize, ySize);
+        Renderer.fit();
         gameplayState = GameplayState.PLAYING;
     }
 
@@ -88,7 +76,7 @@ public abstract class GameplayLogic {
     }
 
     public enum GameplayState {
-        NOT_STARTED, PLAYING, PAUSED
+        NOT_STARTED, MAP_GENERATING, PLAYING, PAUSED
     }
 
     public enum GameplayOption {

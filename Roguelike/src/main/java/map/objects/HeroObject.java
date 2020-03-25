@@ -1,11 +1,12 @@
 package map.objects;
 
 import basicComponents.GameplayLogic;
-import hero.HeroLogic;
 import map.*;
 import map.shapes.Shape;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static map.MapOfObjects.mapLock;
@@ -18,15 +19,16 @@ public class HeroObject extends Creature {
     private Waiter waiterRunY;
     private Waiter waiterAttack;
     private Coord attackingCoord;
+    public List<DependingObject> dependingObjects = new ArrayList<>();
 
-    public HeroObject(int x, int y, int speedDelay) {
-        init(new Coord(x, y), Shape.SINGLE_PIXEL_SHAPE);
+    public HeroObject(Coord coord, int speedDelay) {
+        init(coord, Shape.SINGLE_PIXEL_SHAPE);
         this.speedDelay = speedDelay;
         waiterWalkX = new Waiter(speedDelay);
         waiterWalkY = new Waiter((int) ((double) speedDelay * 4 / 3));
         waiterRunX = new Waiter((int) ((double) speedDelay / 2.5));
         waiterRunY = new Waiter((int) ((double) speedDelay * 4 / 7));
-        waiterAttack = new Waiter(15);
+        waiterAttack = new Waiter(25);
         new Thread(waiterWalkX).start();
         new Thread(waiterWalkY).start();
         new Thread(waiterRunX).start();
@@ -83,33 +85,19 @@ public class HeroObject extends Creature {
             waiter.ready = false;
             waiter.notify();
         }
+        for (DependingObject o : dependingObjects) {
+            o.update();
+        }
     }
 
     @Override
     public void takeDamage(Damage damage) {
-        HeroLogic.takeDamage(damage);
     }
 
     @Override
     public Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown) {
         Map<Coord, LogicPixel> map = new HashMap<>();
         map.put(location, LogicPixel.HERO);
-
-        for (int i = leftUp.x; i < rightDown.x; i++) {
-            for (int j = leftUp.y; j < rightDown.y; j++) {
-                int d = (int) (Math.pow((location.x - i), 2) + Math.pow(2 * (location.y - j), 2));
-
-                if (d > 300) {
-                    map.put(new Coord(i, j), LogicPixel.DARKNESS_FULL);
-                } else if (d > 150) {
-                    map.put(new Coord(i, j), LogicPixel.DARKNESS_3);
-                } else if (d > 75) {
-                    map.put(new Coord(i, j), LogicPixel.DARKNESS_2);
-                } else if (d > 15) {
-                    map.put(new Coord(i, j), LogicPixel.DARKNESS_1);
-                }
-            }
-        }
         if (!waiterAttack.ready) {
             map.put(attackingCoord, LogicPixel.ATTACK);
         }
@@ -131,7 +119,6 @@ public class HeroObject extends Creature {
                 waiterAttack.ready = false;
                 waiterAttack.notify();
             }
-
         }
     }
 

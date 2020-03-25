@@ -1,10 +1,8 @@
 package map;
 
-import map.Coord;
 import map.objects.Object;
 
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
 public abstract class MapOfObjects {
     public static int xSize;
@@ -22,7 +20,7 @@ public abstract class MapOfObjects {
         List<Coord> objectCoords = object.getCoords();
         for (Coord c : objectCoords) {
             if (mapObjects[c.x][c.y] != null) {
-
+                System.out.println("place is taken by another object: " + mapObjects[c.x][c.y].getClass().getName());
             }
         }
         for (Coord c : objectCoords) {
@@ -34,7 +32,7 @@ public abstract class MapOfObjects {
         List<Coord> objectCoords = object.getCoords();
         for (Coord c : objectCoords) {
             if (mapObjects[c.x][c.y] != object) {
-
+                System.out.println("this object is not here anymore: " + object.getClass().getName());
             }
         }
         for (Coord c : objectCoords) {

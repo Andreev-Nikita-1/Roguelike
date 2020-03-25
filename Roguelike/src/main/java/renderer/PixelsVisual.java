@@ -10,7 +10,7 @@ public class PixelsVisual {
     public static TextColor COLOR1 = new TextColor.RGB(0, 0, 102);
     public static TextColor COLOR2 = new TextColor.RGB(255, 255, 204);
     public static TextColor COLOR3 = new TextColor.RGB(255, 255, 153);
-    public static TextColor COLOR4 = new TextColor.RGB(204, 255, 153);
+    public static TextColor COLOR4 = new TextColor.RGB(225, 255, 175);
     public static TextColor COLOR5 = new TextColor.RGB(204, 255, 204);
     public static TextColor COLOR6 = new TextColor.RGB(102, 51, 0);
     public static TextColor COLOR7 = new TextColor.RGB(204, 153, 0);

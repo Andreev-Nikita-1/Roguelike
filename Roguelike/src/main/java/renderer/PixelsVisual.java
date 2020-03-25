@@ -12,6 +12,14 @@ public class PixelsVisual {
                 return new Renderer.PixelData[]{
                         new Renderer.PixelData(true, 10, HERO_COLOR, 1, HERO_SYMBOL)
                 };
+            case SWORDSMAN:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(true, 10, COLOR2, 1, '@')
+                };
+            case ATTACK:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, 20, TextColor.ANSI.RED, 0.3, ' ')
+                };
             case LIGHT:
                 return new Renderer.PixelData[]{
                         new Renderer.PixelData(false, 20, COLOR3, 0.2, ' ')
@@ -21,6 +29,10 @@ public class PixelsVisual {
                         new Renderer.PixelData(false, 20, TextColor.ANSI.BLACK, 0.5, ' ')
                 };
             case DARKNESS_2:
+                return new Renderer.PixelData[]{
+                        new Renderer.PixelData(false, 20, TextColor.ANSI.BLACK, 0.7, ' ')
+                };
+            case DARKNESS_3:
                 return new Renderer.PixelData[]{
                         new Renderer.PixelData(false, 20, TextColor.ANSI.BLACK, 0.9, ' ')
                 };

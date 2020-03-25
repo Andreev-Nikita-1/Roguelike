@@ -18,6 +18,7 @@ public class Renderer {
 
     private static PixelStack[][] pixelStacks;
     private static boolean pixelStacksInitialized = false;
+    private static TerminalCoord terminalCoord = new TerminalCoord();
 
     public static void reset() {
         pixelStacksInitialized = false;
@@ -43,8 +44,9 @@ public class Renderer {
 
         int xSize = Math.min(Controller.getTerminalSizeX(), MapOfObjects.xSize);
         int ySize = Math.min(Controller.getTerminalSizeY(), MapOfObjects.ySize);
-        int xLeftUp = getFrame(GameplayLogic.heroObject.getLocation().x, xSize, MapOfObjects.xSize);
-        int yLeftUp = getFrame(GameplayLogic.heroObject.getLocation().y, ySize, MapOfObjects.ySize);
+        Coord leftUp = terminalCoord.getLeftUp(xSize, ySize, new Coord(GameplayLogic.heroObject.getLocation()));
+        int xLeftUp = leftUp.x;
+        int yLeftUp = leftUp.y;
 
         mergePixelsInsideFrame(xSize, ySize, xLeftUp, yLeftUp);
 
@@ -55,18 +57,6 @@ public class Renderer {
                         pixel.symbolColor, pixel.backgroundColor));
             }
         }
-    }
-
-    private static int getFrame(int location, int size, int maxSize) {
-        int a = size / 2;
-        int b = size - a;
-        if (location - a < 0) {
-            return 0;
-        }
-        if (location + b >= maxSize) {
-            return maxSize - size;
-        }
-        return location - a;
     }
 
     private static void pixelStacksInitialize() {
@@ -125,6 +115,86 @@ public class Renderer {
         }
     }
 
+    private static class TerminalCoord {
+
+        private Coord coord = new Coord(Coord.ZERO);
+        private Coord size = new Coord(Coord.ZERO);
+        private Coord heroRelative = new Coord(Coord.ZERO);
+        private Coord treshold = new Coord(Coord.ZERO);
+        private Coord heroPred = new Coord(Coord.ZERO);
+        private double trasholdCoeff = 0.4;
+
+        public Coord getLeftUp(int newXSize, int newYSize, Coord heroLocation) {
+            if (size.x != newXSize || size.y != newYSize) {
+                setFrame(newXSize, newYSize, heroLocation);
+            } else {
+                update(heroLocation);
+            }
+            return coord;
+        }
+
+        private void update(Coord heroNew) {
+            Coord diff = new Coord(heroNew.x - heroPred.x, heroNew.y - heroPred.y);
+            if (diff.x == 0 && diff.y == 0) {
+                return;
+            }
+            Coord heroRelativeNew = heroRelative.shifted(diff);
+            if (heroRelativeNew.x >= treshold.x &&
+                    heroRelativeNew.x <= size.x - treshold.x ||
+                    heroRelativeNew.x < treshold.x && coord.x == 0 ||
+                    heroRelativeNew.x > size.x - treshold.x && size.x + coord.x == MapOfObjects.xSize
+            ) {
+                heroRelative.x = heroRelativeNew.x;
+            } else {
+                coord.x += diff.x;
+                if (coord.x < 0) {
+                    coord.x = 0;
+                }
+                if (coord.x + size.x > MapOfObjects.xSize) {
+                    coord.x = MapOfObjects.xSize - size.x;
+                }
+            }
+            if (heroRelativeNew.y >= treshold.y &&
+                    heroRelativeNew.y <= size.y - treshold.y ||
+                    heroRelativeNew.y < treshold.y && coord.y == 0 ||
+                    heroRelativeNew.y > size.y - treshold.y && size.y + coord.y == MapOfObjects.ySize
+            ) {
+                heroRelative.y = heroRelativeNew.y;
+            } else {
+                coord.y += diff.y;
+                if (coord.y < 0) {
+                    coord.y = 0;
+                }
+                if (coord.y + size.y > MapOfObjects.ySize) {
+                    coord.y = MapOfObjects.ySize - size.y;
+                }
+            }
+            heroPred = heroNew;
+        }
+
+        private void setFrame(int newXSize, int newYSize, Coord heroLocation) {
+            size = new Coord(newXSize, newYSize);
+            treshold = new Coord((int) (trasholdCoeff * newXSize), (int) (trasholdCoeff * newYSize));
+            heroPred = heroLocation;
+            int x = centralOneDimFrame(newXSize, MapOfObjects.xSize, heroLocation.x);
+            int y = centralOneDimFrame(newYSize, MapOfObjects.ySize, heroLocation.y);
+            coord = new Coord(x, y);
+            heroRelative = new Coord(heroLocation.x - x, heroLocation.y - y);
+        }
+
+        private static int centralOneDimFrame(int size, int maxSize, int location) {
+            int a = size / 2;
+            int b = size - a;
+            if (location - a < 0) {
+                return 0;
+            }
+            if (location + b >= maxSize) {
+                return maxSize - size;
+            }
+            return location - a;
+        }
+    }
+
     private static class PixelStack {
 
         private List<PixelData> staticObjectsStack = new ArrayList<>();
@@ -157,7 +227,7 @@ public class Renderer {
             }
         }
 
-        public static Pixel overlay(List<PixelData> stack) {
+        private static Pixel overlay(List<PixelData> stack) {
             double r1 = 0, g1 = 0, b1 = 0;
             double r2 = 0, g2 = 0, b2 = 0;
             double k1 = 1;
@@ -190,7 +260,6 @@ public class Renderer {
             TextColor backgroundColor = new TextColor.RGB((int) r2, (int) g2, (int) b2);
             return new Pixel(symbol, symbolColor, backgroundColor);
         }
-
     }
 
     static class Pixel {

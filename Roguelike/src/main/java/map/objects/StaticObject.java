@@ -10,19 +10,7 @@ public abstract class StaticObject extends Object {
     protected Map<Coord, LogicPixel> pixelSet;
 
     @Override
-    public void act() {
-    }
-
-    @Override
-    public void takeDamage(Damage damage) {
-    }
-
-    @Override
     public Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown) {
         return pixelSet;
     }
-
-    ;
-
-
 }

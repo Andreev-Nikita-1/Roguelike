@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -12,6 +13,7 @@ import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import renderer.Renderer;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +37,7 @@ public abstract class Controller {
 
     public static void initialize() throws IOException {
         terminal = new SwingTerminalFrame("GAME",
-                new TerminalSize(60, 30),
+                new TerminalSize(100, 35),
                 null, null, null,
                 TerminalEmulatorAutoCloseTrigger.CloseOnExitPrivateMode);
 
@@ -51,17 +53,25 @@ public abstract class Controller {
 
     public static void run() {
         try {
+            terminal.setLocationByPlatform(true);
             terminal.setVisible(true);
             gui.getScreen().startScreen();
             mainWindow.setComponent(component);
             drawMenu(AppLogic.mainMenuActions);
-
             while (true) {
                 sleep(10);
                 gui.updateScreen();
                 gui.processInput();
             }
         } catch (IOException | InterruptedException e) {
+
+        }
+    }
+
+    public static void draw() {
+        try {
+            gui.updateScreen();
+        } catch (IOException e) {
 
         }
     }
@@ -115,38 +125,3 @@ class MapRenderer implements InteractableRenderer<GameplayComponent> {
 }
 
 
-class CharInputComponent extends AbstractInteractableComponent<CharInputComponent> {
-
-    @Override
-    protected InteractableRenderer<CharInputComponent> createDefaultRenderer() {
-        return new MyRenderer();
-    }
-
-    @Override
-    protected Result handleKeyStroke(KeyStroke keyStroke) {
-        if (!(keyStroke.getKeyType() == KeyType.Escape)) {
-            char hero = keyStroke.getCharacter();
-            AppLogic.HERO_SYMBOL = hero;
-            Controller.drawMenu(AppLogic.optionsActions);
-        }
-        return Result.HANDLED;
-    }
-
-    private class MyRenderer implements InteractableRenderer<CharInputComponent> {
-
-        @Override
-        public TerminalPosition getCursorLocation(CharInputComponent component) {
-            return null;
-        }
-
-        @Override
-        public TerminalSize getPreferredSize(CharInputComponent component) {
-            return null;
-        }
-
-        @Override
-        public void drawComponent(TextGUIGraphics graphics, CharInputComponent component) {
-
-        }
-    }
-}

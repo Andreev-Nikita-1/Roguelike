@@ -12,16 +12,16 @@ public class Background extends StaticObject {
     public static LogicPixel generate(BackgroundType type) {
         switch (type) {
             case SAND:
-                return LogicPixel.generatePixel(new double[]{0.6, 0.01, 0.01, 0.38}, new LogicPixel[]{
+                return LogicPixel.generate(new double[]{0.6, 0.01, 0.01, 0.38}, new LogicPixel[]{
                         LogicPixel.SAND_BACKGROUND_EMPTY, LogicPixel.SAND_BACKGROUND_1, LogicPixel.SAND_BACKGROUND_2, LogicPixel.SAND_BACKGROUND_3});
             case GRASS:
-                return LogicPixel.generatePixel(new double[]{0.6, 0.2, 0.2}, new LogicPixel[]{
+                return LogicPixel.generate(new double[]{0.6, 0.2, 0.2}, new LogicPixel[]{
                         LogicPixel.GRASS_BACKGROUND_EMPTY, LogicPixel.GRASS_BACKGROUND_1, LogicPixel.GRASS_BACKGROUND_2});
             case WATER:
-                return LogicPixel.generatePixel(new double[]{0.6, 0.2, 0.2}, new LogicPixel[]{
+                return LogicPixel.generate(new double[]{0.6, 0.2, 0.2}, new LogicPixel[]{
                         LogicPixel.WATER_BACKGROUND_EMPTY, LogicPixel.WATER_BACKGROUND_1, LogicPixel.WATER_BACKGROUND_2});
             case DUNGEON:
-                return LogicPixel.generatePixel(new double[]{0.6, 0.2, 0.2}, new LogicPixel[]{
+                return LogicPixel.generate(new double[]{0.6, 0.2, 0.2}, new LogicPixel[]{
                         LogicPixel.DUNGEON_BACKGROUND_EMPTY, LogicPixel.DUNGEON_BACKGROUND_1, LogicPixel.DUNGEON_BACKGROUND_2});
         }
         return null;

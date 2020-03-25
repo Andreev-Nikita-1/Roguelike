@@ -3,7 +3,7 @@ package map;
 public class Damage {
     public int value;
 
-    Damage(int value) {
+    public Damage(int value) {
         this.value = value;
     }
 

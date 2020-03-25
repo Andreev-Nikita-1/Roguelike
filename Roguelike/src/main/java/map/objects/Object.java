@@ -1,5 +1,6 @@
 package map.objects;
 
+import basicComponents.GameplayLogic;
 import map.Coord;
 import map.Damage;
 import map.MapOfObjects;
@@ -10,14 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static map.MapOfObjects.mapLock;
+
 public abstract class Object {
     protected Coord location;
-    protected Coord size;
     protected Shape shape;
 
     public void init(Coord coord, Shape shape) {
         location = new Coord(coord);
         this.shape = shape;
+        MapOfObjects.placeObject(this);
+        GameplayLogic.objects.add(this);
     }
 
     public List<Coord> getCoords() {
@@ -35,9 +39,12 @@ public abstract class Object {
         MapOfObjects.placeObject(this);
     }
 
-    public abstract void act();
-
-    public abstract void takeDamage(Damage damage);
+    public void delete() {
+        synchronized (mapLock) {
+            MapOfObjects.detachObject(this);
+            GameplayLogic.objects.remove(this);
+        }
+    }
 
     public abstract Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown);
 }

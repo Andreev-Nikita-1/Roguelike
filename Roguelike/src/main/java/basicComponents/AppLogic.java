@@ -1,6 +1,9 @@
 package basicComponents;
 
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
+import map.objects.DynamicObject;
+import map.objects.Swordsman;
 import renderer.Renderer;
 
 import java.util.ArrayList;
@@ -34,11 +37,13 @@ public abstract class AppLogic {
         assert (gameState == GameState.ON_MAP);
         switch (keyStroke.getKeyType()) {
             case Escape:
+                pause();
                 gameState = GameState.MAIN_MENU;
                 Controller.drawMenu(AppLogic.mainMenuActions);
                 break;
             default:
-                GameplayLogic.handleOption(getGameplayOption(keyStroke));
+                GameplayLogic.GameplayOption option = getGameplayOption(keyStroke);
+                if (option != null) GameplayLogic.handleOption(option);
                 break;
         }
     }
@@ -50,23 +55,42 @@ public abstract class AppLogic {
         switch (keyStroke.getKeyType()) {
             case ArrowUp:
                 if (alt) return GameplayLogic.GameplayOption.ATTACK_DOWN;
-                else return GameplayLogic.GameplayOption.MOVE_DOWN;
+                if (shift) return GameplayLogic.GameplayOption.RUN_DOWN;
+                else return GameplayLogic.GameplayOption.WALK_DOWN;
             case ArrowDown:
                 if (alt) return GameplayLogic.GameplayOption.ATTACK_UP;
-                else return GameplayLogic.GameplayOption.MOVE_UP;
+                if (shift) return GameplayLogic.GameplayOption.RUN_UP;
+                else return GameplayLogic.GameplayOption.WALK_UP;
             case ArrowLeft:
                 if (alt) return GameplayLogic.GameplayOption.ATTACK_LEFT;
-                else return GameplayLogic.GameplayOption.MOVE_LEFT;
+                if (shift) return GameplayLogic.GameplayOption.RUN_LEFT;
+                else return GameplayLogic.GameplayOption.WALK_LEFT;
             case ArrowRight:
                 if (alt) return GameplayLogic.GameplayOption.ATTACK_RIGHT;
-                else return GameplayLogic.GameplayOption.MOVE_RIGHT;
+                if (shift) return GameplayLogic.GameplayOption.RUN_RIGHT;
+                else return GameplayLogic.GameplayOption.WALK_RIGHT;
             default:
                 return null;
         }
     }
 
+    public static void pause() {
+        for (Object o : GameplayLogic.objects) {
+            if (o instanceof DynamicObject) {
+                ((DynamicObject) o).pause();
+            }
+        }
+    }
+
+    public static void unpause() {
+        synchronized (GameplayLogic.pauseLock) {
+            GameplayLogic.pauseLock.notifyAll();
+        }
+    }
+
     public static void applyContinueAction() {
         assert (gameState == GameState.MAIN_MENU);
+        unpause();
         gameState = GameState.ON_MAP;
     }
 

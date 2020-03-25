@@ -23,7 +23,7 @@ public class Walls extends StaticObject {
                 break;
         }
         for (Coord c : getCoords()) {
-            pixelSet.put(c, LogicPixel.generatePixel(weights, options));
+            pixelSet.put(c, LogicPixel.generate(weights, options));
         }
     }
 }

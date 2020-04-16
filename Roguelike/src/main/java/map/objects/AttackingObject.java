@@ -1,6 +1,6 @@
 package map.objects;
 
-import map.Direction;
+import util.Direction;
 
 public interface AttackingObject {
     public void attack(Direction direction);

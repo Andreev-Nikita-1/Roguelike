@@ -1,25 +1,23 @@
 package map.objects;
 
-import map.Coord;
-import map.Direction;
+import map.shapes.Shape;
+import util.Coord;
+import util.Direction;
 import map.MapOfObjects;
 
-import java.util.List;
+public abstract class MovableObject extends MapObject {
+    public MovableObject(MapOfObjects map, Coord coord, Shape shape) {
+        super(map, coord, shape);
+    }
 
-import static map.MapOfObjects.mapLock;
-
-public abstract class MovableObject extends Object {
-    public void move(Direction direction) {
-        synchronized (mapLock) {
+    public boolean move(Direction direction) {
+        synchronized (map) {
             Coord shift = Coord.fromDirection(direction);
-            List<Coord> coords = getCoords();
-            for (Coord c : coords) {
-                if (!MapOfObjects.inside(c.shifted(shift)) ||
-                        MapOfObjects.isTaken(c.shifted(shift))) {
-                    return;
-                }
+            if (shape.canPlace(map, location.shifted(shift))) {
+                shift(shift);
+                return true;
             }
-            shift(shift);
+            return false;
         }
     }
 }

@@ -10,20 +10,25 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
+import menuLogic.Menu;
+import menuLogic.MenuAction;
 import renderer.Renderer;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 import static java.lang.Thread.sleep;
+import static menuLogic.Menu.mainMenu;
 
-public abstract class Controller {
+public class Controller {
 
     private static SwingTerminalFrame terminal;
     private static WindowBasedTextGUI gui;
     private static Window mainWindow;
     private static GameplayComponent component;
+
+    private Controller() {
+    }
 
     public static int getTerminalSizeX() {
         return gui.getScreen().getTerminalSize().getColumns();
@@ -45,6 +50,7 @@ public abstract class Controller {
         mainWindow.setHints(Arrays.asList(Window.Hint.NO_DECORATIONS, Window.Hint.FULL_SCREEN));
         gui.addWindow(mainWindow);
         component = new GameplayComponent();
+        Menu.InitializeMenus();
     }
 
 
@@ -54,7 +60,7 @@ public abstract class Controller {
             terminal.setVisible(true);
             gui.getScreen().startScreen();
             mainWindow.setComponent(component);
-            drawMenu(AppLogic.mainMenuActions);
+            drawMenu(mainMenu);
             while (true) {
                 sleep(10);
                 gui.updateScreen();
@@ -74,11 +80,11 @@ public abstract class Controller {
     }
 
 
-    public static void drawMenu(List<AppLogic.MenuAction> menuActions) {
+    public static void drawMenu(Menu menu) {
         ActionListDialogBuilder builder = new ActionListDialogBuilder();
-        builder.setTitle(AppLogic.MAIN_MENU_TITLE);
+        builder.setTitle(menu.getTitle());
         builder.setCanCancel(false);
-        for (AppLogic.MenuAction action : menuActions) {
+        for (MenuAction action : menu.getActions()) {
             builder.addAction(action.getName(), action.getAction());
         }
         DialogWindow dialog = builder.build();

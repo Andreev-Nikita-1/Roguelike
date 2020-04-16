@@ -1,25 +1,46 @@
 package map.shapes;
 
-import map.Coord;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import map.MapOfObjects;
+import map.objects.MapObject;
+import util.Coord;
 
 public abstract class Shape {
+
     public static Shape SINGLE_PIXEL_SHAPE = new Shape() {
+        @Override
+        public void placeObject(MapOfObjects map, MapObject object) {
+            map.setObject(object, object.getLocation());
+        }
 
         @Override
-        public List<Coord> getShifts() {
-            return new ArrayList<>(Arrays.asList(Coord.ZERO));
+        public void detachObject(MapOfObjects map, MapObject object) {
+            map.unsetObject(object, object.getLocation());
+        }
+
+        @Override
+        public boolean canPlace(MapOfObjects map, Coord location) {
+            return map.inside(location) && !map.isTaken(location);
         }
     };
+
     public static Shape EMPTY_SHAPE = new Shape() {
         @Override
-        public List<Coord> getShifts() {
-            return new ArrayList<>();
+        public void placeObject(MapOfObjects map, MapObject object) {
+        }
+
+        @Override
+        public void detachObject(MapOfObjects map, MapObject object) {
+        }
+
+        @Override
+        public boolean canPlace(MapOfObjects map, Coord location) {
+            return true;
         }
     };
 
-    public abstract List<Coord> getShifts();
+    public abstract void placeObject(MapOfObjects map, MapObject object);
+
+    public abstract void detachObject(MapOfObjects map, MapObject object);
+
+    public abstract boolean canPlace(MapOfObjects map, Coord location);
 }

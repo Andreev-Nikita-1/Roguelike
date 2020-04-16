@@ -1,16 +1,14 @@
 package map.objects;
 
-import map.Coord;
-import map.Damage;
+import map.MapOfObjects;
+import map.shapes.Shape;
+import util.Coord;
 import map.LogicPixel;
 
 import java.util.Map;
 
-public abstract class StaticObject extends Object {
-    protected Map<Coord, LogicPixel> pixelSet;
-
-    @Override
-    public Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown) {
-        return pixelSet;
+public abstract class StaticObject extends MapObject {
+    public StaticObject(MapOfObjects map, Coord coord, Shape shape) {
+        super(map, coord, shape);
     }
 }

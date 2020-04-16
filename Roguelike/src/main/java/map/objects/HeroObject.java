@@ -1,89 +1,52 @@
 package map.objects;
 
-import basicComponents.GameplayLogic;
 import map.*;
-import map.shapes.Shape;
+import util.Coord;
+import util.Direction;
+import util.Waiter;
+import util.Mover;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static map.MapOfObjects.mapLock;
+import static map.shapes.Shape.SINGLE_PIXEL_SHAPE;
+import static util.Direction.LEFT;
+import static util.Direction.RIGHT;
 
 public class HeroObject extends Creature {
-    private int speedDelay;
-    private Waiter waiterWalkX;
-    private Waiter waiterWalkY;
-    private Waiter waiterRunX;
-    private Waiter waiterRunY;
+    private Mover walker;
+    private Mover runner;
     private Waiter waiterAttack;
     private Coord attackingCoord;
     public List<DependingObject> dependingObjects = new ArrayList<>();
 
-    public HeroObject(Coord coord, int speedDelay) {
-        init(coord, Shape.SINGLE_PIXEL_SHAPE);
-        this.speedDelay = speedDelay;
-        waiterWalkX = new Waiter(speedDelay);
-        waiterWalkY = new Waiter((int) ((double) speedDelay * 4 / 3));
-        waiterRunX = new Waiter((int) ((double) speedDelay / 2.5));
-        waiterRunY = new Waiter((int) ((double) speedDelay * 4 / 7));
+    public HeroObject(MapOfObjects map, Coord coord, int speedDelay) {
+        super(map, coord, SINGLE_PIXEL_SHAPE);
+        walker = new Mover(speedDelay);
+        runner = new Mover((int) ((double) speedDelay / 2.5));
         waiterAttack = new Waiter(25);
-        new Thread(waiterWalkX).start();
-        new Thread(waiterWalkY).start();
-        new Thread(waiterRunX).start();
-        new Thread(waiterRunY).start();
-        new Thread(waiterAttack).start();
     }
 
     public Coord getLocation() {
         return location;
     }
 
-    public void makeMovement(GameplayLogic.GameplayOption option) {
-        Waiter waiter;
-        Direction direction;
-        switch (option) {
-            case WALK_UP:
-                direction = Direction.UP;
-                waiter = waiterWalkY;
-                break;
-            case WALK_DOWN:
-                direction = Direction.DOWN;
-                waiter = waiterWalkY;
-                break;
-            case WALK_LEFT:
-                direction = Direction.LEFT;
-                waiter = waiterWalkX;
-                break;
-            case WALK_RIGHT:
-                direction = Direction.RIGHT;
-                waiter = waiterWalkX;
-                break;
-            case RUN_UP:
-                direction = Direction.UP;
-                waiter = waiterRunY;
-                break;
-            case RUN_DOWN:
-                direction = Direction.DOWN;
-                waiter = waiterRunY;
-                break;
-            case RUN_LEFT:
-                direction = Direction.LEFT;
-                waiter = waiterRunX;
-                break;
-            case RUN_RIGHT:
-                direction = Direction.RIGHT;
-                waiter = waiterRunX;
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + option);
-        }
-        synchronized (waiter) {
-            if (!waiter.ready) return;
-            move(direction);
-            waiter.ready = false;
-            waiter.notify();
+    public void makeWalkMovement(Direction direction) {
+        makeMovement(walker, direction);
+    }
+
+    public void makeRunMovement(Direction direction) {
+        makeMovement(runner, direction);
+    }
+
+    public void makeMovement(Mover mover, Direction direction) {
+        Waiter waiter = (direction == LEFT || direction == RIGHT) ? mover.waiterX : mover.waiterY;
+        if (waiter.isReady()) {
+            if (move(direction)) {
+                waiter.reset();
+            }
         }
         for (DependingObject o : dependingObjects) {
             o.update();
@@ -96,33 +59,67 @@ public class HeroObject extends Creature {
 
     @Override
     public Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown) {
-        Map<Coord, LogicPixel> map = new HashMap<>();
-        map.put(location, LogicPixel.HERO);
-        if (!waiterAttack.ready) {
-            map.put(attackingCoord, LogicPixel.ATTACK);
+        Map<Coord, LogicPixel> pixels = new HashMap<>();
+        pixels.put(location, LogicPixel.HERO);
+        if (!waiterAttack.isReady()) {
+            pixels.put(attackingCoord, LogicPixel.ATTACK);
         }
-        return map;
+        return pixels;
     }
 
     @Override
     public void attack(Direction direction) {
-        synchronized (mapLock) {
-            synchronized (waiterAttack) {
-                if (!waiterAttack.ready) return;
-                Coord c = location.shifted(Coord.fromDirection(direction));
-                attackingCoord = c;
-                if (!MapOfObjects.inside(c)) return;
-                Object o = MapOfObjects.getObject(c);
-                if (o instanceof DamageableObject) {
-                    ((DamageableObject) o).takeDamage(new Damage(10));
-                }
-                waiterAttack.ready = false;
-                waiterAttack.notify();
+        synchronized (map) {
+            if (!waiterAttack.isReady()) {
+                return;
             }
+            Coord c = location.shifted(Coord.fromDirection(direction));
+            attackingCoord = c;
+            if (!map.inside(c)) return;
+            MapObject o = map.getObject(c);
+            if (o instanceof DamageableObject) {
+                ((DamageableObject) o).takeDamage(new Damage(10));
+            }
+            waiterAttack.reset();
         }
     }
 
     @Override
+    public HeroObject start() {
+        waiterAttack.start();
+        walker.start();
+        runner.start();
+        return this;
+    }
+
+    @Override
     public void pause() {
+        waiterAttack.pause();
+        walker.pause();
+        runner.pause();
+    }
+
+    @Override
+    public void unpause() {
+        waiterAttack.unpause();
+        walker.unpause();
+        runner.unpause();
+    }
+
+    @Override
+    public void kill() throws InterruptedException {
+        walker.kill();
+        runner.kill();
+        waiterAttack.kill();
+    }
+
+    @Override
+    public HeroObject attachToMap() {
+        return (HeroObject) super.attachToMap();
+    }
+
+    @Override
+    public void die() {
+
     }
 }

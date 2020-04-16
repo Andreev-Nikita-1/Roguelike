@@ -1,30 +1,25 @@
 package map.objects;
 
-import map.Coord;
-import map.MapGenerator;
-import map.shapes.Shape;
 import map.LogicPixel;
+import map.MapOfObjects;
+import map.shapes.CustomStaticShape;
+import util.Coord;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Walls extends StaticObject {
-    public Walls(Coord coord, Shape shape, MapGenerator.SettingType type) {
-        init(coord, shape);
-        pixelSet = new HashMap<>();
-        double[] weights = new double[0];
-        LogicPixel[] options = new LogicPixel[0];
-        switch (type) {
-            case GRASS:
-                weights = new double[]{0.6, 0.4};
-                options = new LogicPixel[]{LogicPixel.GRASS_WALL_1, LogicPixel.GRASS_WALL_2};
-                break;
-            case DUNGEON:
-                weights = new double[]{1};
-                options = new LogicPixel[]{LogicPixel.DUNGEON_WALL};
-                break;
+    public Walls(MapOfObjects map, Coord coord, LogicPixel[][] array) {
+        super(map, coord, new CustomStaticShape(array, true));
+    }
+
+    @Override
+    public Map<Coord, LogicPixel> getPixels(Coord leftUp, Coord rightDown) {
+        Map<Coord, LogicPixel> shapePixels = ((CustomStaticShape) shape).getPixels();
+        Map<Coord, LogicPixel> pixelSet = new HashMap<>();
+        for (Coord c : shapePixels.keySet()) {
+            pixelSet.put(location.shifted(c), shapePixels.get(c));
         }
-        for (Coord c : getCoords()) {
-            pixelSet.put(c, MapGenerator.generate(weights, options));
-        }
+        return pixelSet;
     }
 }

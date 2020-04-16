@@ -1,51 +1,35 @@
 package basicComponents;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import map.objects.DynamicObject;
-import renderer.Renderer;
-import basicComponents.GameplayLogic.GameplayOption;
+import gameplayOptions.DirectedOption;
+import menuLogic.RealAction;
+import gameplayOptions.GameplayOption;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static basicComponents.GameplayLogic.pause;
+import static basicComponents.GameplayLogic.unpause;
+import static menuLogic.Menu.*;
 
-public abstract class AppLogic {
+public class AppLogic {
     public static final String MAIN_WINDOW_TITLE = "GAME";
-    public static final String MAIN_MENU_TITLE = "MENU";
 
     public static char HERO_SYMBOL = '+';
 
-    public static List<MenuAction> mainMenuActions = new ArrayList<>(Arrays.asList(
-            MenuAction.newGame,
-            MenuAction.options,
-            MenuAction.exit));
-
-    public static List<MenuAction> levelSelectorActions = new ArrayList<>(Arrays.asList(
-            MenuAction.level1,
-            MenuAction.level2,
-            MenuAction.level3,
-            MenuAction.back));
-
-    public static List<MenuAction> optionsActions = new ArrayList<>(Arrays.asList(
-            MenuAction.back));
-
-    private static GameState gameState = GameState.MAIN_MENU;
+    private AppLogic() {
+    }
 
 
     public static void handleKeyStrokeOnMap(KeyStroke keyStroke) {
-        assert (gameState == GameState.ON_MAP);
         if (GameplayLogic.gameplayState != GameplayLogic.GameplayState.PLAYING) {
             return;
         }
         switch (keyStroke.getKeyType()) {
             case Escape:
                 pause();
-                gameState = GameState.MAIN_MENU;
-                Controller.drawMenu(AppLogic.mainMenuActions);
+                Controller.drawMenu(mainMenu);
                 break;
             default:
                 GameplayOption option = getGameplayOption(keyStroke);
-                if (option != null) GameplayLogic.handleOption(option);
+                GameplayLogic.handleOption(option);
                 break;
         }
     }
@@ -56,137 +40,59 @@ public abstract class AppLogic {
         boolean shift = keyStroke.isShiftDown();
         switch (keyStroke.getKeyType()) {
             case ArrowUp:
-                if (alt) return GameplayOption.ATTACK_DOWN;
-                if (shift) return GameplayOption.RUN_DOWN;
-                else return GameplayOption.WALK_DOWN;
+                if (alt) return DirectedOption.ATTACK_DOWN;
+                if (shift) return DirectedOption.RUN_DOWN;
+                else return DirectedOption.WALK_DOWN;
             case ArrowDown:
-                if (alt) return GameplayOption.ATTACK_UP;
-                if (shift) return GameplayOption.RUN_UP;
-                else return GameplayOption.WALK_UP;
+                if (alt) return DirectedOption.ATTACK_UP;
+                if (shift) return DirectedOption.RUN_UP;
+                else return DirectedOption.WALK_UP;
             case ArrowLeft:
-                if (alt) return GameplayOption.ATTACK_LEFT;
-                if (shift) return GameplayOption.RUN_LEFT;
-                else return GameplayOption.WALK_LEFT;
+                if (alt) return DirectedOption.ATTACK_LEFT;
+                if (shift) return DirectedOption.RUN_LEFT;
+                else return DirectedOption.WALK_LEFT;
             case ArrowRight:
-                if (alt) return GameplayOption.ATTACK_RIGHT;
-                if (shift) return GameplayOption.RUN_RIGHT;
-                else return GameplayOption.WALK_RIGHT;
+                if (alt) return DirectedOption.ATTACK_RIGHT;
+                if (shift) return DirectedOption.RUN_RIGHT;
+                else return DirectedOption.WALK_RIGHT;
             default:
-                return null;
-        }
-    }
-
-    public static void pause() {
-        for (Object o : GameplayLogic.objects) {
-            if (o instanceof DynamicObject) {
-                ((DynamicObject) o).pause();
-            }
-        }
-    }
-
-    public static void unpause() {
-        synchronized (GameplayLogic.pauseLock) {
-            GameplayLogic.pauseLock.notifyAll();
+                return GameplayOption.NOTHING;
         }
     }
 
     public static void applyContinueAction() {
-        assert (gameState == GameState.MAIN_MENU);
         unpause();
-        gameState = GameState.ON_MAP;
-    }
-
-    public static void applyNewGameAction() {
-        assert (gameState == GameState.MAIN_MENU);
-        gameState = GameState.LEVEL_SELECTOR;
-        Controller.drawMenu(levelSelectorActions);
-    }
-
-    public static void applyOptionsAction() {
-        assert (gameState == GameState.MAIN_MENU);
-        gameState = GameState.OPTIONS;
-        Controller.drawMenu(optionsActions);
     }
 
     public static void applyExitAction() {
-        assert (gameState == GameState.MAIN_MENU);
         System.exit(0);
     }
 
-    public static void applyBackAction() {
-        assert (gameState == GameState.LEVEL_SELECTOR || gameState == GameState.OPTIONS);
-        gameState = GameState.MAIN_MENU;
-        Controller.drawMenu(mainMenuActions);
-    }
-
     public static void applyLevel1Action() {
-        assert (gameState == GameState.LEVEL_SELECTOR);
-        if (!mainMenuActions.contains(MenuAction.continueGame)) {
-            mainMenuActions.add(0, MenuAction.continueGame);
+        if (!mainMenu.getActions().contains(RealAction.continueGameAction)) {
+            mainMenu.addAction(0, RealAction.continueGameAction);
         }
-        gameState = GameState.ON_MAP;
-        new Thread(() -> GameplayLogic.createMapLevel1()).start();
+//        new Thread(() -> GameplayLogic.createMapLevel1()).start();
+        GameplayLogic.createMapLevel1();
     }
 
     public static void applyLevel2Action() {
-        assert (gameState == GameState.LEVEL_SELECTOR);
-        if (!mainMenuActions.contains(MenuAction.continueGame)) {
-            mainMenuActions.add(0, MenuAction.continueGame);
-        }
-        gameState = GameState.ON_MAP;
-        new Thread(() -> GameplayLogic.createMapLevel2()).start();
+//        assert (gameState == GameState.LEVEL_SELECTOR);
+//        if (!mainMenuActions.contains(MenuAction.continueGame)) {
+//            mainMenuActions.add(0, MenuAction.continueGame);
+//        }
+//        gameState = GameState.ON_MAP;
+//        new Thread(() -> GameplayLogic.createMapLevel2()).start();
     }
 
     public static void applyLevel3Action() {
-        assert (gameState == GameState.LEVEL_SELECTOR);
-        if (!mainMenuActions.contains(MenuAction.continueGame)) {
-            mainMenuActions.add(0, MenuAction.continueGame);
-        }
-        gameState = GameState.ON_MAP;
-        new Thread(() -> GameplayLogic.createMapLevel3()).start();
+//        assert (gameState == GameState.LEVEL_SELECTOR);
+//        if (!mainMenuActions.contains(MenuAction.continueGame)) {
+//            mainMenuActions.add(0, MenuAction.continueGame);
+//        }
+//        gameState = GameState.ON_MAP;
+//        new Thread(() -> GameplayLogic.createMapLevel3()).start();
     }
-
-    public static class MenuAction {
-        private String name;
-        private Runnable action;
-
-        public static MenuAction continueGame = new MenuAction("continue",
-                () -> AppLogic.applyContinueAction());
-        public static MenuAction newGame = new MenuAction("new game",
-                () -> AppLogic.applyNewGameAction());
-        public static MenuAction options = new MenuAction("options",
-                () -> AppLogic.applyOptionsAction());
-        public static MenuAction exit = new MenuAction("exit",
-                () -> AppLogic.applyExitAction());
-
-        public static MenuAction back = new MenuAction("back",
-                () -> AppLogic.applyBackAction());
-
-        public static MenuAction level1 = new MenuAction("level 1",
-                () -> AppLogic.applyLevel1Action());
-        public static MenuAction level2 = new MenuAction("level 2",
-                () -> AppLogic.applyLevel2Action());
-        public static MenuAction level3 = new MenuAction("level 3",
-                () -> AppLogic.applyLevel3Action());
-
-        MenuAction(String name, Runnable action) {
-            this.name = name;
-            this.action = action;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Runnable getAction() {
-            return action;
-        }
-    }
-
-    enum GameState {
-        MAIN_MENU, LEVEL_SELECTOR, OPTIONS, MAP_GENERATING, ON_MAP, IN_INVENTORY
-    }
-
 }
 
 

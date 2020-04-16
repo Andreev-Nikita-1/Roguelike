@@ -1,54 +1,73 @@
 package map;
 
-import map.objects.Object;
+import map.objects.DynamicObject;
+import map.objects.HeroObject;
+import map.objects.MapObject;
+import util.Coord;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class MapOfObjects {
-    public static int xSize;
-    public static int ySize;
-    private static Object[][] mapObjects;
-    public static final String mapLock = "MAP LOCK";
+public class MapOfObjects {
+    public int xSize;
+    public int ySize;
+    public List<MapObject> objectsList = new CopyOnWriteArrayList<>();
+    private MapObject[][] objectsMap;
+    public HeroObject heroObject;
 
-    public static void initialize(int xSize_, int ySize_) {
-        xSize = xSize_;
-        ySize = ySize_;
-        mapObjects = new Object[xSize][ySize];
+    public MapOfObjects(int xSize, int ySize) {
+        this.xSize = xSize;
+        this.ySize = ySize;
+        objectsMap = new MapObject[xSize][ySize];
     }
 
-    public static void placeObject(Object object) {
-        List<Coord> objectCoords = object.getCoords();
-        for (Coord c : objectCoords) {
-            if (mapObjects[c.x][c.y] != null) {
-                System.out.println("place is taken by another object: " + mapObjects[c.x][c.y].getClass().getName());
-            }
-        }
-        for (Coord c : objectCoords) {
-            mapObjects[c.x][c.y] = object;
-        }
+    public Coord getHeroLocation() {
+        return heroObject.getLocation();
     }
 
-    public static void detachObject(Object object) {
-        List<Coord> objectCoords = object.getCoords();
-        for (Coord c : objectCoords) {
-            if (mapObjects[c.x][c.y] != object) {
-                System.out.println("this object is not here anymore: " + object.getClass().getName());
-            }
-        }
-        for (Coord c : objectCoords) {
-            mapObjects[c.x][c.y] = null;
-        }
+    public void setObject(MapObject object, Coord c) {
+        assert (objectsMap[c.x][c.y] == null);
+        objectsMap[c.x][c.y] = object;
     }
 
-    public static Object getObject(Coord c) {
-        return mapObjects[c.x][c.y];
+    public void unsetObject(MapObject object, Coord c) {
+        assert (objectsMap[c.x][c.y] == object);
+        objectsMap[c.x][c.y] = null;
     }
 
-    public static boolean isTaken(Coord c) {
+    public MapObject getObject(Coord c) {
+        return objectsMap[c.x][c.y];
+    }
+
+    public boolean isTaken(Coord c) {
         return getObject(c) != null;
     }
 
-    public static boolean inside(Coord coord) {
+    public boolean inside(Coord coord) {
         return coord.x < xSize && coord.x >= 0 && coord.y < ySize && coord.y >= 0;
+    }
+
+    public void start() {
+        for (MapObject object : objectsList) {
+            if (object instanceof DynamicObject) {
+                ((DynamicObject) object).start();
+            }
+        }
+    }
+
+    public void pause() {
+        for (MapObject object : objectsList) {
+            if (object instanceof DynamicObject) {
+                ((DynamicObject) object).pause();
+            }
+        }
+    }
+
+    public void unpause() {
+        for (MapObject object : objectsList) {
+            if (object instanceof DynamicObject) {
+                ((DynamicObject) object).unpause();
+            }
+        }
     }
 }

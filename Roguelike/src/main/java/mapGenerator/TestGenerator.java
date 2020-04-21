@@ -1,11 +1,13 @@
 package mapGenerator;
 
 import map.roomSystem.*;
+import objects.creatures.HeroObject;
+import objects.creatures.Swordsman;
 import renderer.VisualPixel;
 import map.MapOfObjects;
-import objects.*;
 import util.Coord;
 
+import static java.lang.Thread.sleep;
 import static renderer.VisualPixel.*;
 import static util.Util.generate;
 
@@ -27,7 +29,7 @@ public class TestGenerator extends MapGenerator {
         MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
         int xHero = mapXSize / 2;
         int yHero = mapYSize / 2;
-        map.heroObject = new HeroObject(map, new Coord(xHero, yHero), 100).attachToMap();
+        map.heroObject = (HeroObject) new HeroObject(map, new Coord(xHero, yHero)).attachToMap();
         RoomSystem roomSystem = new RoomSystem(map);
         RoomTextures textures = new DungeonTextures();
         Room room1 = new Room(map, new Coord(8, 8), new Coord(5, 5), 1, textures);
@@ -76,6 +78,19 @@ public class TestGenerator extends MapGenerator {
         roomSystem.addPassage(new Corridor(room8, room7));
 
         roomSystem.attachToMap();
+
+        Swordsman swordsman = (Swordsman) new Swordsman(map, new Coord(11, 11)).attachToMap();
+
+        new Thread(() -> {
+            while (true) {
+                System.out.println(map.heroObject.health + " " + swordsman.health);
+                try {
+                    sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 //
 
 

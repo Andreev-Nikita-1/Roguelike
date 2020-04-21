@@ -3,7 +3,8 @@ package renderer;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
-import objects.VisualObject;
+import objects.DynamicVisualObject;
+import objects.StaticVisualObject;
 import util.Coord;
 import map.MapOfObjects;
 
@@ -77,12 +78,10 @@ public class MapRenderer {
         pixelStacks = new PixelStack[map.xSize][map.ySize];
         for (int i = 0; i < map.xSize; i++) {
             for (int j = 0; j < map.ySize; j++) {
-                Renderer.percent = 0.6 + ((double) i * map.ySize + j) / (map.xSize * map.ySize) / 5;
                 pixelStacks[i][j] = new PixelStack();
             }
         }
-
-        for (VisualObject object : map.staticObjects) {
+        for (StaticVisualObject object : map.staticObjects) {
             Map<Coord, VisualPixel> mappingPixels = object.getPixels(Coord.ZERO, new Coord(map.xSize, map.ySize));
             for (Coord c : mappingPixels.keySet()) {
                 List<PixelData> pixelDatas = mappingPixels.get(c).getPixelDataList();
@@ -104,7 +103,7 @@ public class MapRenderer {
                 pixelStacks[i][j].reset();
             }
         }
-        for (VisualObject object : map.dynamicObjects) {
+        for (DynamicVisualObject object : map.dynamicObjects) {
             Map<Coord, VisualPixel> mappingPixels = object.getPixels(new Coord(xLeftUp, yLeftUp), new Coord(xLeftUp + xSize, yLeftUp + ySize));
             for (Coord c : mappingPixels.keySet()) {
                 if (c.x >= xLeftUp && c.x < xLeftUp + xSize &&

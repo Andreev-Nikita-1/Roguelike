@@ -8,19 +8,15 @@ import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
 import static renderer.Colors.*;
 
-
 public class Renderer {
 
     public static volatile int page = 0;
-    public static volatile double percent = 0;
 
     public static void render(TextGUIGraphics graphics) {
         switch (GameplayLogic.gameplayState) {
             case NOT_STARTED:
-                drawStartPicture(graphics);
-                break;
             case MAP_GENERATING:
-                drawLoading(graphics, percent);
+                drawStartPicture(graphics);
                 break;
             case PAUSED:
             case PLAYING:
@@ -68,8 +64,5 @@ public class Renderer {
             graphics.setForegroundColor(new TextColor.RGB(255, 255, 255));
             graphics.putString((int) (xSize / 2) + 4, (int) (ySize / 2), "100%");
         }
-
     }
-
-
 }

@@ -1,4 +1,4 @@
-package objects.mobs;
+package objects.creatures;
 
 import map.MapOfObjects;
 import util.Coord;
@@ -24,17 +24,20 @@ public abstract class OnePixelMob extends Creature {
     }
 
     @Override
-    public boolean move(Direction direction) {
-        synchronized (map) {
-            Coord shift = Coord.fromDirection(direction);
-            Coord nextLocation = location.shifted(shift);
+    public synchronized boolean move(Direction direction) {
+        Coord shift = Coord.fromDirection(direction);
+        Coord nextLocation = location.shifted(shift);
+        map.getCoordLock(nextLocation).lock();
+        try {
             if (map.inside(nextLocation) && !map.isTaken(nextLocation)) {
                 map.unsetObject(this, location);
                 location.shift(shift);
                 map.setObject(this, location);
                 return true;
             }
-            return false;
+        } finally {
+            map.getCoordLock(nextLocation).unlock();
         }
+        return false;
     }
 }

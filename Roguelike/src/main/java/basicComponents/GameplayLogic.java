@@ -45,7 +45,7 @@ public class GameplayLogic {
         gameplayState = PLAYING;
     }
 
-    public static void handleOption(GameplayOption option) {
+    public static void handleOption(GameplayOption option, long eventTine) {
         if (option == GameplayOption.INTERACT) {
             currentMap.heroObject.interactWith();
         }
@@ -53,10 +53,10 @@ public class GameplayLogic {
             switch (((DirectedOption) option).action) {
                 case WALK:
                 case RUN:
-                    currentMap.heroObject.makeMovement((DirectedOption) option);
+                    currentMap.heroObject.makeMovement((DirectedOption) option, eventTine);
                     break;
                 case ATTACK:
-                    currentMap.heroObject.attack(((DirectedOption) option).direction);
+                    currentMap.heroObject.makeAttack(((DirectedOption) option), eventTine);
                     break;
             }
         }

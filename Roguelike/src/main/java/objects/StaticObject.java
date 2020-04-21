@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class StaticObject extends MapObject implements VisualObject {
+public abstract class StaticObject extends MapObject implements StaticVisualObject {
     protected Coord location;
     protected Map<Coord, VisualPixel> pixels;
     protected Set<Coord> coords = new HashSet<>();
@@ -32,7 +32,7 @@ public abstract class StaticObject extends MapObject implements VisualObject {
 
     @Override
     public StaticObject attachToMap() {
-        map.staticObjects.add(this);
+        super.attachToMap();
         for (Coord c : coords) {
             map.setObject(this, c);
         }
@@ -41,7 +41,7 @@ public abstract class StaticObject extends MapObject implements VisualObject {
 
     @Override
     public void deleteFromMap() {
-        map.staticObjects.remove(this);
+        super.deleteFromMap();
         for (Coord c : coords) {
             map.unsetObject(this, c);
         }

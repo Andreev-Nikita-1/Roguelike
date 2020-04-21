@@ -36,7 +36,7 @@ public class AppLogic {
                 break;
             default:
                 GameplayOption option = getGameplayOption(keyStroke);
-                GameplayLogic.handleOption(option);
+                GameplayLogic.handleOption(option, keyStroke.getEventTime());
                 break;
         }
     }

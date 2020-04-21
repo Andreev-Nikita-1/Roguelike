@@ -4,7 +4,6 @@ import com.googlecode.lanterna.TextColor;
 import objects.*;
 import renderer.VisualPixel;
 import util.Coord;
-import util.Direction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
 import static map.roomSystem.Door.DoorState.*;
 import static renderer.VisualPixel.*;
 
-public class Door extends Passage implements VisualObject, InteractiveObject {
+public class Door extends Passage implements DynamicVisualObject, InteractiveObject {
     protected Coord doorCoord;
     protected DoorState state = CLOSED;
     protected boolean highlighted = false;
@@ -39,14 +38,20 @@ public class Door extends Passage implements VisualObject, InteractiveObject {
         doorCoord = location.shifted(shift);
     }
 
-    public void closeDoor() {
-        if (state == CLOSED) return;
-        synchronized (map) {
+    public boolean closeDoor() {
+        if (state == CLOSED) return true;
+        map.getCoordLock(doorCoord).lock();
+        try {
             if (map.setObject(this, doorCoord)) {
                 state = CLOSED;
+                return true;
             }
+        } finally {
+            map.getCoordLock(doorCoord).unlock();
         }
+        return false;
     }
+
 
     public void openDoor() {
         if (state == OPEN) return;
@@ -82,7 +87,7 @@ public class Door extends Passage implements VisualObject, InteractiveObject {
 
     @Override
     public Door attachToMap() {
-        map.dynamicObjects.add(this);
+        super.attachToMap();
         map.heroObject.dependingObjects.add(this);
         map.setObject(this, doorCoord);
         update();
@@ -91,7 +96,7 @@ public class Door extends Passage implements VisualObject, InteractiveObject {
 
     @Override
     public void deleteFromMap() {
-        map.dynamicObjects.remove(this);
+        super.deleteFromMap();
         map.unsetObject(this, doorCoord);
         if (map.heroObject.interactiveObject == this) {
             map.heroObject.interactiveObject = null;

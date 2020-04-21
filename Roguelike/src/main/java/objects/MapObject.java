@@ -1,10 +1,6 @@
 package objects;
 
-import util.Coord;
 import map.MapOfObjects;
-import renderer.VisualPixel;
-
-import java.util.Map;
 
 public abstract class MapObject {
     public final MapOfObjects map;
@@ -13,8 +9,28 @@ public abstract class MapObject {
         this.map = map;
     }
 
-    public abstract MapObject attachToMap();
+    public MapObject attachToMap() {
+        if (this instanceof PausableObject) {
+            map.pausableObjects.add((PausableObject) this);
+        }
+        if (this instanceof DynamicVisualObject) {
+            map.dynamicObjects.add((DynamicVisualObject) this);
+        }
+        if (this instanceof StaticVisualObject) {
+            map.staticObjects.add((StaticVisualObject) this);
+        }
+        return this;
+    }
 
-    public abstract void deleteFromMap();
-
+    public void deleteFromMap() {
+        if (this instanceof PausableObject) {
+            map.pausableObjects.remove(this);
+        }
+        if (this instanceof DynamicVisualObject) {
+            map.dynamicObjects.remove(this);
+        }
+        if (this instanceof StaticVisualObject) {
+            map.staticObjects.remove(this);
+        }
+    }
 }

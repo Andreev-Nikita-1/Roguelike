@@ -65,7 +65,7 @@ public class Controller {
     }
 
     public static void zoomDefault() {
-        fontSize = 48;
+        fontSize = 40;
         update();
         drawMenu(optionsMenu);
     }
@@ -77,7 +77,8 @@ public class Controller {
     }
 
     public static void zoomOut() {
-        fontSize -= 5;
+        if (fontSize > 5)
+            fontSize -= 5;
         update();
         drawMenu(optionsMenu);
     }

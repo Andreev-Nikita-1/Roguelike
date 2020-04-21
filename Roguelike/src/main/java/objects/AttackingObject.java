@@ -3,5 +3,7 @@ package objects;
 import util.Direction;
 
 public interface AttackingObject {
-    public void attack(Direction direction);
+    int attackVisualizationPeriod = 70;
+
+    void attack(Direction direction);
 }

@@ -6,5 +6,4 @@ public class Damage {
     public Damage(int value) {
         this.value = value;
     }
-
 }

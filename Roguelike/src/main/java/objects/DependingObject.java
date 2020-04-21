@@ -1,4 +1,4 @@
-package map.objects;
+package objects;
 
 public interface DependingObject {
     void update();

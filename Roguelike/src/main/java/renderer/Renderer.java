@@ -6,11 +6,12 @@ import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
-import static renderer.PixelsVisual.*;
+import static renderer.Colors.*;
 
 
 public class Renderer {
 
+    public static volatile int page = 0;
     public static volatile double percent = 0;
 
     public static void render(TextGUIGraphics graphics) {

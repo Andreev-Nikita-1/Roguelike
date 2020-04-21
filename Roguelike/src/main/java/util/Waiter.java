@@ -1,32 +1,38 @@
 package util;
 
-import map.objects.DynamicObject;
-
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.sleep;
 
-public class Waiter implements DynamicObject, Actor {
+public class Waiter implements Pausable, Runnable {
 
     private volatile int delay;
     private volatile boolean ready = true;
     private Lock lock = new ReentrantLock();
     private Condition notReadyCond;
     private Condition readyCond;
-    private ThreadState threadState;
+    private PauseController pauseController;
 
     public Waiter(int delay) {
         this.delay = delay;
-        threadState = new ThreadState(this);
+        pauseController = new PauseController(this);
         notReadyCond = lock.newCondition();
         readyCond = lock.newCondition();
     }
 
-    public synchronized void changeDelay(int delay) {
+    public synchronized void setDelay(int delay) {
         this.delay = delay;
     }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public boolean isActive(){
+        return pauseController.isActive();
+    };
 
     public boolean isReady() {
         return ready;
@@ -51,33 +57,33 @@ public class Waiter implements DynamicObject, Actor {
     }
 
     public void reset(int delay) {
-        changeDelay(delay);
+        setDelay(delay);
         reset();
     }
 
     @Override
     public Waiter start() {
-        threadState.start();
+        pauseController.start();
         return this;
     }
 
     @Override
     public void pause() {
-        threadState.pause();
+        pauseController.pause();
     }
 
     @Override
     public void unpause() {
-        threadState.unpause();
+        pauseController.unpause();
     }
 
     @Override
     public void kill() throws InterruptedException {
-        threadState.kill();
+        pauseController.kill();
     }
 
     @Override
-    public void act() throws InterruptedException {
+    public void run() {
         lock.lock();
         try {
             if (!ready) {
@@ -88,6 +94,7 @@ public class Waiter implements DynamicObject, Actor {
             while (ready) {
                 notReadyCond.await();
             }
+        } catch (InterruptedException e) {
         } finally {
             lock.unlock();
         }

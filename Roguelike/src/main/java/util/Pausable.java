@@ -1,8 +1,8 @@
-package map.objects;
+package util;
 
-public interface DynamicObject {
+public interface Pausable {
 
-    DynamicObject start();
+    Pausable start();
 
     void pause();
 

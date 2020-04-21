@@ -1,6 +1,7 @@
 import basicComponents.AppLogic;
 import basicComponents.Controller;
 import com.googlecode.lanterna.TextColor;
+import menuLogic.Menu;
 
 import java.io.IOException;
 
@@ -13,16 +14,11 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Controller.initialize();
+        Menu.InitializeMenus();
+        Controller.update();
+        Controller.drawMenu(Menu.mainMenu);
         Thread thread = new Thread(Controller::run);
         thread.start();
-//        Thread tr = new Thread(() -> {
-//            new Tester().test();
-//        });
-//        tr.start();
-//        sleep(2000);
-//        tr.interrupt();
-
-
     }
 
     static class Tester {

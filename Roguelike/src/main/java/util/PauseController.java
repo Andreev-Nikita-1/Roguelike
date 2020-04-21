@@ -1,20 +1,18 @@
 package util;
 
-import map.objects.DynamicObject;
-
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ThreadState implements DynamicObject, Runnable {
+public class PauseController implements Pausable, Runnable {
     private volatile boolean active = false;
     private volatile boolean dead = false;
     private Thread thread;
-    private Actor actor;
+    private Runnable actor;
     private Lock lock = new ReentrantLock();
     private Condition activeCond;
 
-    public ThreadState(Actor actor) {
+    public PauseController(Runnable actor) {
         this.actor = actor;
         thread = new Thread(this);
         activeCond = lock.newCondition();
@@ -28,7 +26,7 @@ public class ThreadState implements DynamicObject, Runnable {
                 while (!active) {
                     activeCond.await();
                 }
-                actor.act();
+                actor.run();
             } catch (InterruptedException e) {
             } finally {
                 lock.unlock();
@@ -36,8 +34,12 @@ public class ThreadState implements DynamicObject, Runnable {
         }
     }
 
+    public boolean isActive(){
+        return active;
+    }
+
     @Override
-    public ThreadState start() {
+    public PauseController start() {
         active = true;
         thread.start();
         return this;

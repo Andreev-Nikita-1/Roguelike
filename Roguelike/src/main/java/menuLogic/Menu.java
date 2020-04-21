@@ -24,6 +24,10 @@ public class Menu {
         levelSelector.addAction(level3Action);
         levelSelector.addAction(back(mainMenu));
 
+
+        optionsMenu.addAction(zoomIn);
+        optionsMenu.addAction(zoomOut);
+        optionsMenu.addAction(zoomDefault);
         optionsMenu.addAction(back(mainMenu));
 
     }

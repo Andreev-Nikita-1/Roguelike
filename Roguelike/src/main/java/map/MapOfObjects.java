@@ -1,19 +1,23 @@
 package map;
 
-import map.objects.DynamicObject;
-import map.objects.HeroObject;
-import map.objects.MapObject;
+import objects.*;
 import util.Coord;
+import util.Pausable;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
-public class MapOfObjects {
+public class MapOfObjects implements Pausable {
     public int xSize;
     public int ySize;
-    public List<MapObject> objectsList = new CopyOnWriteArrayList<>();
     private MapObject[][] objectsMap;
+    public List<VisualObject> staticObjects = new CopyOnWriteArrayList<>();
+    public List<VisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
+    public List<PausableObject> pausableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
+    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     public MapOfObjects(int xSize, int ySize) {
         this.xSize = xSize;
@@ -25,14 +29,23 @@ public class MapOfObjects {
         return heroObject.getLocation();
     }
 
-    public void setObject(MapObject object, Coord c) {
-        assert (objectsMap[c.x][c.y] == null);
+    public boolean setObject(MapObject object, Coord c) {
+        if(c.y==20){
+            return false;
+        }
+        if (objectsMap[c.x][c.y] != null) {
+            return false;
+        }
         objectsMap[c.x][c.y] = object;
+        return true;
     }
 
-    public void unsetObject(MapObject object, Coord c) {
-        assert (objectsMap[c.x][c.y] == object);
+    public boolean unsetObject(MapObject object, Coord c) {
+        if (objectsMap[c.x][c.y] != object) {
+            return false;
+        }
         objectsMap[c.x][c.y] = null;
+        return true;
     }
 
     public MapObject getObject(Coord c) {
@@ -47,27 +60,32 @@ public class MapOfObjects {
         return coord.x < xSize && coord.x >= 0 && coord.y < ySize && coord.y >= 0;
     }
 
-    public void start() {
-        for (MapObject object : objectsList) {
-            if (object instanceof DynamicObject) {
-                ((DynamicObject) object).start();
-            }
+    @Override
+    public MapOfObjects start() {
+        for (PausableObject object : pausableObjects) {
+            object.start();
         }
+        return this;
     }
 
+    @Override
     public void pause() {
-        for (MapObject object : objectsList) {
-            if (object instanceof DynamicObject) {
-                ((DynamicObject) object).pause();
-            }
+        for (PausableObject object : pausableObjects) {
+            object.pause();
         }
     }
 
+    @Override
     public void unpause() {
-        for (MapObject object : objectsList) {
-            if (object instanceof DynamicObject) {
-                ((DynamicObject) object).unpause();
-            }
+        for (PausableObject object : pausableObjects) {
+            object.unpause();
+        }
+    }
+
+    @Override
+    public void kill() throws InterruptedException {
+        for (PausableObject object : pausableObjects) {
+            object.kill();
         }
     }
 }

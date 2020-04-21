@@ -1,13 +1,13 @@
 package renderer;
 
 import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
+import objects.VisualObject;
 import util.Coord;
-import map.LogicPixel;
 import map.MapOfObjects;
-import map.objects.MapObject;
-import map.objects.StaticObject;
 
+import java.util.List;
 import java.util.Map;
 
 public class MapRenderer {
@@ -21,7 +21,34 @@ public class MapRenderer {
         terminalCoordinate = new TerminalCoordinate(new Coord(map.xSize, map.ySize));
     }
 
+    private void showUnicode(TextGUIGraphics graphics) {
+        graphics.setBackgroundColor(new TextColor.RGB(255, 255, 255));
+        graphics.setForegroundColor(new TextColor.RGB(0, 0, 0));
+        graphics.fill(' ');
+        TextColor color1 = new TextColor.RGB(0, 0, 0);
+        TextColor color2 = new TextColor.RGB(200, 200, 200);
+        int i, j;
+        for (j = 0; j < 20; j++) {
+            graphics.putString(j + 6, 0, String.valueOf(j % 10));
+        }
+        char k = (char) (40 + Renderer.page * 200);
+        for (i = 0; i < 10; i++) {
+            graphics.putString(0, i + 1, String.valueOf((int) k));
+            for (j = 0; j < 20; j++) {
+                if (k >= 32 && k != 7 * 16 + 15) {
+                    if ((i + j) % 2 == 0)
+                        graphics.setCharacter(j + 6, i + 1, new TextCharacter(k, color1, color2));
+                    else
+                        graphics.setCharacter(j + 6, i + 1, new TextCharacter(k, color2, color1));
+                }
+                k++;
+            }
+        }
+    }
+
     public void drawMap(TextGUIGraphics graphics, int terminalSizeX, int terminalSizeY) {
+
+
         int xSize = Math.min(terminalSizeX, map.xSize);
         int ySize = Math.min(terminalSizeY, map.ySize);
         Coord leftUp = terminalCoordinate.getLeftUp(xSize, ySize, map.getHeroLocation());
@@ -37,6 +64,8 @@ public class MapRenderer {
                         pixel.symbolColor, pixel.backgroundColor));
             }
         }
+
+//        showUnicode(graphics);
     }
 
     public MapRenderer fit() {
@@ -53,16 +82,12 @@ public class MapRenderer {
             }
         }
 
-        for (int i = 0; i < map.objectsList.size(); i++) {
-            MapObject object = map.objectsList.get(i);
-            Renderer.percent = 0.8 + (double) i / map.objectsList.size() / 5;
-            if (object instanceof StaticObject) {
-                Map<Coord, LogicPixel> mappingPixels = object.getPixels(Coord.ZERO, new Coord(map.xSize, map.ySize));
-                for (Coord c : mappingPixels.keySet()) {
-                    PixelData[] pixelDatas = PixelsVisual.getPixelData(mappingPixels.get(c));
-                    for (PixelData pixelData : pixelDatas) {
-                        pixelStacks[c.x][c.y].insertStaticPixel(pixelData);
-                    }
+        for (VisualObject object : map.staticObjects) {
+            Map<Coord, VisualPixel> mappingPixels = object.getPixels(Coord.ZERO, new Coord(map.xSize, map.ySize));
+            for (Coord c : mappingPixels.keySet()) {
+                List<PixelData> pixelDatas = mappingPixels.get(c).getPixelDataList();
+                for (PixelData pixelData : pixelDatas) {
+                    pixelStacks[c.x][c.y].insertStaticPixel(pixelData);
                 }
             }
         }
@@ -79,16 +104,15 @@ public class MapRenderer {
                 pixelStacks[i][j].reset();
             }
         }
-        for (MapObject object : map.objectsList) {
-            if (!(object instanceof StaticObject)) {
-                Map<Coord, LogicPixel> mappingPixels = object.getPixels(new Coord(xLeftUp, yLeftUp), new Coord(xLeftUp + xSize, yLeftUp + ySize));
-                for (Coord c : mappingPixels.keySet()) {
-                    if (c.x >= xLeftUp && c.x < xLeftUp + xSize &&
-                            c.y >= yLeftUp && c.y < yLeftUp + ySize) {
-                        PixelData[] pixelDatas = PixelsVisual.getPixelData(mappingPixels.get(c));
-                        for (PixelData pixelData : pixelDatas) {
-                            pixelStacks[c.x][c.y].insert(pixelData);
-                        }
+        for (VisualObject object : map.dynamicObjects) {
+            Map<Coord, VisualPixel> mappingPixels = object.getPixels(new Coord(xLeftUp, yLeftUp), new Coord(xLeftUp + xSize, yLeftUp + ySize));
+            for (Coord c : mappingPixels.keySet()) {
+                if (c.x >= xLeftUp && c.x < xLeftUp + xSize &&
+                        c.y >= yLeftUp && c.y < yLeftUp + ySize) {
+                    List<PixelData> pixelDatas = mappingPixels.get(c).getPixelDataList();
+                    for (PixelData pixelData : pixelDatas) {
+                        pixelStacks[c.x][c.y].insert(pixelData);
+
                     }
                 }
             }

@@ -1,0 +1,129 @@
+package map.roomSystem;
+
+import com.googlecode.lanterna.TextColor;
+import objects.*;
+import renderer.VisualPixel;
+import util.Coord;
+import util.Direction;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static map.roomSystem.Door.DoorState.*;
+import static renderer.VisualPixel.*;
+
+public class Door extends Passage implements VisualObject, InteractiveObject {
+    protected Coord doorCoord;
+    protected DoorState state = CLOSED;
+    protected boolean highlighted = false;
+
+    public Door(Room room1, Room room2) {
+        super(room1, room2);
+        setWidthAndBias(1, width / 2);
+        setDepth((length - 1) / 2);
+    }
+
+    public Door(Room room1, Room room2, int bias) {
+        super(room1, room2, 1, bias);
+        setDepth((length - 1) / 2);
+    }
+
+    public Door(Room room1, Room room2, int bias, int depth) {
+        super(room1, room2, 1, bias);
+        setDepth(depth);
+    }
+
+    public void setDepth(int depth) {
+        Coord shift = direction.vertical() ?
+                new Coord(0, depth) : new Coord(depth, 0);
+        doorCoord = location.shifted(shift);
+    }
+
+    public void closeDoor() {
+        if (state == CLOSED) return;
+        synchronized (map) {
+            if (map.setObject(this, doorCoord)) {
+                state = CLOSED;
+            }
+        }
+    }
+
+    public void openDoor() {
+        if (state == OPEN) return;
+        map.unsetObject(this, doorCoord);
+        state = OPEN;
+    }
+
+    @Override
+    public void interact() {
+        switch (state) {
+            case OPEN:
+                closeDoor();
+                break;
+            case CLOSED:
+                openDoor();
+                break;
+        }
+    }
+
+    @Override
+    public void update() {
+        if (doorCoord.near(map.heroObject.getLocation())
+                && !doorCoord.equals(map.heroObject.getLocation())) {
+            highlighted = true;
+            map.heroObject.interactiveObject = this;
+        } else {
+            highlighted = false;
+            if (map.heroObject.interactiveObject == this) {
+                map.heroObject.interactiveObject = null;
+            }
+        }
+    }
+
+    @Override
+    public Door attachToMap() {
+        map.dynamicObjects.add(this);
+        map.heroObject.dependingObjects.add(this);
+        map.setObject(this, doorCoord);
+        update();
+        return this;
+    }
+
+    @Override
+    public void deleteFromMap() {
+        map.dynamicObjects.remove(this);
+        map.unsetObject(this, doorCoord);
+        if (map.heroObject.interactiveObject == this) {
+            map.heroObject.interactiveObject = null;
+        }
+    }
+
+    @Override
+    public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
+        Map<Coord, VisualPixel> pixels = new HashMap<>();
+        VisualPixel doorPixel;
+        switch (state) {
+            case OPEN:
+                doorPixel = direction.horizontal() ? DOOR_OPEN_HORIZONTAL : DOOR_OPEN_VERTICAl;
+                break;
+            case CLOSED:
+                doorPixel = DOOR_CLOSED;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + state);
+        }
+        if (doorCoord.between(leftUp, rightDown)) {
+            if (highlighted) {
+                pixels.put(doorCoord, doorPixel.highlighted(TextColor.ANSI.GREEN, 0.1));
+            } else {
+                pixels.put(doorCoord, doorPixel);
+            }
+        }
+        return pixels;
+    }
+
+    protected enum DoorState {
+        CLOSED,
+        OPEN
+    }
+}

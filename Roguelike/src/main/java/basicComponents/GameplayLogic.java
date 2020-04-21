@@ -2,7 +2,7 @@ package basicComponents;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import mapGenerator.ForestGenerator;
+import mapGenerator.TestGenerator;
 import mapGenerator.MapGenerator;
 import map.MapOfObjects;
 import renderer.MapRenderer;
@@ -16,8 +16,8 @@ public class GameplayLogic {
     public static MapOfObjects currentMap;
     public static MapRenderer currentMapRenderer;
 
-    private static int xSize = 480;
-    private static int ySize = 240;
+    private static int xSize = 20;
+    private static int ySize = 20;
 
     private GameplayLogic() {
     }
@@ -41,40 +41,25 @@ public class GameplayLogic {
 
     public static void createMapLevel1() {
         gameplayState = MAP_GENERATING;
-        createMap(new ForestGenerator(xSize, ySize));
+        createMap(new TestGenerator(xSize, ySize));
         gameplayState = PLAYING;
     }
 
-//    public static void createMapLevel2() {
-//        gameplayState = GameplayState.MAP_GENERATING;
-//        MapGenerator1.desertGenerate(xSize, ySize);
-//        Renderer.fit();
-//        gameplayState = GameplayState.PLAYING;
-//    }
-//
-//    public static void createMapLevel3() {
-//        gameplayState = GameplayState.MAP_GENERATING;
-//        MapGenerator1.dungeonGenerate(xSize, ySize);
-//        Renderer.fit();
-//        gameplayState = GameplayState.PLAYING;
-//    }
-
     public static void handleOption(GameplayOption option) {
-//        System.out.println(currentMap.getHeroLocation().x);
+        if (option == GameplayOption.INTERACT) {
+            currentMap.heroObject.interactWith();
+        }
         if (option instanceof DirectedOption) {
             switch (((DirectedOption) option).action) {
                 case WALK:
-                    currentMap.heroObject.makeWalkMovement(((DirectedOption) option).direction);
-                    break;
                 case RUN:
-                    currentMap.heroObject.makeRunMovement(((DirectedOption) option).direction);
+                    currentMap.heroObject.makeMovement((DirectedOption) option);
                     break;
                 case ATTACK:
                     currentMap.heroObject.attack(((DirectedOption) option).direction);
                     break;
             }
         }
-//        Controller.draw();
     }
 
     public enum GameplayState {

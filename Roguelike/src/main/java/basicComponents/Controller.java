@@ -8,17 +8,24 @@ import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import menuLogic.Menu;
 import menuLogic.MenuAction;
 import renderer.Renderer;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.sleep;
 import static menuLogic.Menu.mainMenu;
+import static menuLogic.Menu.optionsMenu;
 
 public class Controller {
 
@@ -26,6 +33,8 @@ public class Controller {
     private static WindowBasedTextGUI gui;
     private static Window mainWindow;
     private static GameplayComponent component;
+
+    public static volatile int fontSize = 40;
 
     private Controller() {
     }
@@ -40,8 +49,10 @@ public class Controller {
 
     public static void initialize() throws IOException {
         terminal = new SwingTerminalFrame(AppLogic.MAIN_WINDOW_TITLE,
-                new TerminalSize(100, 30),
-                null, null, null,
+                new TerminalSize(30, 13),
+                null,
+                new SwingTerminalFontConfiguration(false, AWTTerminalFontConfiguration.BoldMode.NOTHING, new Font("VL Gothic Regular", Font.PLAIN, fontSize)),
+                null,
                 TerminalEmulatorAutoCloseTrigger.CloseOnExitPrivateMode);
         TerminalScreen screen = new TerminalScreen(terminal);
         screen.setCursorPosition(null);
@@ -50,24 +61,51 @@ public class Controller {
         mainWindow.setHints(Arrays.asList(Window.Hint.NO_DECORATIONS, Window.Hint.FULL_SCREEN));
         gui.addWindow(mainWindow);
         component = new GameplayComponent();
-        Menu.InitializeMenus();
+
     }
 
+    public static void zoomDefault() {
+        fontSize = 48;
+        update();
+        drawMenu(optionsMenu);
+    }
 
-    public static void run() {
+    public static void zoomIn() {
+        fontSize += 5;
+        update();
+        drawMenu(optionsMenu);
+    }
+
+    public static void zoomOut() {
+        fontSize -= 5;
+        update();
+        drawMenu(optionsMenu);
+    }
+
+    public static void update() {
         try {
-            terminal.setLocationByPlatform(true);
+            AppLogic.active = true;
+            terminal.close();
+            initialize();
             terminal.setVisible(true);
+            terminal.setExtendedState(terminal.MAXIMIZED_BOTH);
             gui.getScreen().startScreen();
             mainWindow.setComponent(component);
-            drawMenu(mainMenu);
-            while (true) {
-                sleep(10);
-                gui.updateScreen();
-                gui.processInput();
+        } catch (IOException e) {
+        }
+    }
+
+    public static void run() {
+        while (AppLogic.active) {
+            AppLogic.active = false;
+            try {
+                while (true) {
+                    sleep(10);
+                    gui.updateScreen();
+                    gui.processInput();
+                }
+            } catch (IOException | InterruptedException e) {
             }
-        } catch (IOException | InterruptedException e) {
-            System.exit(0);
         }
     }
 
@@ -75,7 +113,6 @@ public class Controller {
         try {
             gui.updateScreen();
         } catch (IOException e) {
-
         }
     }
 
@@ -90,6 +127,10 @@ public class Controller {
         DialogWindow dialog = builder.build();
         dialog.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING));
         gui.addWindow(dialog);
+        if (gui.getScreen().getFrontCharacter(0, gui.getScreen().getTerminalSize().getRows() - 1).getCharacter() == 'T') {
+            dialog.setHints(Arrays.asList(Window.Hint.FULL_SCREEN, Window.Hint.NO_POST_RENDERING));
+            System.out.println("aaa");
+        }
     }
 
 

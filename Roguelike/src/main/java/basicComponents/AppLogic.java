@@ -4,15 +4,16 @@ import com.googlecode.lanterna.input.KeyStroke;
 import gameplayOptions.DirectedOption;
 import menuLogic.RealAction;
 import gameplayOptions.GameplayOption;
+import renderer.Renderer;
 
-import static basicComponents.GameplayLogic.pause;
-import static basicComponents.GameplayLogic.unpause;
 import static menuLogic.Menu.*;
 
 public class AppLogic {
     public static final String MAIN_WINDOW_TITLE = "GAME";
 
-    public static char HERO_SYMBOL = '+';
+    public static char HERO_SYMBOL = (char) 9977;
+
+    public static volatile boolean active = true;
 
     private AppLogic() {
     }
@@ -24,8 +25,14 @@ public class AppLogic {
         }
         switch (keyStroke.getKeyType()) {
             case Escape:
-                pause();
+                GameplayLogic.pause();
                 Controller.drawMenu(mainMenu);
+                break;
+            case F1:
+                Renderer.page += 1;
+                break;
+            case F2:
+                Renderer.page -= 1;
                 break;
             default:
                 GameplayOption option = getGameplayOption(keyStroke);
@@ -39,11 +46,15 @@ public class AppLogic {
         boolean alt = keyStroke.isAltDown();
         boolean shift = keyStroke.isShiftDown();
         switch (keyStroke.getKeyType()) {
-            case ArrowUp:
+            case Character:
+                if (keyStroke.getCharacter() == ' ') {
+                    return GameplayOption.INTERACT;
+                }
+            case ArrowDown:
                 if (alt) return DirectedOption.ATTACK_DOWN;
                 if (shift) return DirectedOption.RUN_DOWN;
                 else return DirectedOption.WALK_DOWN;
-            case ArrowDown:
+            case ArrowUp:
                 if (alt) return DirectedOption.ATTACK_UP;
                 if (shift) return DirectedOption.RUN_UP;
                 else return DirectedOption.WALK_UP;
@@ -61,7 +72,7 @@ public class AppLogic {
     }
 
     public static void applyContinueAction() {
-        unpause();
+        GameplayLogic.unpause();
     }
 
     public static void applyExitAction() {
@@ -72,7 +83,6 @@ public class AppLogic {
         if (!mainMenu.getActions().contains(RealAction.continueGameAction)) {
             mainMenu.addAction(0, RealAction.continueGameAction);
         }
-//        new Thread(() -> GameplayLogic.createMapLevel1()).start();
         GameplayLogic.createMapLevel1();
     }
 

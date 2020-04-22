@@ -1,6 +1,9 @@
 package objects.creatures;
 
+import gameplayOptions.DirectedOption;
+import gameplayOptions.GameplayOption;
 import map.*;
+import map.strategies.Strategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
@@ -15,6 +18,7 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
     private volatile int speedDelayX = 160;
     private volatile int speedDelayY = (int) ((double) 160 * 4 / 3);
     private volatile int attackDelay = 100;
+
 
     public Swordsman(MapOfObjects map, Coord coord) {
         super(map, coord);
@@ -43,6 +47,21 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
 
     @Override
     public int act() {
+        GameplayOption action = strategy.getAction(this);
+        if (action == GameplayOption.NOTHING) {
+            return 0;
+        }
+        if (action instanceof DirectedOption) {
+            switch (((DirectedOption) action).action) {
+                case WALK:
+                case RUN:
+                    move(((DirectedOption) action).direction);
+                    return ((DirectedOption) action).direction.horizontal() ? speedDelayX : speedDelayY;
+                case ATTACK:
+                    attack(((DirectedOption) action).direction);
+                    return attackDelay;
+            }
+        }
         Direction direction = generate(new double[]{0.25, 0.25, 0.25, 0.25}, Direction.values());
         if (move(direction)) {
             return direction.horizontal() ? speedDelayX : speedDelayY;

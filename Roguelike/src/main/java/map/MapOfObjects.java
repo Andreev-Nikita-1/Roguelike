@@ -2,6 +2,7 @@ package map;
 
 import objects.*;
 import objects.creatures.HeroObject;
+import objects.neighbourfoods.AccessNeighbourhood;
 import util.Coord;
 import util.Pausable;
 
@@ -20,6 +21,7 @@ public class MapOfObjects implements Pausable {
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
     public List<PausableObject> pausableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
+    public AccessNeighbourhood heroAccessNeighbourhood;
     public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     public MapOfObjects(int xSize, int ySize) {
@@ -100,6 +102,7 @@ public class MapOfObjects implements Pausable {
 
     @Override
     public MapOfObjects start() {
+        heroAccessNeighbourhood.update();
         for (PausableObject object : pausableObjects) {
             object.start();
         }

@@ -1,7 +1,9 @@
 package objects.creatures;
 
+import basicComponents.Controller;
 import gameplayOptions.DirectedOption;
 import map.*;
+import menuLogic.Menu;
 import objects.DamageableObject;
 import objects.DependingObject;
 import objects.InteractiveObject;
@@ -32,7 +34,12 @@ public class HeroObject extends OnePixelMob {
     @Override
     public synchronized void die() {
         super.deleteFromMap();
-        kill();
+        try {
+            map.kill();
+        } catch (InterruptedException e) {
+        }
+        Menu.mainMenu.deleteAction(0);
+        Controller.drawMenu(Menu.mainMenu);
     }
 
     public HeroObject(MapOfObjects map, Coord coord) {

@@ -4,6 +4,7 @@ import map.MapOfObjects;
 import map.roomSystem.*;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
+import objects.neighbourfoods.AccessNeighbourhood;
 import objects.neighbourfoods.DistantDarkness;
 import util.Coord;
 
@@ -21,7 +22,7 @@ public class DungeonGenerator extends MapGenerator {
     public MapOfObjects generateMap() {
         MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
         map.heroObject = (HeroObject) new HeroObject(map, new Coord(6, 6)).attachToMap();
-
+        new Swordsman(map, new Coord(7, 6)).attachToMap();
         RoomSystem roomSystem = new RoomSystem(map);
         RoomTextures textures = new DungeonTextures();
 
@@ -74,6 +75,7 @@ public class DungeonGenerator extends MapGenerator {
 
         roomSystem.attachToMap();
         new DistantDarkness(map, map.heroObject.getLocation(), 10).attachToMap();
+        map.heroAccessNeighbourhood = (AccessNeighbourhood) new AccessNeighbourhood(map, map.getHeroLocation(), 5).attachToMap();
 
         return map;
     }

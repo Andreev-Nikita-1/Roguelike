@@ -31,8 +31,7 @@ public class ViewNeighbourhood extends Neghbourhood {
 
     @Override
     public synchronized void update() {
-//        map.unsubscribeFromCoords(this, centerSnapshot, radius);
-        map.unsubscribeFromCoord(this, centerSnapshot);
+        map.unsubscribeFromCoords(this, centerSnapshot, radius);
         List<Coord> frame = new ArrayList<>();
         borders = new ConcurrentLinkedDeque<>();
         int frameRadius = 2 * radius;

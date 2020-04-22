@@ -43,6 +43,10 @@ public class Menu {
         this.actions.add(index, action);
     }
 
+    public void deleteAction(int index) {
+        this.actions.remove(index);
+    }
+
     public void addAction(MenuAction action) {
         this.actions.add(action);
     }

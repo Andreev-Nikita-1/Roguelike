@@ -16,7 +16,7 @@ public class Util {
     public static <T> T generate(T[] options) {
         double t = Math.random();
         for (int i = 0; i < options.length; i++) {
-            if (t < 1 / options.length) {
+            if (t < (double) 1 / options.length) {
                 return options[i];
             } else {
                 t -= 1 / options.length;

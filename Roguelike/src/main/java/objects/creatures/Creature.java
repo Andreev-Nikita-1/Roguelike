@@ -1,6 +1,8 @@
 package objects.creatures;
 
 import map.MapOfObjects;
+import map.strategies.Strategy;
+import map.strategies.StrollStrategy;
 import objects.*;
 import renderer.VisualPixel;
 import util.Coord;
@@ -21,6 +23,8 @@ public abstract class Creature extends RunnableObject implements DynamicVisualOb
     protected volatile long lastAttackTime = 0;
     public volatile int health;
     protected volatile int power;
+
+    public Strategy strategy = new StrollStrategy();
 
     public abstract void die();
 

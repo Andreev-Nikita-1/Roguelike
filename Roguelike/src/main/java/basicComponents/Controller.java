@@ -19,12 +19,8 @@ import renderer.Renderer;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.sleep;
-import static menuLogic.Menu.mainMenu;
 import static menuLogic.Menu.optionsMenu;
 
 public class Controller {
@@ -135,37 +131,36 @@ public class Controller {
     }
 
 
-}
+    static class GameplayComponent extends AbstractInteractableComponent<GameplayComponent> {
 
-class GameplayComponent extends AbstractInteractableComponent<GameplayComponent> {
+        @Override
+        protected InteractableRenderer<GameplayComponent> createDefaultRenderer() {
+            return new MapRenderer();
+        }
 
-    @Override
-    protected InteractableRenderer<GameplayComponent> createDefaultRenderer() {
-        return new MapRenderer();
+        @Override
+        protected Result handleKeyStroke(KeyStroke keyStroke) {
+            AppLogic.handleKeyStrokeOnMap(keyStroke);
+            return Result.HANDLED;
+        }
     }
 
-    @Override
-    protected Result handleKeyStroke(KeyStroke keyStroke) {
-        AppLogic.handleKeyStrokeOnMap(keyStroke);
-        return Result.HANDLED;
-    }
-}
+    static class MapRenderer implements InteractableRenderer<GameplayComponent> {
 
-class MapRenderer implements InteractableRenderer<GameplayComponent> {
+        @Override
+        public TerminalPosition getCursorLocation(GameplayComponent component) {
+            return null;
+        }
 
-    @Override
-    public TerminalPosition getCursorLocation(GameplayComponent component) {
-        return null;
-    }
+        @Override
+        public TerminalSize getPreferredSize(GameplayComponent component) {
+            return null;
+        }
 
-    @Override
-    public TerminalSize getPreferredSize(GameplayComponent component) {
-        return null;
-    }
-
-    @Override
-    public void drawComponent(TextGUIGraphics graphics, GameplayComponent component) {
-        Renderer.render(graphics);
+        @Override
+        public void drawComponent(TextGUIGraphics graphics, GameplayComponent component) {
+            Renderer.render(graphics);
+        }
     }
 }
 

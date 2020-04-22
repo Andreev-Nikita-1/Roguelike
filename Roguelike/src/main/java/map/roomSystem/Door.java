@@ -55,8 +55,13 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
 
     public void openDoor() {
         if (state == OPEN) return;
-        map.unsetObject(this, doorCoord);
-        state = OPEN;
+        map.getCoordLock(doorCoord).lock();
+        try {
+            map.unsetObject(this, doorCoord);
+            state = OPEN;
+        } finally {
+            map.getCoordLock(doorCoord).unlock();
+        }
     }
 
     @Override
@@ -88,8 +93,8 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     @Override
     public Door attachToMap() {
         super.attachToMap();
-        map.heroObject.dependingObjects.add(this);
         map.setObject(this, doorCoord);
+        map.subscribeOnCoords(this, doorCoord, 3);
         update();
         return this;
     }
@@ -98,6 +103,7 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     public void deleteFromMap() {
         super.deleteFromMap();
         map.unsetObject(this, doorCoord);
+        map.subscribeOnCoords(this, doorCoord, 3);
         if (map.heroObject.interactiveObject == this) {
             map.heroObject.interactiveObject = null;
         }

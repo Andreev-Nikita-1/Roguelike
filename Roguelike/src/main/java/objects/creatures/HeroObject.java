@@ -23,7 +23,6 @@ public class HeroObject extends OnePixelMob {
     private int attackDelay;
     private long lastMoveX;
     private long lastMoveY;
-    public List<DependingObject> dependingObjects = new ArrayList<>();
     public InteractiveObject interactiveObject;
 
     public Coord getLocation() {
@@ -76,9 +75,6 @@ public class HeroObject extends OnePixelMob {
                 lastMoveY = eventTime;
             }
         }
-        for (DependingObject o : dependingObjects) {
-            o.update();
-        }
     }
 
     public void makeAttack(DirectedOption option, long eventTime) {
@@ -91,7 +87,7 @@ public class HeroObject extends OnePixelMob {
     @Override
     public void takeDamage(Damage damage) {
         health -= damage.value;
-        if(health <=0){
+        if (health <= 0) {
             die();
         }
     }

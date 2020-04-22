@@ -49,8 +49,6 @@ public abstract class StaticObject extends MapObject implements StaticVisualObje
 
     @Override
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
-        Map<Coord, VisualPixel> pixels1 = pixels;
-        pixels = null;
-        return pixels1;
+        return pixels;
     }
 }

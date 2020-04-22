@@ -6,17 +6,15 @@ import util.Coord;
 import util.Pausable;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.locks.Lock;
+import java.util.Set;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MapOfObjects implements Pausable {
     public int xSize;
     public int ySize;
     private MapObject[][] objectsMap;
-    private Lock[][] lockMap;
+    private MapAreaLock[][] lockMap;
     private int lockSize = 10;
     public List<StaticVisualObject> staticObjects = new CopyOnWriteArrayList<>();
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
@@ -28,16 +26,44 @@ public class MapOfObjects implements Pausable {
         this.xSize = xSize;
         this.ySize = ySize;
         objectsMap = new MapObject[xSize][ySize];
-        lockMap = new Lock[xSize / lockSize + 1][ySize / lockSize + 1];
+        lockMap = new MapAreaLock[xSize / lockSize + 1][ySize / lockSize + 1];
         for (int i = 0; i < lockMap.length; i++) {
             for (int j = 0; j < lockMap[0].length; j++) {
-                lockMap[i][j] = new ReentrantLock();
+                lockMap[i][j] = new MapAreaLock();
             }
         }
     }
 
-    public Lock getCoordLock(Coord coord) {
+    public MapAreaLock getCoordLock(Coord coord) {
         return lockMap[coord.x / lockSize][coord.y / lockSize];
+    }
+
+    public void subscribeOnCoord(DependingObject object, Coord coord) {
+        getCoordLock(coord).subscribe(object);
+    }
+
+    public void unsubscribeFromCoord(DependingObject object, Coord coord) {
+        getCoordLock(coord).unsubscribe(object);
+    }
+
+    public void subscribeOnCoords(DependingObject object, Coord coord, int radius) {
+        for (int i = -radius; i <= radius + lockSize; i += lockSize) {
+            for (int j = -radius; j <= radius + lockSize; j += lockSize) {
+                if (inside(coord.shifted(new Coord(i, j)))) {
+                    subscribeOnCoord(object, coord.shifted(new Coord(i, j)));
+                }
+            }
+        }
+    }
+
+    public void unsubscribeFromCoords(DependingObject object, Coord coord, int radius) {
+        for (int i = -radius; i <= radius + lockSize; i += lockSize) {
+            for (int j = -radius; j <= radius + lockSize; j += lockSize) {
+                if (inside(coord.shifted(new Coord(i, j)))) {
+                    subscribeOnCoord(object, coord.shifted(new Coord(i, j)));
+                }
+            }
+        }
     }
 
     public Coord getHeroLocation() {
@@ -103,5 +129,25 @@ public class MapOfObjects implements Pausable {
             object.kill();
         }
         scheduler.shutdown();
+    }
+
+    public class MapAreaLock extends ReentrantLock {
+        private Set<DependingObject> subscribers = new CopyOnWriteArraySet<>();
+
+        public void subscribe(DependingObject object) {
+            subscribers.add(object);
+        }
+
+        public void unsubscribe(DependingObject object) {
+            subscribers.remove(object);
+        }
+
+        @Override
+        public void unlock() {
+            super.unlock();
+            for (DependingObject subscriber : subscribers) {
+                subscriber.update();
+            }
+        }
     }
 }

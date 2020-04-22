@@ -1,6 +1,7 @@
 package mapGenerator;
 
 import map.roomSystem.*;
+import objects.neighbourfoods.DistantDarkness;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
 import renderer.VisualPixel;
@@ -30,6 +31,8 @@ public class TestGenerator extends MapGenerator {
         int xHero = mapXSize / 2;
         int yHero = mapYSize / 2;
         map.heroObject = (HeroObject) new HeroObject(map, new Coord(xHero, yHero)).attachToMap();
+
+        new DistantDarkness(map, map.heroObject.getLocation(), 10).attachToMap();
         RoomSystem roomSystem = new RoomSystem(map);
         RoomTextures textures = new DungeonTextures();
         Room room1 = new Room(map, new Coord(8, 8), new Coord(5, 5), 1, textures);
@@ -79,18 +82,9 @@ public class TestGenerator extends MapGenerator {
 
         roomSystem.attachToMap();
 
-        Swordsman swordsman = (Swordsman) new Swordsman(map, new Coord(11, 11)).attachToMap();
+        new Swordsman(map, new Coord(11, 11)).attachToMap();
 
-        new Thread(() -> {
-            while (true) {
-                System.out.println(map.heroObject.health + " " + swordsman.health);
-                try {
-                    sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+
 //
 
 

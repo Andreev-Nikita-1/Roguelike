@@ -8,7 +8,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public abstract class RunnableObject extends PausableObject implements Runnable {
     private volatile ScheduledFuture<?> future;
-    private volatile int delay = 10000;
+    private volatile int delay = 10000000;
 
     public RunnableObject(MapOfObjects map) {
         super(map);

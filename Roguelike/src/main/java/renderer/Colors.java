@@ -35,7 +35,7 @@ public class Colors {
     public static TextColor COLOR24 = new TextColor.RGB(30, 48, 52);
     public static TextColor COLOR25 = new TextColor.RGB(26, 37, 39);
     public static TextColor HERO_COLOR = COLOR9;
-    public static TextColor SWORDMEN_COLOR = COLOR6;
+    public static TextColor SWORDMEN_COLOR = DOOR_SYMBOL_COLOR;
 
 }
 

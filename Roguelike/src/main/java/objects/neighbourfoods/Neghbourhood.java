@@ -17,13 +17,13 @@ public abstract class Neghbourhood extends MapObject implements DependingObject 
     protected int radius;
     protected int[][] mask;
     protected Direction[][] directions;
-    protected Function<Coord, Double> norm;
 
 
     public Neghbourhood(MapOfObjects map, Coord center, int radius) {
         this(map, center, radius, Coord::euqlideanScaled);
     }
 
+    protected Function<Coord, Double> norm;
 
     public Neghbourhood(MapOfObjects map, Coord center, int radius, Function<Coord, Double> norm) {
         super(map);
@@ -33,6 +33,13 @@ public abstract class Neghbourhood extends MapObject implements DependingObject 
         this.norm = norm;
         directions = new Direction[2 * radius + 1][2 * radius + 1];
         mask = new int[2 * radius + 1][2 * radius + 1];
+    }
+
+    @Override
+    public Neghbourhood attachToMap() {
+        super.attachToMap();
+        map.subscribeOnCoords(this, center, radius);
+        return this;
     }
 
     public int number(Coord coord) {

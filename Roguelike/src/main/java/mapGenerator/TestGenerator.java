@@ -4,6 +4,7 @@ import map.roomSystem.*;
 import objects.neighbourfoods.DistantDarkness;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
+import objects.neighbourfoods.testAcess;
 import renderer.VisualPixel;
 import map.MapOfObjects;
 import util.Coord;
@@ -27,63 +28,64 @@ public class TestGenerator extends MapGenerator {
 
     @Override
     public MapOfObjects generateMap() {
-        MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
-        int xHero = mapXSize / 2;
-        int yHero = mapYSize / 2;
-        map.heroObject = (HeroObject) new HeroObject(map, new Coord(xHero, yHero)).attachToMap();
-
-        new DistantDarkness(map, map.heroObject.getLocation(), 10).attachToMap();
-        RoomSystem roomSystem = new RoomSystem(map);
-        RoomTextures textures = new DungeonTextures();
-        Room room1 = new Room(map, new Coord(8, 8), new Coord(5, 5), 1, textures);
-        Room room2 = new Room(map, new Coord(7, 5), new Coord(7, 2), 0, textures);
-        Room room3 = new Room(map, new Coord(7, 14), new Coord(7, 1), 0, textures);
-        Room room4 = new Room(map, new Coord(4, 2), new Coord(3, 13), 0, textures);
-        Room room5 = new Room(map, new Coord(14, 5), new Coord(3, 10), 0, textures);
-        Room room6 = new Room(map, new Coord(8, 2), new Coord(9, 2), 1, textures);
-        Room room7 = new Room(map, new Coord(18, 0), new Coord(1, 15), 0, 1, 1, 1, textures);
-        Room room8 = new Room(map, new Coord(0, 0), new Coord(17, 1), 0, 1, 0, 1, textures);
-        Room room9 = new Room(map, new Coord(1, 16), new Coord(4, 3), 1, textures);
-        Room room10 = new Room(map, new Coord(6, 16), new Coord(9, 3), 1, textures);
-        Room room11 = new Room(map, new Coord(16, 16), new Coord(4, 3), 1, 1, 1, 0, textures);
-        Room room12 = new Room(map, new Coord(0, 2), new Coord(2, 13), 1, 1, 0, 2, textures);
-        roomSystem.addRoom(room1);
-        roomSystem.addRoom(room2);
-        roomSystem.addRoom(room3);
-        roomSystem.addRoom(room4);
-        roomSystem.addRoom(room5);
-        roomSystem.addRoom(room6);
-        roomSystem.addRoom(room7);
-        roomSystem.addRoom(room8);
-        roomSystem.addRoom(room9);
-        roomSystem.addRoom(room10);
-        roomSystem.addRoom(room11);
-        roomSystem.addRoom(room12);
-
-
-        roomSystem.addPassage(new Corridor(room1, room4, 3));
-        roomSystem.addPassage(new Corridor(room1, room5, 3));
-        roomSystem.addPassage(new Door(room1, room2));
-        roomSystem.addPassage(new Door(room4, room6, 1));
-        roomSystem.addPassage(new Door(room6, room7, 0));
-        roomSystem.addPassage(new Door(room7, room11));
-        roomSystem.addPassage(new Door(room6, room5));
-        roomSystem.addPassage(new Door(room8, room12, 1));
-        roomSystem.addPassage(new Door(room9, room12));
-        roomSystem.addPassage(new Door(room3, room10));
-        roomSystem.addPassage(new Door(room4, room12, 9, 0));
-        roomSystem.addPassage(new Corridor(room11, room10, 1, 2));
-        roomSystem.addPassage(new Corridor(room9, room10, 1, 2));
-        roomSystem.addPassage(new Corridor(room2, room5));
-        roomSystem.addPassage(new Corridor(room2, room4));
-        roomSystem.addPassage(new Corridor(room3, room5));
-        roomSystem.addPassage(new Corridor(room3, room4));
-        roomSystem.addPassage(new Corridor(room8, room7));
-
-        roomSystem.attachToMap();
-
-        new Swordsman(map, new Coord(11, 11)).attachToMap();
-
+//        MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
+//        int xHero = mapXSize / 2;
+//        int yHero = mapYSize / 2;
+//        map.heroObject = (HeroObject) new HeroObject(map, new Coord(xHero, yHero)).attachToMap();
+//
+////        new DistantDarkness(map, map.heroObject.getLocation(), 10).attachToMap();
+////        new testAcess(map, map.heroObject.getLocation(), 10).attachToMap();
+//        RoomSystem roomSystem = new RoomSystem(map);
+//        RoomTextures textures = new DungeonTextures();
+//        Room room1 = new Room(map, new Coord(8, 8), new Coord(5, 5), 1, textures);
+//        Room room2 = new Room(map, new Coord(7, 5), new Coord(7, 2), 0, textures);
+//        Room room3 = new Room(map, new Coord(7, 14), new Coord(7, 1), 0, textures);
+//        Room room4 = new Room(map, new Coord(4, 2), new Coord(3, 13), 0, textures);
+//        Room room5 = new Room(map, new Coord(14, 5), new Coord(3, 10), 0, textures);
+//        Room room6 = new Room(map, new Coord(8, 2), new Coord(9, 2), 1, textures);
+//        Room room7 = new Room(map, new Coord(18, 0), new Coord(1, 15), 0, 1, 1, 1, textures);
+//        Room room8 = new Room(map, new Coord(0, 0), new Coord(17, 1), 0, 1, 0, 1, textures);
+//        Room room9 = new Room(map, new Coord(1, 16), new Coord(4, 3), 1, textures);
+//        Room room10 = new Room(map, new Coord(6, 16), new Coord(9, 3), 1, textures);
+//        Room room11 = new Room(map, new Coord(16, 16), new Coord(4, 3), 1, 1, 1, 0, textures);
+//        Room room12 = new Room(map, new Coord(0, 2), new Coord(2, 13), 1, 1, 0, 2, textures);
+//        roomSystem.addRoom(room1);
+//        roomSystem.addRoom(room2);
+//        roomSystem.addRoom(room3);
+//        roomSystem.addRoom(room4);
+//        roomSystem.addRoom(room5);
+//        roomSystem.addRoom(room6);
+//        roomSystem.addRoom(room7);
+//        roomSystem.addRoom(room8);
+//        roomSystem.addRoom(room9);
+//        roomSystem.addRoom(room10);
+//        roomSystem.addRoom(room11);
+//        roomSystem.addRoom(room12);
+//
+//
+//        roomSystem.addPassage(new Corridor(room1, room4, 3));
+//        roomSystem.addPassage(new Corridor(room1, room5, 3));
+//        roomSystem.addPassage(new Door(room1, room2));
+//        roomSystem.addPassage(new Door(room4, room6, 1));
+//        roomSystem.addPassage(new Door(room6, room7, 0));
+//        roomSystem.addPassage(new Door(room7, room11));
+//        roomSystem.addPassage(new Door(room6, room5));
+//        roomSystem.addPassage(new Door(room8, room12, 1));
+//        roomSystem.addPassage(new Door(room9, room12));
+//        roomSystem.addPassage(new Door(room3, room10));
+//        roomSystem.addPassage(new Door(room4, room12, 9, 0));
+//        roomSystem.addPassage(new Corridor(room11, room10, 1, 2));
+//        roomSystem.addPassage(new Corridor(room9, room10, 1, 2));
+//        roomSystem.addPassage(new Corridor(room2, room5));
+//        roomSystem.addPassage(new Corridor(room2, room4));
+//        roomSystem.addPassage(new Corridor(room3, room5));
+//        roomSystem.addPassage(new Corridor(room3, room4));
+//        roomSystem.addPassage(new Corridor(room8, room7));
+//
+//        roomSystem.attachToMap();
+//
+//        new Swordsman(map, new Coord(11, 11)).attachToMap();
+//
 
 //
 
@@ -117,7 +119,7 @@ public class TestGenerator extends MapGenerator {
 //        }
 
 
-        return map;
+        return null;
     }
 
     private double treesProportion(int distanceX, int distanceY) {

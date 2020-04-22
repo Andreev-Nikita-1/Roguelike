@@ -35,7 +35,8 @@ public class AccessNeighbourhood extends Neghbourhood {
             if (norm.apply(current) >= radius) continue;
             for (Direction direction : Direction.getDirections()) {
                 Coord c = current.shifted(Coord.fromDirection(direction));
-                if (map.inside(center.shifted(c)) && !map.isTaken(center.shifted(c)) && mask[c.x + radius][c.y + radius] == -1) {
+                if (map.inside(center.shifted(c)) && !map.isTaken(center.shifted(c))
+                        && mask[c.x + radius][c.y + radius] == -1) {
                     deque.addLast(c);
                     directions[c.x + radius][c.y + radius] = direction.opposite();
                     mask[c.x + radius][c.y + radius] = mask[current.x + radius][current.y + radius] + 1;

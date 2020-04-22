@@ -71,9 +71,6 @@ public class MapOfObjects implements Pausable {
     }
 
     public boolean setObject(MapObject object, Coord c) {
-        if (c.y == 20) {
-            return false;
-        }
         if (objectsMap[c.x][c.y] != null) {
             return false;
         }

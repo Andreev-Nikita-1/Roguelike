@@ -2,6 +2,7 @@ package basicComponents;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
+import mapGenerator.DungeonGenerator;
 import mapGenerator.TestGenerator;
 import mapGenerator.MapGenerator;
 import map.MapOfObjects;
@@ -16,8 +17,8 @@ public class GameplayLogic {
     public static MapOfObjects currentMap;
     public static MapRenderer currentMapRenderer;
 
-    private static int xSize = 20;
-    private static int ySize = 20;
+    private static int xSize = 200;
+    private static int ySize = 200;
 
     private GameplayLogic() {
     }
@@ -41,7 +42,8 @@ public class GameplayLogic {
 
     public static void createMapLevel1() {
         gameplayState = MAP_GENERATING;
-        createMap(new TestGenerator(xSize, ySize));
+//        createMap(new TestGenerator(xSize, ySize));
+        createMap(new DungeonGenerator(xSize, ySize));
         gameplayState = PLAYING;
     }
 

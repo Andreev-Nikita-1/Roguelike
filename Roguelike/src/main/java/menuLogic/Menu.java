@@ -20,8 +20,8 @@ public class Menu {
         mainMenu.addAction(exit);
 
         levelSelector.addAction(level1Action);
-        levelSelector.addAction(level2Action);
-        levelSelector.addAction(level3Action);
+//        levelSelector.addAction(level2Action);
+//        levelSelector.addAction(level3Action);
         levelSelector.addAction(back(mainMenu));
 
 

@@ -13,9 +13,9 @@ public class VisualPixel {
     public static final VisualPixel HERO = new VisualPixel(
             new PixelData(true, 10, HERO_COLOR, 1, HERO_SYMBOL));
     public static final VisualPixel SWORDSMAN = new VisualPixel(
-            new PixelData(true, 10, SWORDMEN_COLOR, 1, (char) 7461));
+            new PixelData(true, 10, SWORDMEN_COLOR, 1, (char) 555));
     public static final VisualPixel ATTACK = new VisualPixel(
-            new PixelData(false, 20, TextColor.ANSI.RED, 0.3, ' '));
+            new PixelData(false, 19, TextColor.ANSI.RED, 0.3, ' '));
     public static final VisualPixel INTERACT = new VisualPixel(
             new PixelData(false, 19, TextColor.ANSI.GREEN, 0.1, ' '));
     public static final VisualPixel DOOR_CLOSED = new VisualPixel(

@@ -1,6 +1,8 @@
 package objects.neighbourfoods;
 
 import map.MapOfObjects;
+import objects.creatures.Creature;
+import objects.creatures.Swordsman;
 import objects.neighbourfoods.Neghbourhood;
 import util.Coord;
 import util.Direction;
@@ -25,9 +27,12 @@ public class ViewNeighbourhood extends Neghbourhood {
         return borders;
     }
 
+    static volatile int i = 0;
+
     @Override
     public synchronized void update() {
-        map.unsubscribeFromCoords(this, centerSnapshot, radius);
+//        map.unsubscribeFromCoords(this, centerSnapshot, radius);
+        map.unsubscribeFromCoord(this, centerSnapshot);
         List<Coord> frame = new ArrayList<>();
         borders = new ConcurrentLinkedDeque<>();
         int frameRadius = 2 * radius;
@@ -49,7 +54,8 @@ public class ViewNeighbourhood extends Neghbourhood {
             do {
                 direction = current.walkTheLine(center, frameCoord);
                 currentRelative = current.relative(center).shift(new Coord(radius, radius));
-                if (norm.apply(current.relative(center)) >= radius || !map.inside(current) || map.isTaken(current)) {
+                if (norm.apply(current.relative(center)) >= radius || !map.inside(current)
+                        || map.isTaken(current) && !(map.getObject(current) instanceof Swordsman)) {
                     break;
                 }
                 if (mask[currentRelative.x][currentRelative.y] == -1 ||
@@ -61,7 +67,8 @@ public class ViewNeighbourhood extends Neghbourhood {
             } while (direction != null);
 
         }
-        map.subscribeOnCoords(this, center, radius);
+//        map.subscribeOnCoords(this, center, radius);
+        map.subscribeOnCoord(this, center);
         centerSnapshot = new Coord(center);
     }
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static mapGenerator.DungeonGenerator.room1;
 import static util.Direction.*;
 
 
@@ -20,7 +21,7 @@ public class Room extends MapObject {
     private int downWallWidth;
     private int leftWallWidth;
     private int rightWallWidth;
-    private List<Passage> passages = new ArrayList<>();
+    public List<Passage> passages = new ArrayList<>();
     private RoomTextures textures;
     private Wall upWall;
     private Wall downWall;
@@ -60,6 +61,9 @@ public class Room extends MapObject {
 
     @Override
     public Room attachToMap() {
+        if(this == room1){
+            System.out.println("aaa");
+        }
         if (upWallWidth > 0) {
             upWall = textures.createWall(map,
                     location.shifted(new Coord(0, -upWallWidth)),

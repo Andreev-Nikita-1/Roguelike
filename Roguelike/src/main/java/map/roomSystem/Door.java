@@ -16,6 +16,11 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     protected DoorState state = CLOSED;
     protected boolean highlighted = false;
 
+    @Override
+    public boolean passable(int width) {
+        return width <= 1 && state == OPEN;
+    }
+
     public Door(Room room1, Room room2) {
         super(room1, room2);
         setWidthAndBias(1, width / 2);

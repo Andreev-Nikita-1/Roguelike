@@ -1,5 +1,8 @@
 package map;
 
+import map.roomSystem.Passage;
+import map.roomSystem.Room;
+import map.roomSystem.RoomSystem;
 import objects.*;
 import objects.creatures.HeroObject;
 import objects.neighbourfoods.AccessNeighbourhood;
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+
 
 public class MapOfObjects implements Pausable {
     public int xSize;
@@ -22,7 +26,9 @@ public class MapOfObjects implements Pausable {
     public List<PausableObject> pausableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
     public AccessNeighbourhood heroAccessNeighbourhood;
-    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+    public RoomSystem roomSystem;
+    //    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public MapOfObjects(int xSize, int ySize) {
         this.xSize = xSize;
@@ -62,9 +68,29 @@ public class MapOfObjects implements Pausable {
         for (int i = -radius; i <= radius + lockSize; i += lockSize) {
             for (int j = -radius; j <= radius + lockSize; j += lockSize) {
                 if (inside(coord.shifted(new Coord(i, j)))) {
-                    subscribeOnCoord(object, coord.shifted(new Coord(i, j)));
+                    unsubscribeFromCoord(object, coord.shifted(new Coord(i, j)));
                 }
             }
+        }
+    }
+
+    public Room closestRoom(Coord coord) {
+        Room room = roomSystem.findOutRoom(coord);
+        if (room != null) {
+            return room;
+        } else {
+            Passage passage = roomSystem.findOutPassage(coord);
+            AccessNeighbourhood neighbourhood = new AccessNeighbourhood(this, coord, 5, Coord::lInftyNorm).attachToMap();
+            Coord first = passage.entryLocation(passage.room1);
+            Coord second = passage.entryLocation(passage.room2);
+            if (neighbourhood.accessible(first)) {
+                neighbourhood.deleteFromMap();
+                return passage.room1;
+            } else if (neighbourhood.accessible(second)) {
+                neighbourhood.deleteFromMap();
+                return passage.room2;
+            }
+            return passage.room1;
         }
     }
 
@@ -98,6 +124,10 @@ public class MapOfObjects implements Pausable {
 
     public boolean inside(Coord coord) {
         return coord.x < xSize && coord.x >= 0 && coord.y < ySize && coord.y >= 0;
+    }
+
+    public boolean accesible(Coord coord) {
+        return inside(coord) && !isTaken(coord);
     }
 
     @Override

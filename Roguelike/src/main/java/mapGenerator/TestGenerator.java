@@ -4,7 +4,6 @@ import map.roomSystem.*;
 import objects.neighbourfoods.DistantDarkness;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
-import objects.neighbourfoods.testAcess;
 import renderer.VisualPixel;
 import map.MapOfObjects;
 import util.Coord;

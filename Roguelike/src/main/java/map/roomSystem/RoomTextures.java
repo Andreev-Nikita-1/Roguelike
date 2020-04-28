@@ -22,7 +22,7 @@ public abstract class RoomTextures {
                         } catch (ArrayIndexOutOfBoundsException e) {
                         }
                     }
-                }
+                }  
             } else {
                 for (int y = relativeLocation.y; y < relativeLocation.y + passage.width; y++) {
                     for (int x = 0; x < array.length; x++) {

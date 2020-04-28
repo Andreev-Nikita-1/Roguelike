@@ -7,19 +7,20 @@ import objects.creatures.Creature;
 import util.Direction;
 
 public class PersueStrategy extends Strategy {
+    public PersueStrategy(Creature owner) {
+        super(owner);
+    }
+
     @Override
-    public GameplayOption getAction(Creature object) {
-        Direction direction = object.map.heroAccessNeighbourhood.follow(object.getLocation());
+    public GameplayOption getAction() {
+        Direction direction = map.heroAccessNeighbourhood.follow(owner.getLocation());
         if (direction == null) {
-            if (!object.map.heroAccessNeighbourhood.accessible(object.getLocation())) {
-                object.strategy = new StrollStrategy();
-                return GameplayOption.NOTHING;
-            }
+            return GameplayOption.NOTHING;
         }
-        if (object.map.getHeroLocation().near(object.getLocation())) {
+        if (map.getHeroLocation().near(owner.getLocation())) {
             return new DirectedOption(DirectedOption.Action.ATTACK, direction);
         } else {
-            return new DirectedOption(DirectedOption.Action.WALK, direction);
+            return new DirectedOption(DirectedOption.Action.RUN, direction);
         }
     }
 }

@@ -4,7 +4,7 @@ import objects.MapObject;
 import util.Coord;
 import util.Direction;
 
-import static util.Direction.UP;
+import static util.Direction.*;
 
 public abstract class Passage extends MapObject {
 
@@ -16,6 +16,8 @@ public abstract class Passage extends MapObject {
     public Room room2;
 
 
+    public abstract boolean passable(int width);
+
     public void setWidestPassage() {
         Coord commonLengthY = segmentsIntersection(
                 new Coord(room1.location.y, room1.rightDown.y),
@@ -25,7 +27,7 @@ public abstract class Passage extends MapObject {
             if (distance > 0) {
                 width = commonLengthY.y;
                 direction = Direction.RIGHT;
-                this.length = distance;
+                this.length = distance - 1;
                 location = new Coord(room1.rightDown.x + 1, commonLengthY.x);
                 return;
             }
@@ -33,7 +35,7 @@ public abstract class Passage extends MapObject {
             if (distance > 0) {
                 width = commonLengthY.y;
                 direction = Direction.LEFT;
-                this.length = distance;
+                this.length = distance - 1;
                 location = new Coord(room2.rightDown.x + 1, commonLengthY.x);
                 return;
             }
@@ -46,14 +48,14 @@ public abstract class Passage extends MapObject {
             if (distance > 0) {
                 width = commonLengthX.y;
                 direction = Direction.DOWN;
-                this.length = distance;
+                this.length = distance - 1;
                 location = new Coord(commonLengthX.x, room1.rightDown.y + 1);
             }
             distance = room1.location.y - room2.rightDown.y;
             if (distance > 0) {
                 width = commonLengthX.y;
                 direction = UP;
-                this.length = distance;
+                this.length = distance - 1;
                 location = new Coord(commonLengthX.x, room2.rightDown.y + 1);
             }
         }
@@ -73,6 +75,11 @@ public abstract class Passage extends MapObject {
         setWidthAndBias(width, bias);
     }
 
+    public Coord rightDown() {
+        Coord shift = direction.horizontal() ? new Coord(length - 1, width - 1) : new Coord(width - 1, length - 1);
+        return location.shifted(shift);
+    }
+
     public void setWidthAndBias(int width, int bias) {
         setWidestPassage();
         this.width = width;
@@ -90,7 +97,26 @@ public abstract class Passage extends MapObject {
         }
     }
 
-    public static Coord segmentsIntersection(Coord s1, Coord s2) {
+    public Coord entryLocation(Room room) {
+        Coord shiftWidth = direction.horizontal() ? new Coord(-1, width / 2) : new Coord(width / 2, -1);
+        Coord shiftLength = direction.horizontal() ? new Coord(length + 1, 0) : new Coord(0, length + 1);
+        if ((direction == RIGHT || direction == DOWN) && room2 == room
+                || (direction == LEFT || direction == UP) && room1 == room) {
+            shiftWidth.shift(shiftLength);
+        }
+        return location.shifted(shiftWidth);
+    }
+
+
+    public Room otherSideRoom(Room room) {
+        if (room1 == room) {
+            return room2;
+        } else {
+            return room1;
+        }
+    }
+
+    private static Coord segmentsIntersection(Coord s1, Coord s2) {
         if (s1.y < s2.x || s2.y < s1.x) {
             return new Coord(-1, -1);
         }

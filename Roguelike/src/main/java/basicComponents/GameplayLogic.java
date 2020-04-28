@@ -17,8 +17,8 @@ public class GameplayLogic {
     public static MapOfObjects currentMap;
     public static MapRenderer currentMapRenderer;
 
-    private static int xSize = 200;
-    private static int ySize = 200;
+    private static int xSize = 100;
+    private static int ySize = 50;
 
     private GameplayLogic() {
     }

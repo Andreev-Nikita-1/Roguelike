@@ -2,7 +2,6 @@ package objects.creatures;
 
 import map.MapOfObjects;
 import map.strategies.Strategy;
-import map.strategies.StrollStrategy;
 import objects.*;
 import renderer.VisualPixel;
 import util.Coord;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Creature extends RunnableObject implements DynamicVisualObject, MovableObject, AttackingObject, DamageableObject {
 
@@ -21,10 +21,10 @@ public abstract class Creature extends RunnableObject implements DynamicVisualOb
     protected Coord location;
     protected Set<Coord> attackingCoords = new HashSet<>();
     protected volatile long lastAttackTime = 0;
-    public volatile int health;
+    public AtomicInteger health;
     protected volatile int power;
 
-    public Strategy strategy = new StrollStrategy();
+    public Strategy strategy;
 
     public abstract void die();
 

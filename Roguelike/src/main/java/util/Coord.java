@@ -1,5 +1,7 @@
 package util;
 
+import map.MapOfObjects;
+
 import java.util.Objects;
 
 public class Coord {
@@ -57,8 +59,8 @@ public class Coord {
         for (int i = 0; i < 4; i++) {
             Coord v = vertex[i];
             Coord w = vertex[(i + 1) % 4];
-            if (segmentLineIntersect(v, w, vector) < 0
-                    && segmentLineIntersect(ZERO.relative(v), vector.relative(v), w.relative(v)) < 0) {
+            if (segmentLineIntersect(v, w, vector) <= 0
+                    && segmentLineIntersect(ZERO.relative(v), vector.relative(v), w.relative(v)) <= 0) {
                 return true;
             }
         }
@@ -70,9 +72,27 @@ public class Coord {
         Direction xDirection = (finish.x - start.x > 0) ? Direction.RIGHT : Direction.LEFT;
         Direction yDirection = (finish.y - start.y > 0) ? Direction.DOWN : Direction.UP;
         for (Direction direction : new Direction[]{xDirection, yDirection}) {
-            if (this.shifted(Coord.fromDirection(direction)).pixelCrossedBySegment(start, finish)) {
-                shift(Coord.fromDirection(direction));
+            if (this.shifted(fromDirection(direction)).pixelCrossedBySegment(start, finish)) {
+                shift(fromDirection(direction));
                 return direction;
+            }
+        }
+        return null;
+    }
+
+    public Direction properDirection(Coord target) {
+        Coord vector = target.relative(this);
+        if (Math.abs(vector.x) > Math.abs(vector.y)) {
+            if (vector.x > 0) {
+                return Direction.RIGHT;
+            } else {
+                return Direction.LEFT;
+            }
+        } else {
+            if (vector.y > 0) {
+                return Direction.DOWN;
+            } else if (vector.y < 0) {
+                return Direction.UP;
             }
         }
         return null;

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static mapGenerator.DungeonGenerator.room1;
 import static util.Direction.*;
 
 
@@ -58,12 +57,12 @@ public class Room extends MapObject {
         passages.add(passage);
     }
 
+    public Coord center() {
+        return new Coord((location.x + rightDown.x) / 2, (location.y + rightDown.y) / 2);
+    }
 
     @Override
     public Room attachToMap() {
-        if(this == room1){
-            System.out.println("aaa");
-        }
         if (upWallWidth > 0) {
             upWall = textures.createWall(map,
                     location.shifted(new Coord(0, -upWallWidth)),
@@ -111,6 +110,16 @@ public class Room extends MapObject {
         return this;
     }
 
+    public Passage passageTo(Room targetRoom, int minWidth) {
+        for (Passage passage : passages) {
+            if ((passage.room1 == this && passage.room2 == targetRoom
+                    || passage.room2 == this && passage.room1 == targetRoom)
+                    && passage.width >= minWidth) {
+                return passage;
+            }
+        }
+        return null;
+    }
 
     @Override
     public void deleteFromMap() {

@@ -2,6 +2,11 @@ package map.roomSystem;
 
 public class Corridor extends Passage {
 
+    @Override
+    public boolean passable(int width) {
+        return this.width >= width;
+    }
+
     public Corridor(Room room1, Room room2) {
         super(room1, room2);
     }

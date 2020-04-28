@@ -27,11 +27,8 @@ public class ViewNeighbourhood extends Neghbourhood {
         return borders;
     }
 
-    static volatile int i = 0;
-
     @Override
-    public synchronized void update() {
-        map.unsubscribeFromCoords(this, centerSnapshot, radius);
+    public void reset() {
         List<Coord> frame = new ArrayList<>();
         borders = new ConcurrentLinkedDeque<>();
         int frameRadius = 2 * radius;
@@ -41,10 +38,11 @@ public class ViewNeighbourhood extends Neghbourhood {
             frame.add(new Coord(i - frameRadius, frameRadius).shift(center));
             frame.add(new Coord(i - frameRadius, -frameRadius).shift(center));
         }
-        for (int[] row : mask) {
+        tempMask = new int[2 * radius + 1][2 * radius + 1];
+        for (int[] row : tempMask) {
             Arrays.fill(row, -1);
         }
-        mask[radius][radius] = 0;
+        tempMask[radius][radius] = 0;
         for (Coord frameCoord : frame) {
             Coord current = new Coord(center);
             int counter = 0;
@@ -54,21 +52,17 @@ public class ViewNeighbourhood extends Neghbourhood {
                 direction = current.walkTheLine(center, frameCoord);
                 currentRelative = current.relative(center).shift(new Coord(radius, radius));
                 if (norm.apply(current.relative(center)) >= radius || !map.inside(current)
-                        || map.isTaken(current) && !(map.getObject(current) instanceof Swordsman)) {
+                        || map.isTaken(current) && !(map.getObject(current) instanceof Creature)) {
                     break;
                 }
-                if (mask[currentRelative.x][currentRelative.y] == -1 ||
-                        mask[currentRelative.x][currentRelative.y] > counter + 1) {
-                    mask[currentRelative.x][currentRelative.y] = counter + 1;
-                    directions[currentRelative.x][currentRelative.y] = direction.opposite();
+                if (tempMask[currentRelative.x][currentRelative.y] == -1 ||
+                        tempMask[currentRelative.x][currentRelative.y] > counter + 1) {
+                    tempMask[currentRelative.x][currentRelative.y] = counter + 1;
                 }
                 counter++;
             } while (direction != null);
-
         }
-//        map.subscribeOnCoords(this, center, radius);
-        map.subscribeOnCoord(this, center);
-        centerSnapshot = new Coord(center);
     }
+
 }
 

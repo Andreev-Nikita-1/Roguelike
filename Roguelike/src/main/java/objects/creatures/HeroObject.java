@@ -16,6 +16,7 @@ import util.Direction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HeroObject extends OnePixelMob {
     private int walkDelayX;
@@ -33,7 +34,7 @@ public class HeroObject extends OnePixelMob {
 
     @Override
     public synchronized void die() {
-        super.deleteFromMap();
+        deleteFromMap();
         try {
             map.kill();
         } catch (InterruptedException e) {
@@ -51,7 +52,7 @@ public class HeroObject extends OnePixelMob {
         runDelayY = walkDelayY / 3;
         attackDelay = 100;
         power = 20;
-        health = 100;
+        health = new AtomicInteger(100);
     }
 
     public void makeMovement(DirectedOption option, long eventTime) {
@@ -93,8 +94,8 @@ public class HeroObject extends OnePixelMob {
 
     @Override
     public void takeDamage(Damage damage) {
-        health -= damage.value;
-        if (health <= 0) {
+        health.addAndGet(-damage.value);
+        if (health.get() <= 0) {
             die();
         }
     }

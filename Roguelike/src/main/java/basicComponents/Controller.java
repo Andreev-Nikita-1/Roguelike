@@ -106,14 +106,6 @@ public class Controller {
         }
     }
 
-    public static void draw() {
-        try {
-            gui.updateScreen();
-        } catch (IOException e) {
-        }
-    }
-
-
     public static void drawMenu(Menu menu) {
         ActionListDialogBuilder builder = new ActionListDialogBuilder();
         builder.setTitle(menu.getTitle());
@@ -124,10 +116,6 @@ public class Controller {
         DialogWindow dialog = builder.build();
         dialog.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING));
         gui.addWindow(dialog);
-        if (gui.getScreen().getFrontCharacter(0, gui.getScreen().getTerminalSize().getRows() - 1).getCharacter() == 'T') {
-            dialog.setHints(Arrays.asList(Window.Hint.FULL_SCREEN, Window.Hint.NO_POST_RENDERING));
-            System.out.println("aaa");
-        }
     }
 
 

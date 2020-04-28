@@ -48,8 +48,6 @@ public class MapRenderer {
     }
 
     public void drawMap(TextGUIGraphics graphics, int terminalSizeX, int terminalSizeY) {
-
-
         int xSize = Math.min(terminalSizeX, map.xSize);
         int ySize = Math.min(terminalSizeY, map.ySize);
         Coord leftUp = terminalCoordinate.getLeftUp(xSize, ySize, map.getHeroLocation());
@@ -66,6 +64,7 @@ public class MapRenderer {
             }
         }
 
+        graphics.putString(0,0, String.valueOf(map.heroObject.health));
 //        showUnicode(graphics);
     }
 

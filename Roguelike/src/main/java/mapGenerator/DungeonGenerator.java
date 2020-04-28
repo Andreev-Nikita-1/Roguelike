@@ -8,10 +8,10 @@ import objects.neighbourfoods.AccessNeighbourhood;
 import objects.neighbourfoods.DistantDarkness;
 import util.Coord;
 
+
 public class DungeonGenerator extends MapGenerator {
     private int mapXSize;
     private int mapYSize;
-    public static Room room1;
 
     public DungeonGenerator(int xSize, int ySize) {
         mapXSize = xSize;
@@ -44,16 +44,18 @@ public class DungeonGenerator extends MapGenerator {
                 Room room2 = rooms[i + 1][j];
                 Room room3 = rooms[i][j + 1];
                 if (room1 != null && room2 != null) {
-                    int width = (int) (Math.random() * 4) + 1;
+                    int bias = (int) (Math.random() * 3);
+                    int width = (int) (Math.random() * (4 - bias)) + 1;
                     double rand = Math.random();
                     if (rand < 0.2) {
-                        roomSystem.addPassage(new Door(room1, room2));
+                        roomSystem.addPassage(new Door(room1, room2, bias));
                     } else if (rand < 0.7) {
-                        roomSystem.addPassage(new Corridor(room1, room2, width));
+                        roomSystem.addPassage(new Corridor(room1, room2, bias, width));
                     }
                 }
                 if (room1 != null && room3 != null) {
-                    int width = (int) (Math.random() * 4) + 1;
+                    int bias = (int) (Math.random() * 3);
+                    int width = (int) (Math.random() * (4 - bias)) + 1;
                     double rand = Math.random();
                     if (rand < 0.2) {
                         roomSystem.addPassage(new Door(room1, room3));
@@ -61,7 +63,8 @@ public class DungeonGenerator extends MapGenerator {
                         roomSystem.addPassage(new Corridor(room1, room3, width));
                     }
                     if (room1.passages.isEmpty()) {
-                        width = (int) (Math.random() * 4) + 1;
+                        bias = (int) (Math.random() * 3);
+                        width = (int) (Math.random() * (4 - bias)) + 1;
                         rand = Math.random();
                         if (rand < 0.4) {
                             roomSystem.addPassage(new Door(room1, room3));
@@ -76,7 +79,6 @@ public class DungeonGenerator extends MapGenerator {
         roomSystem.attachToMap();
         new DistantDarkness(map, map.heroObject.getLocation(), 10).attachToMap();
         map.heroAccessNeighbourhood = (AccessNeighbourhood) new AccessNeighbourhood(map, map.getHeroLocation(), 5).attachToMap();
-
         return map;
     }
 }

@@ -25,11 +25,14 @@ public abstract class OnePixelMob extends Creature {
 
     @Override
     public synchronized boolean move(Direction direction) {
+        if (direction == null) {
+            return false;
+        }
         Coord shift = Coord.fromDirection(direction);
         Coord nextLocation = location.shifted(shift);
         map.getCoordLock(nextLocation).lock();
         try {
-            if (map.inside(nextLocation) && !map.isTaken(nextLocation)) {
+            if (map.accesible(nextLocation)) {
                 map.unsetObject(this, location);
                 location.shift(shift);
                 map.setObject(this, location);

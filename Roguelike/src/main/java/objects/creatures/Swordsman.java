@@ -3,7 +3,7 @@ package objects.creatures;
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
 import map.*;
-import map.strategies.Strategy;
+import map.strategies.CombinedStrategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
@@ -11,19 +11,20 @@ import renderer.VisualPixel;
 import util.*;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static util.Util.generate;
 
 public class Swordsman extends OnePixelMob implements DynamicVisualObject {
-    private volatile int speedDelayX = 160;
-    private volatile int speedDelayY = (int) ((double) 160 * 4 / 3);
+    private volatile int speedDelayX = 200;
+    private volatile int speedDelayY = (int) ((double) 200 * 4 / 3);
     private volatile int attackDelay = 100;
 
 
     public Swordsman(MapOfObjects map, Coord coord) {
         super(map, coord);
-        health = 30;
+        health = new AtomicInteger(30);
         power = 10;
+        strategy = new CombinedStrategy(this);
     }
 
     @Override
@@ -41,40 +42,43 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
 
     @Override
     public synchronized void die() {
-        deleteFromMap();
-        kill();
+        map.getCoordLock(location).lock();
+        try {
+            deleteFromMap();
+            kill();
+        } finally {
+            map.getCoordLock(location).unlock();
+        }
     }
 
     @Override
     public int act() {
-        GameplayOption action = strategy.getAction(this);
+        GameplayOption action = strategy.getAction();
         if (action == GameplayOption.NOTHING) {
-            return 0;
+            return 10;
         }
         if (action instanceof DirectedOption) {
             switch (((DirectedOption) action).action) {
                 case WALK:
                 case RUN:
-                    move(((DirectedOption) action).direction);
-                    return ((DirectedOption) action).direction.horizontal() ? speedDelayX : speedDelayY;
+                    if (move(((DirectedOption) action).direction)) {
+                        int d = (((DirectedOption) action).action == DirectedOption.Action.WALK) ? 1 : 2;
+                        return ((DirectedOption) action).direction.horizontal() ? speedDelayX / d : speedDelayY / d;
+                    } else {
+                        return 0;
+                    }
                 case ATTACK:
                     attack(((DirectedOption) action).direction);
                     return attackDelay;
             }
         }
-        Direction direction = generate(new double[]{0.25, 0.25, 0.25, 0.25}, Direction.values());
-        if (move(direction)) {
-            return direction.horizontal() ? speedDelayX : speedDelayY;
-        } else {
-            attack(direction);
-            return attackDelay;
-        }
+        return 0;
     }
 
     @Override
     public void takeDamage(Damage damage) {
-        health -= damage.value;
-        if (health <= 0) {
+        health.addAndGet(-damage.value);
+        if (health.get() <= 0) {
             die();
         }
     }

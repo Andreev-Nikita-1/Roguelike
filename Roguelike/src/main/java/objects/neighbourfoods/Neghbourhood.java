@@ -16,8 +16,7 @@ public abstract class Neghbourhood extends MapObject implements DependingObject 
     protected Coord centerSnapshot;
     protected int radius;
     protected int[][] mask;
-    protected Direction[][] directions;
-
+    protected int[][] tempMask;
 
     public Neghbourhood(MapOfObjects map, Coord center, int radius) {
         this(map, center, radius, Coord::euqlideanScaled);
@@ -31,16 +30,27 @@ public abstract class Neghbourhood extends MapObject implements DependingObject 
         this.centerSnapshot = new Coord(center);
         this.radius = radius;
         this.norm = norm;
-        directions = new Direction[2 * radius + 1][2 * radius + 1];
         mask = new int[2 * radius + 1][2 * radius + 1];
+        tempMask = new int[2 * radius + 1][2 * radius + 1];
     }
 
     @Override
     public Neghbourhood attachToMap() {
         super.attachToMap();
-        map.subscribeOnCoords(this, center, radius);
+        update();
         return this;
     }
+
+    @Override
+    public synchronized void update() {
+        reset();
+        mask = tempMask;
+        map.unsubscribeFromCoords(this, centerSnapshot, radius);
+        centerSnapshot = new Coord(center);
+        map.subscribeOnCoords(this, centerSnapshot, radius);
+    }
+
+    protected abstract void reset();
 
     public int number(Coord coord) {
         if (norm.apply(coord.relative(center)) <= radius) {
@@ -84,13 +94,5 @@ public abstract class Neghbourhood extends MapObject implements DependingObject 
             }
         }
         return -1;
-    }
-
-    public Direction follow(Coord c) {
-        if (norm.apply(center.relative(c)) <= radius) {
-            Coord shift = c.relative(center);
-            return directions[shift.x + radius][shift.y + radius];
-        }
-        return null;
     }
 }

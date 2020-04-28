@@ -1,0 +1,52 @@
+package map.strategies;
+
+import map.roomSystem.Passage;
+import map.roomSystem.Room;
+import objects.creatures.Creature;
+
+import java.util.Iterator;
+import java.util.List;
+
+public class RoomCycleTravelingStrategy extends RoomSwitchingStrategy {
+    public RoomCycleTravelingStrategy(Creature owner, List<Room> roomList, List<Passage> passageList) {
+        super(owner, new RoomCycleIterator(roomList, passageList, true));
+    }
+
+    public RoomCycleTravelingStrategy(Creature owner, List<Room> roomList, List<Passage> passageList, boolean startFromRoom) {
+        super(owner, new RoomCycleIterator(roomList, passageList, startFromRoom));
+    }
+
+    private static class RoomCycleIterator extends RoomPassageIterator {
+        private boolean mustSwitchRooms;
+        private List<Room> roomList;
+        private Iterator<Room> roomIterator;
+        private List<Passage> passageList;
+        private Iterator<Passage> passageIterator;
+
+        public RoomCycleIterator(List<Room> roomList, List<Passage> passageList, boolean mustSwitchRooms) {
+            this.mustSwitchRooms = mustSwitchRooms;
+            this.roomList = roomList;
+            this.passageList = passageList;
+            roomIterator = roomList.iterator();
+            passageIterator = passageList.iterator();
+            currentRoom = roomIterator.next();
+            currentPassage = passageIterator.next();
+        }
+
+        @Override
+        public void next() {
+            if (mustSwitchRooms) {
+                if (!roomIterator.hasNext()) {
+                    roomIterator = roomList.iterator();
+                }
+                currentRoom = roomIterator.next();
+            } else {
+                if (!passageIterator.hasNext()) {
+                    passageIterator = passageList.iterator();
+                }
+                currentPassage = passageIterator.next();
+            }
+            mustSwitchRooms = !mustSwitchRooms;
+        }
+    }
+}

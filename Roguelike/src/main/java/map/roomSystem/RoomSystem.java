@@ -2,6 +2,7 @@ package map.roomSystem;
 
 import map.MapOfObjects;
 import objects.MapObject;
+import util.Coord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,27 @@ public class RoomSystem extends MapObject {
         passages.add(passage);
     }
 
+    public Room findOutRoom(Coord c) {
+        for (Room room : rooms) {
+            if (c.between(room.location, room.rightDown)) {
+                return room;
+            }
+        }
+        return null;
+    }
+
+    public Passage findOutPassage(Coord c) {
+        for (Passage passage : passages) {
+            if (c.between(passage.location, passage.rightDown())) {
+                return passage;
+            }
+        }
+        return null;
+    }
+
     @Override
     public RoomSystem attachToMap() {
+        map.roomSystem = this;
         for (Room room : rooms) {
             room.attachToMap();
         }

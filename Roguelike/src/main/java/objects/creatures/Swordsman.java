@@ -2,11 +2,15 @@ package objects.creatures;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
+import inventory.InventoryItem;
 import map.*;
 import map.strategies.CombinedStrategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
+import objects.items.Health;
+import objects.items.InventoryItemOnMap;
+import objects.items.Item;
 import renderer.VisualPixel;
 import util.*;
 
@@ -22,8 +26,8 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
 
     public Swordsman(MapOfObjects map, Coord coord) {
         super(map, coord);
-        health = new AtomicInteger(30);
-        power = 10;
+        health = new AtomicInteger(60);
+        power = 5;
         strategy = new CombinedStrategy(this);
     }
 
@@ -46,8 +50,19 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
         try {
             deleteFromMap();
             kill();
+            generateItem().attachToMap();
         } finally {
             map.getCoordLock(location).unlock();
+        }
+    }
+
+    private Item generateItem() {
+        if (Math.random() < 0.9) {
+            return new Health(map, location, (int) (Math.random() * 3 * power));
+        } else {
+            return new InventoryItemOnMap(map, location,
+                    Util.generate(new InventoryItem[]{InventoryItem.WEAPON,
+                            InventoryItem.FORTITUDE, InventoryItem.SPEED}));
         }
     }
 

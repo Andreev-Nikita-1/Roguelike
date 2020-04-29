@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static basicComponents.AppLogic.HERO_SYMBOL;
+import static com.googlecode.lanterna.TextColor.ANSI.RED;
 import static renderer.Colors.*;
 
 public class VisualPixel {
@@ -15,7 +16,7 @@ public class VisualPixel {
     public static final VisualPixel SWORDSMAN = new VisualPixel(
             new PixelData(true, 10, SWORDMEN_COLOR, 1, (char) 555));
     public static final VisualPixel ATTACK = new VisualPixel(
-            new PixelData(false, 19, TextColor.ANSI.RED, 0.3, ' '));
+            new PixelData(false, 19, RED, 0.3, ' '));
     public static final VisualPixel INTERACT = new VisualPixel(
             new PixelData(false, 19, TextColor.ANSI.GREEN, 0.1, ' '));
     public static final VisualPixel DOOR_CLOSED = new VisualPixel(
@@ -27,6 +28,15 @@ public class VisualPixel {
     );
     public static final VisualPixel DOOR_OPEN_VERTICAl = new VisualPixel(
             new PixelData(true, 5, DOOR_BACK_COLOR, 1, (char) 9615)
+    );
+    public static final VisualPixel HEART = new VisualPixel(
+            new PixelData(true, 5, RED, 1, (char) 57355)
+    );
+    public static final VisualPixel HEART_CRACKED = new VisualPixel(
+            new PixelData(true, 5, RED, 1, (char) 57356)
+    );
+    public static final VisualPixel STUFF = new VisualPixel(
+            new PixelData(true, 5, COLOR7, 1, (char) 9975)
     );
     public static final VisualPixel LIGHT_1 = new VisualPixel(
             new PixelData(false, 2, COLOR3, 0.2, ' '));

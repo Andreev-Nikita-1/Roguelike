@@ -13,4 +13,7 @@ public abstract class MenuAction {
         return action;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 }

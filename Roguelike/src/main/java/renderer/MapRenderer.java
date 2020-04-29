@@ -64,7 +64,11 @@ public class MapRenderer {
             }
         }
 
-        graphics.putString(0,0, String.valueOf(map.heroObject.health));
+        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.health));
+        if (System.currentTimeMillis() - map.heroObject.lastEnemyAttack < 500) {
+            String str = String.valueOf(map.heroObject.enemyHealth) + String.valueOf((char) ((map.heroObject.enemyHealth < 20) ? 57356 : 57355));
+            graphics.putString(xSize - 1 - str.length(), 0, str);
+        }
 //        showUnicode(graphics);
     }
 

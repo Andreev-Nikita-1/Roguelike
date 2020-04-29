@@ -27,8 +27,7 @@ public class MapOfObjects implements Pausable {
     public HeroObject heroObject;
     public AccessNeighbourhood heroAccessNeighbourhood;
     public RoomSystem roomSystem;
-    //    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 
     public MapOfObjects(int xSize, int ySize) {
         this.xSize = xSize;

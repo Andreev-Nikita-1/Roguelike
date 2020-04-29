@@ -22,7 +22,7 @@ public abstract class Creature extends RunnableObject implements DynamicVisualOb
     protected Set<Coord> attackingCoords = new HashSet<>();
     protected volatile long lastAttackTime = 0;
     public AtomicInteger health;
-    protected volatile int power;
+    public volatile int power;
 
     public Strategy strategy;
 

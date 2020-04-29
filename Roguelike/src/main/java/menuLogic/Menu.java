@@ -14,6 +14,8 @@ public class Menu {
 
     public static Menu optionsMenu = new Menu("OPTIONS");
 
+    public static Menu inventory = new Menu("INVENTORY");
+
     public static void InitializeMenus() {
         mainMenu.addAction(newGameAction);
         mainMenu.addAction(optionsAction);
@@ -30,6 +32,8 @@ public class Menu {
         optionsMenu.addAction(zoomDefault);
         optionsMenu.addAction(back(mainMenu));
 
+        inventory.addAction(continueGameAction);
+
     }
 
     private String title;
@@ -41,6 +45,14 @@ public class Menu {
 
     public void addAction(int index, MenuAction action) {
         this.actions.add(index, action);
+    }
+
+    public void replaceAction(MenuAction action) {
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions.get(i).equals(action)) {
+                actions.set(i, action);
+            }
+        }
     }
 
     public void deleteAction(int index) {

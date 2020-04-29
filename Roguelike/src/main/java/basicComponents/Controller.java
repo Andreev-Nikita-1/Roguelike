@@ -30,7 +30,7 @@ public class Controller {
     private static Window mainWindow;
     private static GameplayComponent component;
 
-    public static volatile int fontSize = 40;
+    public static volatile int fontSize = 35;
 
     private Controller() {
     }
@@ -61,7 +61,7 @@ public class Controller {
     }
 
     public static void zoomDefault() {
-        fontSize = 40;
+        fontSize = 35;
         update();
         drawMenu(optionsMenu);
     }

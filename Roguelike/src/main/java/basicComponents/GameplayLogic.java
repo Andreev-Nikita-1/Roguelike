@@ -2,6 +2,7 @@ package basicComponents;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
+import inventory.Inventory;
 import mapGenerator.DungeonGenerator;
 import mapGenerator.TestGenerator;
 import mapGenerator.MapGenerator;
@@ -16,6 +17,8 @@ public class GameplayLogic {
 
     public static MapOfObjects currentMap;
     public static MapRenderer currentMapRenderer;
+
+    public static Inventory inventory = new Inventory();
 
     private static int xSize = 100;
     private static int ySize = 50;

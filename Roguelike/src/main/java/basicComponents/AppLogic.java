@@ -2,6 +2,7 @@ package basicComponents;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import gameplayOptions.DirectedOption;
+import menuLogic.Menu;
 import menuLogic.RealAction;
 import gameplayOptions.GameplayOption;
 import renderer.Renderer;
@@ -27,6 +28,10 @@ public class AppLogic {
             case Escape:
                 GameplayLogic.pause();
                 Controller.drawMenu(mainMenu);
+                break;
+            case Tab:
+                GameplayLogic.pause();
+                Controller.drawMenu(inventory);
                 break;
             case F1:
                 Renderer.page += 1;
@@ -83,6 +88,8 @@ public class AppLogic {
         if (!mainMenu.getActions().contains(RealAction.continueGameAction)) {
             mainMenu.addAction(0, RealAction.continueGameAction);
         }
+        Menu.inventory = new Menu("INVENTORY");
+        Menu.inventory.addAction(RealAction.continueGameAction);
         GameplayLogic.createMapLevel1();
     }
 

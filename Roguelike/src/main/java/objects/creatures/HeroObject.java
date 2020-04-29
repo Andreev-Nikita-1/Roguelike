@@ -4,6 +4,8 @@ import basicComponents.Controller;
 import gameplayOptions.DirectedOption;
 import map.*;
 import menuLogic.Menu;
+import menuLogic.MenuAction;
+import menuLogic.RealAction;
 import objects.DamageableObject;
 import objects.DependingObject;
 import objects.InteractiveObject;
@@ -19,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HeroObject extends OnePixelMob {
+    public int speed;
+    public int fortitude;
     private int walkDelayX;
     private int walkDelayY;
     private int runDelayX;
@@ -46,13 +50,19 @@ public class HeroObject extends OnePixelMob {
     public HeroObject(MapOfObjects map, Coord coord) {
         super(map, coord);
         location = coord;
-        walkDelayX = 100;
-        walkDelayY = (int) ((double) walkDelayX * 4 / 3);
-        runDelayX = walkDelayX / 3;
-        runDelayY = walkDelayY / 3;
+        updateSpeed(50);
+        fortitude = 50;
         attackDelay = 100;
         power = 20;
         health = new AtomicInteger(100);
+    }
+
+    public void updateSpeed(int newSpeed) {
+        speed = newSpeed;
+        walkDelayX = 5000 / speed;
+        walkDelayY = (int) ((double) walkDelayX * 4 / 3);
+        runDelayX = walkDelayX / 3;
+        runDelayY = walkDelayY / 3;
     }
 
     public void makeMovement(DirectedOption option, long eventTime) {
@@ -94,11 +104,15 @@ public class HeroObject extends OnePixelMob {
 
     @Override
     public void takeDamage(Damage damage) {
-        health.addAndGet(-damage.value);
+        health.addAndGet(-(int) ((double) damage.value * (50 / fortitude)));
         if (health.get() <= 0) {
             die();
         }
     }
+
+
+    public int enemyHealth = 0;
+    public long lastEnemyAttack = 0;
 
     @Override
     public void attack(Direction direction) {
@@ -109,6 +123,8 @@ public class HeroObject extends OnePixelMob {
         MapObject o = map.getObject(c);
         if (o instanceof DamageableObject) {
             ((DamageableObject) o).takeDamage(new Damage(power));
+            enemyHealth = ((Creature) o).health.get();
+            lastEnemyAttack = System.currentTimeMillis();
         }
     }
 

@@ -80,14 +80,14 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
                         int d = (((DirectedOption) action).action == DirectedOption.Action.WALK) ? 1 : 2;
                         return ((DirectedOption) action).direction.horizontal() ? speedDelayX / d : speedDelayY / d;
                     } else {
-                        return 0;
+                        return 10;
                     }
                 case ATTACK:
                     attack(((DirectedOption) action).direction);
                     return attackDelay;
             }
         }
-        return 0;
+        return 10;
     }
 
     @Override

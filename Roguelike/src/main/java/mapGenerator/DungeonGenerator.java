@@ -2,12 +2,11 @@ package mapGenerator;
 
 import map.MapOfObjects;
 import map.roomSystem.*;
+import objects.InternetCodeBasedLighting;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
-import objects.neighbourfoods.AccessNeighbourhood;
-import objects.neighbourfoods.DistantDarkness;
-import util.Coord;
 
+import util.Coord;
 
 public class DungeonGenerator extends MapGenerator {
     private int mapXSize;
@@ -75,10 +74,9 @@ public class DungeonGenerator extends MapGenerator {
                 }
             }
         }
-
         roomSystem.attachToMap();
-        new DistantDarkness(map, map.heroObject.getLocation(), 10).attachToMap();
-        map.heroAccessNeighbourhood = (AccessNeighbourhood) new AccessNeighbourhood(map, map.getHeroLocation(), 5).attachToMap();
+        new InternetCodeBasedLighting(map, 5).attachToMap();
         return map;
+
     }
 }

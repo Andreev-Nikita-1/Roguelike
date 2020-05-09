@@ -108,7 +108,7 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     public void deleteFromMap() {
         super.deleteFromMap();
         map.unsetObject(this, doorCoord);
-        map.subscribeOnCoords(this, doorCoord, 3);
+        map.unsubscribeFromCoords(this, doorCoord, 3);
         if (map.heroObject.interactiveObject == this) {
             map.heroObject.interactiveObject = null;
         }
@@ -117,18 +117,18 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     @Override
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
         Map<Coord, VisualPixel> pixels = new HashMap<>();
-        VisualPixel doorPixel;
-        switch (state) {
-            case OPEN:
-                doorPixel = direction.horizontal() ? DOOR_OPEN_HORIZONTAL : DOOR_OPEN_VERTICAl;
-                break;
-            case CLOSED:
-                doorPixel = DOOR_CLOSED;
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + state);
-        }
         if (doorCoord.between(leftUp, rightDown)) {
+            VisualPixel doorPixel;
+            switch (state) {
+                case OPEN:
+                    doorPixel = direction.horizontal() ? DOOR_OPEN_HORIZONTAL : DOOR_OPEN_VERTICAl;
+                    break;
+                case CLOSED:
+                    doorPixel = DOOR_CLOSED;
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + state);
+            }
             if (highlighted) {
                 pixels.put(doorCoord, doorPixel.highlighted(TextColor.ANSI.GREEN, 0.1));
             } else {

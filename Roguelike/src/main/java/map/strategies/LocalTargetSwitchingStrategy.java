@@ -3,7 +3,7 @@ package map.strategies;
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
 import objects.creatures.Creature;
-import objects.neighbourfoods.AccessNeighbourhood;
+import util.AccessNeighbourhood;
 import util.Coord;
 import util.Direction;
 
@@ -11,8 +11,7 @@ import static gameplayOptions.DirectedOption.Action.*;
 
 public abstract class LocalTargetSwitchingStrategy extends Strategy {
     protected Coord currentLocation = owner.getLocation();
-    public Coord target;
-    protected AccessNeighbourhood neighbourhood;
+    protected Coord target;
 
     public LocalTargetSwitchingStrategy(Creature owner, Coord initialTarget) {
         super(owner);
@@ -28,19 +27,15 @@ public abstract class LocalTargetSwitchingStrategy extends Strategy {
             if (currentLocation.equals(target)) {
                 return GameplayOption.NOTHING;
             }
-            if (neighbourhood != null) {
-                neighbourhood.deleteFromMap();
-            }
-            neighbourhood = null;
         }
 
         Direction direction = currentLocation.properDirection(target);
         if (!map.accesible(currentLocation.shifted(Coord.fromDirection(direction)))) {
-            if (neighbourhood == null) {
-                neighbourhood = new AccessNeighbourhood(map, target, 15, Coord::lInftyNorm).attachToMap();
-            }
-            direction = neighbourhood.follow(currentLocation);
+            AccessNeighbourhood neighbourhood = new AccessNeighbourhood(map, target, 15);
+            direction = neighbourhood.accessibleDirection(currentLocation);
+            neighbourhood.delete();
         }
+
         if (direction == null || !map.accesible(currentLocation.shifted(Coord.fromDirection(direction)))) {
             return GameplayOption.NOTHING;
         } else {

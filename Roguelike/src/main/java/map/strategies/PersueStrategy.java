@@ -13,7 +13,7 @@ public class PersueStrategy extends Strategy {
 
     @Override
     public GameplayOption getAction() {
-        Direction direction = map.heroAccessNeighbourhood.follow(owner.getLocation());
+        Direction direction = map.heroAccessNeighbourhood.accessibleDirection(owner.getLocation());
         if (direction == null) {
             return GameplayOption.NOTHING;
         }

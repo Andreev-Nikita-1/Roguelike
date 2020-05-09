@@ -5,7 +5,7 @@ import map.roomSystem.Room;
 import map.roomSystem.RoomSystem;
 import objects.*;
 import objects.creatures.HeroObject;
-import objects.neighbourfoods.AccessNeighbourhood;
+import util.AccessNeighbourhood;
 import util.Coord;
 import util.Pausable;
 
@@ -79,17 +79,15 @@ public class MapOfObjects implements Pausable {
             return room;
         } else {
             Passage passage = roomSystem.findOutPassage(coord);
-            AccessNeighbourhood neighbourhood = new AccessNeighbourhood(this, coord, 5, Coord::lInftyNorm).attachToMap();
+            AccessNeighbourhood neighbourhood = new AccessNeighbourhood(this, coord, 5);
             Coord first = passage.entryLocation(passage.room1);
-            Coord second = passage.entryLocation(passage.room2);
             if (neighbourhood.accessible(first)) {
-                neighbourhood.deleteFromMap();
+                neighbourhood.delete();
                 return passage.room1;
-            } else if (neighbourhood.accessible(second)) {
-                neighbourhood.deleteFromMap();
+            } else {
+                neighbourhood.delete();
                 return passage.room2;
             }
-            return passage.room1;
         }
     }
 
@@ -131,7 +129,6 @@ public class MapOfObjects implements Pausable {
 
     @Override
     public MapOfObjects start() {
-        heroAccessNeighbourhood.update();
         for (PausableObject object : pausableObjects) {
             object.start();
         }
@@ -143,10 +140,12 @@ public class MapOfObjects implements Pausable {
         for (PausableObject object : pausableObjects) {
             object.pause();
         }
+        scheduler.shutdown();
     }
 
     @Override
     public void unpause() {
+        scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
         for (PausableObject object : pausableObjects) {
             object.unpause();
         }

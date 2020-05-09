@@ -5,18 +5,14 @@ import gameplayOptions.DirectedOption;
 import map.*;
 import menuLogic.Menu;
 import menuLogic.MenuAction;
-import menuLogic.RealAction;
 import objects.DamageableObject;
-import objects.DependingObject;
 import objects.InteractiveObject;
 import objects.MapObject;
-import objects.creatures.OnePixelMob;
 import renderer.VisualPixel;
+import util.AccessNeighbourhood;
 import util.Coord;
 import util.Direction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -145,5 +141,18 @@ public class HeroObject extends OnePixelMob {
     @Override
     public int act() {
         return 1000000000;
+    }
+
+    @Override
+    public HeroObject attachToMap() {
+        super.attachToMap();
+        map.heroAccessNeighbourhood = new AccessNeighbourhood(map, location, 10);
+        return this;
+    }
+
+    @Override
+    public void deleteFromMap() {
+        map.heroAccessNeighbourhood.delete();
+        super.deleteFromMap();
     }
 }

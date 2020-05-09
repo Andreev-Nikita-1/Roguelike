@@ -2,6 +2,7 @@ package map.strategies;
 
 import gameplayOptions.GameplayOption;
 import objects.creatures.Creature;
+import util.Coord;
 
 public class CombinedStrategy extends Strategy {
     private Strategy currentStrategy;
@@ -17,7 +18,7 @@ public class CombinedStrategy extends Strategy {
         if (currentStrategy == null) {
             switchStrategy();
         }
-        if (map.heroAccessNeighbourhood.accessible(owner.getLocation())) {
+        if (map.heroAccessNeighbourhood.accessible(owner.getLocation(), Coord::euqlideanScaled, 5)) {
             if (!(currentStrategy instanceof PersueStrategy)) {
                 currentStrategy = new PersueStrategy(owner);
             }
@@ -26,7 +27,8 @@ public class CombinedStrategy extends Strategy {
         if (option == GameplayOption.NOTHING) {
             nothingCounter++;
         }
-        if (nothingCounter == 5 || Math.random() < 0.1) {
+        if (nothingCounter == 5
+                || (currentStrategy instanceof RoomPatrolStrategy && Math.random() < 0.1)) {
             nothingCounter = 0;
             if (map.closestRoom(owner.getLocation()) == null) {
                 return GameplayOption.NOTHING;
@@ -37,10 +39,10 @@ public class CombinedStrategy extends Strategy {
     }
 
     private void switchStrategy() {
-        if (currentStrategy instanceof PersueStrategy || currentStrategy == null) {
+        if (currentStrategy instanceof PersueStrategy) {
             currentStrategy = new RoomRandomTravelingStrategy(owner);
         } else {
-            if (Math.random() < 0.2) {
+            if (Math.random() < 0.1) {
                 currentStrategy = new RoomPatrolStrategy(owner);
             } else {
                 currentStrategy = new RoomRandomTravelingStrategy(owner);

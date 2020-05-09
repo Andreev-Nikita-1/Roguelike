@@ -1,14 +1,8 @@
 package mapGenerator;
 
-import map.roomSystem.*;
-import objects.neighbourfoods.DistantDarkness;
-import objects.creatures.HeroObject;
-import objects.creatures.Swordsman;
 import renderer.VisualPixel;
 import map.MapOfObjects;
-import util.Coord;
 
-import static java.lang.Thread.sleep;
 import static renderer.VisualPixel.*;
 import static util.Util.generate;
 

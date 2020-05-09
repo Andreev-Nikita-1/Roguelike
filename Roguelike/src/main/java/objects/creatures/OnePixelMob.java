@@ -30,16 +30,18 @@ public abstract class OnePixelMob extends Creature {
         }
         Coord shift = Coord.fromDirection(direction);
         Coord nextLocation = location.shifted(shift);
-        map.getCoordLock(nextLocation).lock();
-        try {
-            if (map.accesible(nextLocation)) {
-                map.unsetObject(this, location);
-                location.shift(shift);
-                map.setObject(this, location);
-                return true;
+        if (map.accesible(nextLocation)) {
+            map.getCoordLock(nextLocation).lock();
+            try {
+                if (map.accesible(nextLocation)) {
+                    map.unsetObject(this, location);
+                    location.shift(shift);
+                    map.setObject(this, location);
+                    return true;
+                }
+            } finally {
+                map.getCoordLock(nextLocation).unlock();
             }
-        } finally {
-            map.getCoordLock(nextLocation).unlock();
         }
         return false;
     }

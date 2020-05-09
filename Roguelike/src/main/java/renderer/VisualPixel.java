@@ -77,6 +77,15 @@ public class VisualPixel {
             new PixelData(false, -10, COLOR20, 1, ' '));
 
 
+    private static Map<Double, VisualPixel> darkness = new HashMap<>();
+
+    public static VisualPixel darkness(double transparency) {
+        if (!darkness.containsKey(transparency)) {
+            darkness.put(transparency, new VisualPixel(new PixelData(false, 20, TextColor.ANSI.BLACK, transparency, ' ')));
+        }
+        return darkness.get(transparency);
+    }
+
     private List<PixelData> pixelDataList;
 
     public VisualPixel(List<PixelData> pixelData) {

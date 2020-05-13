@@ -26,7 +26,7 @@ message HeroAction {
   }
   Action action = 4;
 
-  int32 event_time = 5;
+  int64 event_time = 5;
 }
 
 message GetPixelsMessage {
@@ -42,5 +42,5 @@ message Pixels {
 service Roguelike {
   rpc Join(JoinMessage) returns (HeroId) {}
   rpc DoHeroAction(HeroAction) returns (Nothing) {}
-  rpc GetPixels(HeroId) returns (Pixels) {}
+  rpc GetPixels(GetPixelsMessage) returns (Pixels) {}
 }

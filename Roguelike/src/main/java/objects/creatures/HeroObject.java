@@ -1,6 +1,7 @@
 package objects.creatures;
 
 import basicComponents.Controller;
+import basicComponents.GameplayLogic;
 import gameplayOptions.DirectedOption;
 import map.*;
 import menuLogic.Menu;
@@ -34,13 +35,7 @@ public class HeroObject extends OnePixelMob {
 
     @Override
     public synchronized void die() {
-        deleteFromMap();
-        try {
-            map.kill();
-        } catch (InterruptedException e) {
-        }
-        Menu.mainMenu.deleteAction(0);
-        Controller.drawMenu(Menu.mainMenu);
+        GameplayLogic.currentMap.resetHero(this);
     }
 
     public HeroObject(MapOfObjects map, Coord coord) {
@@ -146,13 +141,13 @@ public class HeroObject extends OnePixelMob {
     @Override
     public HeroObject attachToMap() {
         super.attachToMap();
-        map.heroAccessNeighbourhood = new AccessNeighbourhood(map, location, 10);
+//        map.heroAccessNeighbourhood = new AccessNeighbourhood(map, location, 10);
         return this;
     }
 
     @Override
     public void deleteFromMap() {
-        map.heroAccessNeighbourhood.delete();
+//        map.heroAccessNeighbourhood.delete();
         super.deleteFromMap();
     }
 }

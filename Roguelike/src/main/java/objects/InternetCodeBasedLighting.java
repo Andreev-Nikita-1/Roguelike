@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 import static util.Coord.*;
 
-public class InternetCodeBasedLighting extends MapObject implements DynamicVisualObject {
+public class InternetCodeBasedLighting extends MapObject {
 
     private int radius;
     private SomeLightingCodeFromInternet code;
@@ -39,10 +39,9 @@ public class InternetCodeBasedLighting extends MapObject implements DynamicVisua
         return t;
     }
 
-    @Override
-    public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
+    public Map<Coord, VisualPixel> getPixels(int id, Coord leftUp, Coord rightDown) {
         visible.clear();
-        code.Compute(new Coord(map.getHeroLocation()), radius);
+        code.Compute(new Coord(map.getHeroLocation(id)), radius);
         Map<Coord, VisualPixel> pixelMap = new HashMap<>();
         for (int i = leftUp.x; i < rightDown.x; i++) {
             for (int j = leftUp.y; j < rightDown.y; j++) {
@@ -60,11 +59,11 @@ public class InternetCodeBasedLighting extends MapObject implements DynamicVisua
                             if (visible.contains(neighbour)
                                     && (map.inside(neighbour)
                                     && (!map.isTaken(neighbour) || (map.getObject(neighbour) instanceof Creature)))) {
-                                dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation()));
+                                dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation(id)));
                             }
                         }
                     } else {
-                        dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation()));
+                        dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation(id)));
                     }
                 }
                 pixelMap.put(c, VisualPixel.darkness(transparency(dist)));

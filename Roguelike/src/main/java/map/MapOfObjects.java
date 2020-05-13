@@ -9,6 +9,7 @@ import util.AccessNeighbourhood;
 import util.Coord;
 import util.Pausable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -24,10 +25,60 @@ public class MapOfObjects implements Pausable {
     public List<StaticVisualObject> staticObjects = new CopyOnWriteArrayList<>();
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
     public List<PausableObject> pausableObjects = new CopyOnWriteArrayList<>();
-    public HeroObject heroObject;
-    public AccessNeighbourhood heroAccessNeighbourhood;
+    public HeroObject[] heroObjects = new HeroObject[50];
+    public AccessNeighbourhood[] heroAccessNeighbourhoods = new AccessNeighbourhood[50];
+    private InternetCodeBasedLighting[] lightings = new InternetCodeBasedLighting[50];
     public RoomSystem roomSystem;
     public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+
+    public List<Coord> spawnPlaces = new ArrayList<>();
+
+    public synchronized int addHero() {
+        Coord coord = chooseCoord();
+        while (!accesible(coord)) {
+            coord = chooseCoord();
+        }
+        for (int i = 0; i < heroObjects.length; i++) {
+            if (heroObjects[i] == null) {
+                heroObjects[i] = new HeroObject(this, coord).attachToMap();
+                heroAccessNeighbourhoods[i] = new AccessNeighbourhood(this, coord, 10);
+                lightings[i] = (InternetCodeBasedLighting) new InternetCodeBasedLighting(this, 10).attachToMap();
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public synchronized void resetHero(HeroObject heroObject) {
+        Coord coord = chooseCoord();
+        while (!accesible(coord)) {
+            coord = chooseCoord();
+        }
+        for (int i = 0; i < heroObjects.length; i++) {
+            if (heroObjects[i] == heroObject) {
+                deleteHero(i);
+                heroObjects[i] = new HeroObject(this, coord).attachToMap();
+                heroAccessNeighbourhoods[i] = new AccessNeighbourhood(this, coord, 10);
+                lightings[i] = (InternetCodeBasedLighting) new InternetCodeBasedLighting(this, 10).attachToMap();
+            }
+        }
+    }
+
+    public synchronized void deleteHero(int id) {
+        if (heroObjects[id] != null) {
+            heroObjects[id].deleteFromMap();
+            heroAccessNeighbourhoods[id].delete();
+            lightings[id].deleteFromMap();
+            heroObjects[id] = null;
+            heroAccessNeighbourhoods[id] = null;
+            lightings[id] = null;
+        }
+    }
+
+
+    private Coord chooseCoord() {
+        return spawnPlaces.get((int) (Math.random() * spawnPlaces.size()));
+    }
 
     public MapOfObjects(int xSize, int ySize) {
         this.xSize = xSize;
@@ -91,8 +142,8 @@ public class MapOfObjects implements Pausable {
         }
     }
 
-    public Coord getHeroLocation() {
-        return heroObject.getLocation();
+    public Coord getHeroLocation(int id) {
+        return heroObjects[id].getLocation();
     }
 
     public boolean setObject(MapObject object, Coord c) {

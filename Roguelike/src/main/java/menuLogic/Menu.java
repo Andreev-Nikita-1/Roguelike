@@ -17,11 +17,13 @@ public class Menu {
     public static Menu inventory = new Menu("INVENTORY");
 
     public static void InitializeMenus() {
-        mainMenu.addAction(newGameAction);
+//        mainMenu.addAction(newGameAction);
+        mainMenu.addAction(runServer);
+        mainMenu.addAction(joinGame);
         mainMenu.addAction(optionsAction);
         mainMenu.addAction(exit);
 
-        levelSelector.addAction(level1Action);
+//        levelSelector.addAction(level1Action);
 //        levelSelector.addAction(level2Action);
 //        levelSelector.addAction(level3Action);
         levelSelector.addAction(back(mainMenu));

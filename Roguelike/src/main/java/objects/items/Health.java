@@ -19,9 +19,15 @@ public class Health extends Item {
 
     @Override
     public synchronized void update() {
-        if (location.equals(map.getHeroLocation())) {
-            map.heroObject.health.addAndGet(value);
-            deleteFromMap();
+        try {
+            for (int i = 0; i < map.heroObjects.length; i++) {
+                if (location.equals(map.getHeroLocation(i))) {
+                    map.heroObjects[i].health.addAndGet(value);
+                    deleteFromMap();
+                }
+            }
+        } catch (NullPointerException e) {
+
         }
     }
 

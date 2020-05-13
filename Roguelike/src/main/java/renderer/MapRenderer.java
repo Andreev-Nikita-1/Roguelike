@@ -8,18 +8,21 @@ import objects.StaticVisualObject;
 import util.Coord;
 import map.MapOfObjects;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 public class MapRenderer {
     private MapOfObjects map;
     private PixelStack[][] pixelStacks;
-    private TerminalCoordinate terminalCoordinate;
+    private TerminalCoordinate[] terminalCoordinates = new TerminalCoordinate[50];
 
     public MapRenderer(MapOfObjects map) {
         this.map = map;
         pixelStacks = new PixelStack[map.xSize][map.ySize];
-        terminalCoordinate = new TerminalCoordinate(new Coord(map.xSize, map.ySize));
+        for (int i = 0; i < terminalCoordinates.length; i++) {
+            terminalCoordinates[i] = new TerminalCoordinate(new Coord(map.xSize, map.ySize));
+        }
     }
 
     private void showUnicode(TextGUIGraphics graphics) {
@@ -47,29 +50,39 @@ public class MapRenderer {
         }
     }
 
-    public void drawMap(TextGUIGraphics graphics, int terminalSizeX, int terminalSizeY) {
+    public synchronized String drawMapForClient(int id, int terminalSizeX, int terminalSizeY) {
         int xSize = Math.min(terminalSizeX, map.xSize);
         int ySize = Math.min(terminalSizeY, map.ySize);
-        Coord leftUp = terminalCoordinate.getLeftUp(xSize, ySize, map.getHeroLocation());
+        Coord leftUp = terminalCoordinates[id].getLeftUp(xSize, ySize, map.getHeroLocation(id));
         int xLeftUp = leftUp.x;
         int yLeftUp = leftUp.y;
-
         mergePixelsInsideFrame(xSize, ySize, xLeftUp, yLeftUp);
-
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(map.heroObjects[id].health.get());
+        stringBuilder.append(';');
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 Pixel pixel = pixelStacks[i + xLeftUp][j + yLeftUp].getPixel();
-                graphics.setCharacter(i, j, new TextCharacter(pixel.symbol,
-                        pixel.symbolColor, pixel.backgroundColor));
+                stringBuilder.append((int) pixel.symbol);
+                stringBuilder.append('#');
+                stringBuilder.append(pixel.symbolColor.toColor().getRed());
+                stringBuilder.append('#');
+                stringBuilder.append(pixel.symbolColor.toColor().getGreen());
+                stringBuilder.append('#');
+                stringBuilder.append(pixel.symbolColor.toColor().getBlue());
+                stringBuilder.append('#');
+                stringBuilder.append(pixel.backgroundColor.toColor().getRed());
+                stringBuilder.append('#');
+                stringBuilder.append(pixel.backgroundColor.toColor().getGreen());
+                stringBuilder.append('#');
+                stringBuilder.append(pixel.backgroundColor.toColor().getBlue());
+                stringBuilder.append('&');
             }
+            stringBuilder.append(';');
         }
+        String ans = stringBuilder.toString();
+        return ans;
 
-        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.health));
-        if (System.currentTimeMillis() - map.heroObject.lastEnemyAttack < 500) {
-            String str = String.valueOf(map.heroObject.enemyHealth) + String.valueOf((char) ((map.heroObject.enemyHealth < 20) ? 57356 : 57355));
-            graphics.putString(xSize - 1 - str.length(), 0, str);
-        }
-//        showUnicode(graphics);
     }
 
     public MapRenderer fit() {
@@ -114,7 +127,6 @@ public class MapRenderer {
                     List<PixelData> pixelDatas = mappingPixels.get(c).getPixelDataList();
                     for (PixelData pixelData : pixelDatas) {
                         pixelStacks[c.x][c.y].insert(pixelData);
-
                     }
                 }
             }

@@ -2,7 +2,6 @@ package basicComponents;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import inventory.Inventory;
 import mapGenerator.DungeonGenerator;
 import mapGenerator.MapGenerator;
 import map.MapOfObjects;
@@ -17,7 +16,6 @@ public class GameplayLogic {
     public static MapOfObjects currentMap;
     public static MapRenderer currentMapRenderer;
 
-    public static Inventory inventory = new Inventory();
 
     private static int xSize = 200;
     private static int ySize = 200;
@@ -48,20 +46,55 @@ public class GameplayLogic {
         gameplayState = PLAYING;
     }
 
-    public static void handleOption(GameplayOption option, long eventTine) {
+    public static void handleOption(int id, GameplayOption option, long eventTine) {
         if (option == GameplayOption.INTERACT) {
-            currentMap.heroObject.interactWith();
+            AppLogic.client.doHeroAction(
+                    util.Model.HeroAction.newBuilder()
+                            .setHeroId(AppLogic.id)
+                            .setType(util.Model.HeroAction.Type.INTERACT)
+                            .setAction(util.Model.HeroAction.Action.ATTACK)
+                            .setDirection(util.Model.HeroAction.Direction.DOWN)
+                            .setEventTime(eventTine)
+                            .build()
+            );
         }
         if (option instanceof DirectedOption) {
+            util.Model.HeroAction.Action action = null;
             switch (((DirectedOption) option).action) {
                 case WALK:
+                    action = util.Model.HeroAction.Action.WALK;
+                    break;
                 case RUN:
-                    currentMap.heroObject.makeMovement((DirectedOption) option, eventTine);
+                    action = util.Model.HeroAction.Action.RUN;
                     break;
                 case ATTACK:
-                    currentMap.heroObject.makeAttack(((DirectedOption) option), eventTine);
+                    action = util.Model.HeroAction.Action.ATTACK;
                     break;
             }
+            util.Model.HeroAction.Direction direction = null;
+            switch (((DirectedOption) option).direction) {
+                case UP:
+                    direction = util.Model.HeroAction.Direction.UP;
+                    break;
+                case DOWN:
+                    direction = util.Model.HeroAction.Direction.DOWN;
+                    break;
+                case RIGHT:
+                    direction = util.Model.HeroAction.Direction.RIGHT;
+                    break;
+                case LEFT:
+                    direction = util.Model.HeroAction.Direction.LEFT;
+                    break;
+            }
+            AppLogic.client.doHeroAction(
+                    util.Model.HeroAction.newBuilder()
+                            .setHeroId(AppLogic.id)
+                            .setType(util.Model.HeroAction.Type.DIRECTED_ACTION)
+                            .setAction(action)
+                            .setDirection(direction)
+                            .setEventTime(eventTine)
+                            .build()
+            );
         }
     }
 

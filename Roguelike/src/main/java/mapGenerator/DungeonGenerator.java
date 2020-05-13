@@ -8,6 +8,9 @@ import objects.creatures.Swordsman;
 
 import util.Coord;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DungeonGenerator extends MapGenerator {
     private int mapXSize;
     private int mapYSize;
@@ -20,11 +23,9 @@ public class DungeonGenerator extends MapGenerator {
     @Override
     public MapOfObjects generateMap() {
         MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
-        map.heroObject = (HeroObject) new HeroObject(map, new Coord(6, 6)).attachToMap();
-        new Swordsman(map, new Coord(7, 6)).attachToMap();
         RoomSystem roomSystem = new RoomSystem(map);
         RoomTextures textures = new DungeonTextures();
-
+        List<Coord> spawners = new ArrayList<>();
 
         Room[][] rooms = new Room[mapXSize / 8 + 3][mapYSize / 8 + 3];
         for (int i = 3; i < mapXSize - 8; i += 8) {
@@ -32,6 +33,7 @@ public class DungeonGenerator extends MapGenerator {
                 Room room = new Room(map, new Coord(i, j), new Coord(5, 5), 3, textures);
                 rooms[(i - 2) / 8][(j - 2) / 8] = room;
                 roomSystem.addRoom(room);
+                spawners.add(new Coord(i, j));
                 if (Math.random() < 0.2) {
                     new Swordsman(map, new Coord(i + 1, j + 1)).attachToMap();
                 }
@@ -75,7 +77,7 @@ public class DungeonGenerator extends MapGenerator {
             }
         }
         roomSystem.attachToMap();
-        new InternetCodeBasedLighting(map, 5).attachToMap();
+        map.spawnPlaces = spawners;
         return map;
 
     }

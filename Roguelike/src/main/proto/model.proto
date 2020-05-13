@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message JoinMessage {
+}
+
+message HeroId {
+  int64 timestamp = 2;
+}
+
+service Roguelike {
+  rpc Join(JoinMessage) returns (HeroId) {}
+}

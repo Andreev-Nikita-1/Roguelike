@@ -2,6 +2,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.ServerBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Server extends RoguelikeGrpc.RoguelikeImplBase {
@@ -11,6 +12,7 @@ public class Server extends RoguelikeGrpc.RoguelikeImplBase {
                      io.grpc.stub.StreamObserver<Model.HeroId> responseObserver) {
         // some code TODO
         int new_hero_id = 42; // TODO
+        System.out.println("JOIN DONE");
         responseObserver.onNext(Model.HeroId.newBuilder().setId(new_hero_id).build());
         responseObserver.onCompleted();
     }
@@ -30,6 +32,7 @@ public class Server extends RoguelikeGrpc.RoguelikeImplBase {
             long eventTime = request.getEventTime();
             // TODO some code
         }
+        System.out.println("HERO ACTION DONE");
         responseObserver.onNext(Model.Nothing.newBuilder().build());
         responseObserver.onCompleted();
     }
@@ -41,8 +44,9 @@ public class Server extends RoguelikeGrpc.RoguelikeImplBase {
         int terminalSizeX = request.getTerminalSizeX();
         int terminalSizeY = request.getTerminalSizeY();
         // TODO some code
-        ByteString pixels = ByteString.copyFrom(new String("Nikita").getBytes()); // TODO change
+        ByteString pixels = ByteString.copyFrom(StandardCharsets.UTF_16.encode("Nikita eto serialized_pixels")); // TODO change
         Model.Pixels answer = Model.Pixels.newBuilder().setPixels(pixels).build();
+        System.out.println("GET PIXELS DONE");
         responseObserver.onNext(answer);
         responseObserver.onCompleted();
     }

@@ -3,9 +3,7 @@ package util;
 import basicComponents.GameplayLogic;
 import com.google.protobuf.ByteString;
 import gameplayOptions.DirectedOption;
-import gameplayOptions.GameplayOption;
 import io.grpc.ServerBuilder;
-import renderer.Renderer;
 
 import java.io.IOException;
 

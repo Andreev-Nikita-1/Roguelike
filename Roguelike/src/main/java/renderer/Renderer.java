@@ -33,7 +33,7 @@ public class Renderer {
 
     private static void drawMapFromServer(TextGUIGraphics graphics) {
         String string = AppLogic.client.getPixels(
-                Model.GetPixelsMessage.newBuilder()
+                util.Model.GetPixelsMessage.newBuilder()
                         .setHeroId(AppLogic.id)
                         .build()
         ).toString(StandardCharsets.UTF_16);

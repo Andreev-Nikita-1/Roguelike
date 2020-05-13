@@ -6,7 +6,6 @@ import mapGenerator.DungeonGenerator;
 import menuLogic.Menu;
 import menuLogic.RealAction;
 import gameplayOptions.GameplayOption;
-import renderer.Renderer;
 import util.Client;
 import util.Server;
 
@@ -110,7 +109,7 @@ public class AppLogic {
 
     public static void joinGame() {
         client = new Client("localhost", 6969);
-        id = client.join(Model.JoinMessage.newBuilder().build());
+        id = client.join(util.Model.JoinMessage.newBuilder().build());
     }
 
     public static void applyLevel2Action() {

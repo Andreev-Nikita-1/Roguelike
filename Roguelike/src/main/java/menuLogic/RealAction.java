@@ -18,8 +18,8 @@ public class RealAction extends MenuAction {
     public static RealAction zoomDefault = new RealAction("defaut", Controller::zoomDefault);
 
 
-    public static RealAction runServer;
-    public static RealAction joinGame;
+    public static RealAction runServer = new RealAction("create server", AppLogic::runServer);
+    public static RealAction joinGame = new RealAction("join game", AppLogic::joinGame);
 
     public RealAction(String name, Runnable action) {
         this.name = name;

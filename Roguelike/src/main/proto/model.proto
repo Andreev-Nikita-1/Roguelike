@@ -1,12 +1,46 @@
 syntax = "proto3";
 
+message Nothing {
+}
+
 message JoinMessage {
 }
 
 message HeroId {
-  int64 timestamp = 2;
+  int32 id = 1;
+}
+
+message HeroAction {
+  int32 heroId = 1;
+  enum Type {
+    NOTHING = 0; INTERACT = 1; DIRECTED_ACTION = 2;
+  }
+  Type type = 2;
+  enum Direction {
+      UP = 0; DOWN = 1; LEFT = 2; RIGHT = 3;
+  }
+  Direction direction = 3;
+
+  enum Action {
+      WALK = 0; RUN = 1; ATTACK = 2;
+  }
+  Action action = 4;
+
+  int64 event_time = 5;
+}
+
+message GetPixelsMessage {
+  int32 heroId = 1;
+  int32 terminalSizeX = 2;
+  int32 terminalSizeY = 3;
+}
+
+message Pixels {
+  bytes pixels = 1;
 }
 
 service Roguelike {
   rpc Join(JoinMessage) returns (HeroId) {}
+  rpc DoHeroAction(HeroAction) returns (Nothing) {}
+  rpc GetPixels(GetPixelsMessage) returns (Pixels) {}
 }

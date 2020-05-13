@@ -2,10 +2,15 @@ package basicComponents;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import gameplayOptions.DirectedOption;
+import mapGenerator.DungeonGenerator;
 import menuLogic.Menu;
 import menuLogic.RealAction;
 import gameplayOptions.GameplayOption;
 import renderer.Renderer;
+import util.Client;
+import util.Server;
+
+import java.io.IOException;
 
 import static menuLogic.Menu.*;
 
@@ -25,23 +30,17 @@ public class AppLogic {
             return;
         }
         switch (keyStroke.getKeyType()) {
-            case Escape:
-                GameplayLogic.pause();
-                Controller.drawMenu(mainMenu);
-                break;
-            case Tab:
-                GameplayLogic.pause();
-                Controller.drawMenu(inventory);
-                break;
-            case F1:
-                Renderer.page += 1;
-                break;
-            case F2:
-                Renderer.page -= 1;
-                break;
+//            case Escape:
+//                GameplayLogic.pause();
+//                Controller.drawMenu(mainMenu);
+//                break;
+//            case Tab:
+//                GameplayLogic.pause();
+//                Controller.drawMenu(inventory);
+//                break;
             default:
                 GameplayOption option = getGameplayOption(keyStroke);
-                GameplayLogic.handleOption(option, keyStroke.getEventTime());
+                GameplayLogic.handleOption(0, option, keyStroke.getEventTime());
                 break;
         }
     }
@@ -91,6 +90,27 @@ public class AppLogic {
         Menu.inventory = new Menu("INVENTORY");
         Menu.inventory.addAction(RealAction.continueGameAction);
         GameplayLogic.createMapLevel1();
+        GameplayLogic.currentMap.addHero();
+    }
+
+    static io.grpc.Server server;
+
+    public static void runServer() {
+        try {
+            var server = Server.run(6969);
+        } catch (IOException e) {
+        } catch (InterruptedException e) {
+        }
+        GameplayLogic.createMap(new DungeonGenerator(50, 50));
+    }
+
+
+    public static Client client;
+    public static int id;
+
+    public static void joinGame() {
+        client = new Client("localhost", 6969);
+        id = client.join(Model.JoinMessage.newBuilder().build());
     }
 
     public static void applyLevel2Action() {

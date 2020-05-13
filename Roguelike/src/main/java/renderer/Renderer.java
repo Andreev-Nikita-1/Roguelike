@@ -1,10 +1,14 @@
 package renderer;
 
+import basicComponents.AppLogic;
 import basicComponents.Controller;
 import basicComponents.GameplayLogic;
+import com.google.protobuf.ByteString;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
+
+import java.nio.charset.StandardCharsets;
 
 import static renderer.Colors.*;
 
@@ -20,9 +24,36 @@ public class Renderer {
                 break;
             case PAUSED:
             case PLAYING:
-                GameplayLogic.currentMapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+//                GameplayLogic.currentMapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                drawMapFromServer(graphics);
                 break;
         }
+    }
+
+
+    private static void drawMapFromServer(TextGUIGraphics graphics) {
+        String string = AppLogic.client.getPixels(
+                Model.GetPixelsMessage.newBuilder()
+                        .setHeroId(AppLogic.id)
+                        .build()
+        ).toString(StandardCharsets.UTF_16);
+        String[] lines = string.split(";");
+        int health = Integer.valueOf(lines[0]);
+        for (int i = 1; i < lines.length; i++) {
+            String[] column = lines[i].split("&");
+            for (int j = 0; j < column.length; j++) {
+                char symbol = column[j].charAt(0);
+                String[] color = column[j].substring(1).split("#");
+                int[] rgbs = new int[6];
+                for (int k = 0; k < 6; k++) {
+                    rgbs[k] = Integer.valueOf(color[k]);
+                }
+                TextColor symbolColor = new TextColor.RGB(rgbs[0], rgbs[1], rgbs[2]);
+                TextColor backgroundColor = new TextColor.RGB(rgbs[3], rgbs[4], rgbs[5]);
+                graphics.setCharacter(i - 1, j, new TextCharacter(symbol, symbolColor, backgroundColor));
+            }
+        }
+        graphics.putString(0, 0, String.valueOf(health));
     }
 
 

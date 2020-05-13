@@ -83,15 +83,20 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
 
     @Override
     public void update() {
-        if (doorCoord.near(map.heroObject.getLocation())
-                && !doorCoord.equals(map.heroObject.getLocation())) {
-            highlighted = true;
-            map.heroObject.interactiveObject = this;
-        } else {
-            highlighted = false;
-            if (map.heroObject.interactiveObject == this) {
-                map.heroObject.interactiveObject = null;
+        try {
+            for (int i = 0; i < map.heroObjects.length; i++) {
+                if (doorCoord.near(map.getHeroLocation(i))
+                        && !doorCoord.equals(map.getHeroLocation(i))) {
+                    highlighted = true;
+                    map.heroObjects[i].interactiveObject = this;
+                } else {
+                    highlighted = false;
+                    if (map.heroObjects[i].interactiveObject == this) {
+                        map.heroObjects[i].interactiveObject = null;
+                    }
+                }
             }
+        } catch (NullPointerException e) {
         }
     }
 
@@ -109,8 +114,13 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         super.deleteFromMap();
         map.unsetObject(this, doorCoord);
         map.unsubscribeFromCoords(this, doorCoord, 3);
-        if (map.heroObject.interactiveObject == this) {
-            map.heroObject.interactiveObject = null;
+        try {
+            for (int i = 0; i < map.heroObjects.length; i++) {
+                if (map.heroObjects[i].interactiveObject == this) {
+                    map.heroObjects[i].interactiveObject = null;
+                }
+            }
+        } catch (NullPointerException e) {
         }
     }
 

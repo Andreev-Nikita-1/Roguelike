@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 import static util.Coord.*;
 
-public class InternetCodeBasedLighting extends MapObject implements DynamicVisualObject {
+public class InternetCodeBasedLighting extends MapObject implements VisualObject {
 
     private int radius;
     private SomeLightingCodeFromInternet code;

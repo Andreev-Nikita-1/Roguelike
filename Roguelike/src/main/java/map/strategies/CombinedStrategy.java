@@ -18,10 +18,16 @@ public class CombinedStrategy extends Strategy {
         if (currentStrategy == null) {
             switchStrategy();
         }
-        if (map.heroAccessNeighbourhood.accessible(owner.getLocation(), Coord::euqlideanScaled, 5)) {
-            if (!(currentStrategy instanceof PersueStrategy)) {
-                currentStrategy = new PersueStrategy(owner);
+        try {
+            for (int i = 0; i < map.heroObjects.length; i++) {
+                if (map.heroObjects[i] == null) continue;
+                if (map.heroAccessNeighbourhoods[i].accessible(owner.getLocation(), Coord::euqlideanScaled, 5)) {
+                    if (!(currentStrategy instanceof PersueStrategy)) {
+                        currentStrategy = new PersueStrategy(owner, i);
+                    }
+                }
             }
+        } catch (NullPointerException e) {
         }
         GameplayOption option = currentStrategy.getAction();
         if (option == GameplayOption.NOTHING) {

@@ -48,20 +48,56 @@ public class GameplayLogic {
         gameplayState = PLAYING;
     }
 
-    public static void handleOption(GameplayOption option, long eventTine) {
+    public static void handleOption(int id, GameplayOption option, long eventTine) {
         if (option == GameplayOption.INTERACT) {
-            currentMap.heroObject.interactWith();
+            AppLogic.client.doHeroAction(
+                    Model.HeroAction.newBuilder()
+                            .setHeroId(AppLogic.id)
+                            .setType(Model.HeroAction.Type.INTERACT)
+                            .setAction(Model.HeroAction.Action.ATTACK)
+                            .setDirection(Model.HeroAction.Direction.DOWN)
+                            .setEventTime(2281488)
+                            .build()
+            );
         }
         if (option instanceof DirectedOption) {
+            Model.HeroAction.Action action = null;
             switch (((DirectedOption) option).action) {
                 case WALK:
+                    action = Model.HeroAction.Action.WALK;
+                    break;
                 case RUN:
-                    currentMap.heroObject.makeMovement((DirectedOption) option, eventTine);
+                    action = Model.HeroAction.Action.RUN;
                     break;
                 case ATTACK:
-                    currentMap.heroObject.makeAttack(((DirectedOption) option), eventTine);
+                    action = Model.HeroAction.Action.ATTACK;
+                    currentMap.heroObjects[id].makeAttack(((DirectedOption) option), eventTine);
                     break;
             }
+            Model.HeroAction.Direction direction = null;
+            switch (((DirectedOption) option).direction) {
+                case UP:
+                    direction = Model.HeroAction.Direction.UP;
+                    break;
+                case DOWN:
+                    direction = Model.HeroAction.Direction.DOWN;
+                    break;
+                case RIGHT:
+                    direction = Model.HeroAction.Direction.RIGHT;
+                    break;
+                case LEFT:
+                    direction = Model.HeroAction.Direction.LEFT;
+                    break;
+            }
+            AppLogic.client.doHeroAction(
+                    Model.HeroAction.newBuilder()
+                            .setHeroId(AppLogic.id)
+                            .setType(Model.HeroAction.Type.DIRECTED_ACTION)
+                            .setAction(action)
+                            .setDirection(direction)
+                            .setEventTime(2281488)
+                            .build()
+            );
         }
     }
 

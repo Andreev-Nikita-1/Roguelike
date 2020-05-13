@@ -25,7 +25,6 @@ public class Server extends RoguelikeGrpc.RoguelikeImplBase {
         int id = request.getHeroId();
         Model.HeroAction.Type type = request.getType();
         if (type == Model.HeroAction.Type.NOTHING) {
-
         } else if (type == Model.HeroAction.Type.INTERACT) {
             currentMap.heroObjects[id].interactWith();
         } else if (type == Model.HeroAction.Type.DIRECTED_ACTION) {
@@ -59,10 +58,15 @@ public class Server extends RoguelikeGrpc.RoguelikeImplBase {
                     direction1 = Direction.UP;
                     break;
             }
-            currentMap.heroObjects[id].makeMovement(new DirectedOption(action1, direction1), eventTime);
-            responseObserver.onNext(Model.Nothing.newBuilder().build());
-            responseObserver.onCompleted();
+            if (action1 == DirectedOption.Action.ATTACK) {
+                currentMap.heroObjects[id].makeAttack(new DirectedOption(action1, direction1), eventTime);
+            } else {
+                currentMap.heroObjects[id].makeMovement(new DirectedOption(action1, direction1), eventTime);
+            }
+
         }
+        responseObserver.onNext(Model.Nothing.newBuilder().build());
+        responseObserver.onCompleted();
     }
 
     @Override

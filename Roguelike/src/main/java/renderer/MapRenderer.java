@@ -8,6 +8,7 @@ import objects.StaticVisualObject;
 import util.Coord;
 import map.MapOfObjects;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,8 @@ public class MapRenderer {
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 Pixel pixel = pixelStacks[i + xLeftUp][j + yLeftUp].getPixel();
-                stringBuilder.append(pixel.symbol);
+                stringBuilder.append((int) pixel.symbol);
+                stringBuilder.append('#');
                 stringBuilder.append(pixel.symbolColor.toColor().getRed());
                 stringBuilder.append('#');
                 stringBuilder.append(pixel.symbolColor.toColor().getGreen());
@@ -78,7 +80,9 @@ public class MapRenderer {
             }
             stringBuilder.append(';');
         }
-        return stringBuilder.toString();
+        String ans = stringBuilder.toString();
+        return ans;
+
     }
 
     public MapRenderer fit() {

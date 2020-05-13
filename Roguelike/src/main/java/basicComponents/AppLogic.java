@@ -28,20 +28,8 @@ public class AppLogic {
         if (GameplayLogic.gameplayState != GameplayLogic.GameplayState.PLAYING) {
             return;
         }
-        switch (keyStroke.getKeyType()) {
-//            case Escape:
-//                GameplayLogic.pause();
-//                Controller.drawMenu(mainMenu);
-//                break;
-//            case Tab:
-//                GameplayLogic.pause();
-//                Controller.drawMenu(inventory);
-//                break;
-            default:
-                GameplayOption option = getGameplayOption(keyStroke);
-                GameplayLogic.handleOption(0, option, keyStroke.getEventTime());
-                break;
-        }
+        GameplayOption option = getGameplayOption(keyStroke);
+        GameplayLogic.handleOption(0, option, keyStroke.getEventTime());
     }
 
     private static GameplayOption getGameplayOption(KeyStroke keyStroke) {
@@ -110,6 +98,7 @@ public class AppLogic {
     public static void joinGame() {
         client = new Client("localhost", 6969);
         id = client.join(util.Model.JoinMessage.newBuilder().build());
+        GameplayLogic.gameplayState = GameplayLogic.GameplayState.PLAYING;
     }
 
     public static void applyLevel2Action() {

@@ -35,18 +35,20 @@ public class Renderer {
         String string = AppLogic.client.getPixels(
                 util.Model.GetPixelsMessage.newBuilder()
                         .setHeroId(AppLogic.id)
+                        .setTerminalSizeX(Controller.getTerminalSizeX())
+                        .setTerminalSizeY(Controller.getTerminalSizeY())
                         .build()
-        ).toString(StandardCharsets.UTF_16);
+        ).toStringUtf8();
         String[] lines = string.split(";");
-        int health = Integer.valueOf(lines[0]);
+        int health = Integer.parseInt(lines[0]);
         for (int i = 1; i < lines.length; i++) {
             String[] column = lines[i].split("&");
             for (int j = 0; j < column.length; j++) {
-                char symbol = column[j].charAt(0);
-                String[] color = column[j].substring(1).split("#");
+                String[] color = column[j].split("#");
+                char symbol = (char) (Integer.parseInt(color[0]));
                 int[] rgbs = new int[6];
-                for (int k = 0; k < 6; k++) {
-                    rgbs[k] = Integer.valueOf(color[k]);
+                for (int k = 1; k < 7; k++) {
+                    rgbs[k - 1] = Integer.parseInt(color[k]);
                 }
                 TextColor symbolColor = new TextColor.RGB(rgbs[0], rgbs[1], rgbs[2]);
                 TextColor backgroundColor = new TextColor.RGB(rgbs[3], rgbs[4], rgbs[5]);

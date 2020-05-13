@@ -54,7 +54,7 @@ public class GameplayLogic {
                             .setType(util.Model.HeroAction.Type.INTERACT)
                             .setAction(util.Model.HeroAction.Action.ATTACK)
                             .setDirection(util.Model.HeroAction.Direction.DOWN)
-                            .setEventTime(2281488)
+                            .setEventTime(eventTine)
                             .build()
             );
         }
@@ -69,7 +69,6 @@ public class GameplayLogic {
                     break;
                 case ATTACK:
                     action = util.Model.HeroAction.Action.ATTACK;
-                    currentMap.heroObjects[id].makeAttack(((DirectedOption) option), eventTine);
                     break;
             }
             util.Model.HeroAction.Direction direction = null;
@@ -93,7 +92,7 @@ public class GameplayLogic {
                             .setType(util.Model.HeroAction.Type.DIRECTED_ACTION)
                             .setAction(action)
                             .setDirection(direction)
-                            .setEventTime(2281488)
+                            .setEventTime(eventTine)
                             .build()
             );
         }

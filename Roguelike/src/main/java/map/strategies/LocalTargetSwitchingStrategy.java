@@ -2,7 +2,7 @@ package map.strategies;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import util.AccessNeighbourhood;
 import util.Coord;
 import util.Direction;
@@ -13,7 +13,7 @@ public abstract class LocalTargetSwitchingStrategy extends Strategy {
     protected Coord currentLocation = owner.getLocation();
     protected Coord target;
 
-    public LocalTargetSwitchingStrategy(Creature owner, Coord initialTarget) {
+    public LocalTargetSwitchingStrategy(Mob owner, Coord initialTarget) {
         super(owner);
         target = initialTarget;
     }
@@ -30,13 +30,13 @@ public abstract class LocalTargetSwitchingStrategy extends Strategy {
         }
 
         Direction direction = currentLocation.properDirection(target);
-        if (!map.accesible(currentLocation.shifted(Coord.fromDirection(direction)))) {
+        if (!map.accesible(currentLocation.shifted(direction))) {
             AccessNeighbourhood neighbourhood = new AccessNeighbourhood(map, target, 15);
             direction = neighbourhood.accessibleDirection(currentLocation);
             neighbourhood.delete();
         }
 
-        if (direction == null || !map.accesible(currentLocation.shifted(Coord.fromDirection(direction)))) {
+        if (direction == null || !map.accesible(currentLocation.shifted(direction))) {
             return GameplayOption.NOTHING;
         } else {
             return new DirectedOption(WALK, direction);

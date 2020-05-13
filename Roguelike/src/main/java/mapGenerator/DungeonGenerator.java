@@ -1,8 +1,9 @@
 package mapGenerator;
 
+import inventory.Hero;
 import map.MapOfObjects;
 import map.roomSystem.*;
-import objects.InternetCodeBasedLighting;
+import objects.Lighting;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
 
@@ -18,21 +19,21 @@ public class DungeonGenerator extends MapGenerator {
     }
 
     @Override
-    public MapOfObjects generateMap() {
+    public MapOfObjects generateMap(Hero hero) {
         MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
-        map.heroObject = (HeroObject) new HeroObject(map, new Coord(6, 6)).attachToMap();
+        map.heroObject = new HeroObject(map, new Coord(6, 6), hero).attachToMap();
         new Swordsman(map, new Coord(7, 6)).attachToMap();
         RoomSystem roomSystem = new RoomSystem(map);
-        RoomTextures textures = new DungeonTextures();
-
 
         Room[][] rooms = new Room[mapXSize / 8 + 3][mapYSize / 8 + 3];
         for (int i = 3; i < mapXSize - 8; i += 8) {
             for (int j = 3; j < mapYSize - 8; j += 8) {
-                Room room = new Room(map, new Coord(i, j), new Coord(5, 5), 3, textures);
+                Room room = new Room(map, new Coord(i, j), new Coord(5, 5), 3,
+                        new SeedBasedTextures.DungeonTextures((int) (Math.random() * 100)));
                 rooms[(i - 2) / 8][(j - 2) / 8] = room;
                 roomSystem.addRoom(room);
                 if (Math.random() < 0.2) {
+
                     new Swordsman(map, new Coord(i + 1, j + 1)).attachToMap();
                 }
             }
@@ -75,8 +76,7 @@ public class DungeonGenerator extends MapGenerator {
             }
         }
         roomSystem.attachToMap();
-        new InternetCodeBasedLighting(map, 5).attachToMap();
+        map.lighting = (Lighting) new Lighting(map, 7).attachToMap();
         return map;
-
     }
 }

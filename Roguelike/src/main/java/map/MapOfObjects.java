@@ -23,11 +23,12 @@ public class MapOfObjects implements Pausable {
     private int lockSize = 10;
     public List<StaticVisualObject> staticObjects = new CopyOnWriteArrayList<>();
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
-    public List<PausableObject> pausableObjects = new CopyOnWriteArrayList<>();
+    public List<Pausable> pausableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
     public AccessNeighbourhood heroAccessNeighbourhood;
     public RoomSystem roomSystem;
     public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+    public Lighting lighting;
 
     public MapOfObjects(int xSize, int ySize) {
         this.xSize = xSize;
@@ -129,7 +130,7 @@ public class MapOfObjects implements Pausable {
 
     @Override
     public MapOfObjects start() {
-        for (PausableObject object : pausableObjects) {
+        for (Pausable object : pausableObjects) {
             object.start();
         }
         return this;
@@ -137,7 +138,7 @@ public class MapOfObjects implements Pausable {
 
     @Override
     public void pause() {
-        for (PausableObject object : pausableObjects) {
+        for (Pausable object : pausableObjects) {
             object.pause();
         }
         scheduler.shutdown();
@@ -146,14 +147,14 @@ public class MapOfObjects implements Pausable {
     @Override
     public void unpause() {
         scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-        for (PausableObject object : pausableObjects) {
+        for (Pausable object : pausableObjects) {
             object.unpause();
         }
     }
 
     @Override
     public void kill() throws InterruptedException {
-        for (PausableObject object : pausableObjects) {
+        for (Pausable object : pausableObjects) {
             object.kill();
         }
         scheduler.shutdown();

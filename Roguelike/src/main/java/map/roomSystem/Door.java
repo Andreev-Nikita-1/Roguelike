@@ -22,24 +22,25 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     }
 
     public Door(Room room1, Room room2) {
-        super(room1, room2);
+        super(room1, room2, 0);
         setWidthAndBias(1, width / 2);
         setDepth((length - 1) / 2);
     }
 
     public Door(Room room1, Room room2, int bias) {
-        super(room1, room2, 1, bias);
+        super(room1, room2, 0, 1, bias);
         setDepth((length - 1) / 2);
     }
 
     public Door(Room room1, Room room2, int bias, int depth) {
-        super(room1, room2, 1, bias);
+        super(room1, room2, 0, 1, bias);
         setDepth(depth);
     }
 
     public void setDepth(int depth) {
         Coord shift = direction.vertical() ?
                 new Coord(0, depth) : new Coord(depth, 0);
+        texturesDepth = depth;
         doorCoord = location.shifted(shift);
     }
 

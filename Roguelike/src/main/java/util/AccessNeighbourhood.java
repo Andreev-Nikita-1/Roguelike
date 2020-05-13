@@ -67,7 +67,7 @@ public class AccessNeighbourhood implements DependingObject {
             Coord current = deque.pollFirst();
             if (Coord.lInftyNorm(current) >= radius) continue;
             for (Direction direction : Direction.getDirections()) {
-                Coord c = current.shifted(Coord.fromDirection(direction));
+                Coord c = current.shifted(direction);
                 if (map.inside(tempCenter.shifted(c))
                         && tempMask[c.x + radius][c.y + radius] == -1) {
                     tempDirections[c.x + radius][c.y + radius] = direction.opposite();

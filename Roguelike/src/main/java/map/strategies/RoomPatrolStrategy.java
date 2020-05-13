@@ -1,7 +1,7 @@
 package map.strategies;
 
 import map.roomSystem.Room;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import util.Coord;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class RoomPatrolStrategy extends LocalTargetSwitchingStrategy {
     private List<Coord> knots;
     private int ind = 0;
 
-    public RoomPatrolStrategy(Creature owner) {
+    public RoomPatrolStrategy(Mob owner) {
         super(owner, owner.map.closestRoom(owner.getLocation()).center());
         Room room = owner.map.closestRoom(owner.getLocation());
         knots = new ArrayList<>();

@@ -1,7 +1,5 @@
 package util;
 
-import map.MapOfObjects;
-
 import java.util.Objects;
 
 public class Coord {
@@ -35,6 +33,14 @@ public class Coord {
         return new Coord(this.x + shift.x, this.y + shift.y);
     }
 
+    public Coord shifted(Direction direction) {
+        return shifted(fromDirection(direction));
+    }
+
+    public Coord shift(Direction direction) {
+        return shift(fromDirection(direction));
+    }
+
     public Coord relative(Coord other) {
         return new Coord(this.x - other.x, this.y - other.y);
     }
@@ -47,6 +53,7 @@ public class Coord {
         return leftUp.x <= x && x <= rightDown.x && leftUp.y <= y && y <= rightDown.y;
     }
 
+    //TODO
     public boolean pixelCrossedBySegment(Coord start, Coord finish) {
         Coord vector = finish.relative(start).multiply(2);
         Coord square = this.relative(start).multiply(2);
@@ -80,6 +87,16 @@ public class Coord {
         return null;
     }
 
+    private static int segmentLineIntersect(Coord a, Coord b, Coord vector) {
+        return (a.x * vector.y - a.y * vector.x) * (b.x * vector.y - b.y * vector.x);
+    }
+
+    public Coord multiply(int m) {
+        x *= m;
+        y *= m;
+        return this;
+    }
+
     public Direction properDirection(Coord target) {
         Coord vector = target.relative(this);
         if (Math.abs(vector.x) > Math.abs(vector.y)) {
@@ -98,15 +115,6 @@ public class Coord {
         return null;
     }
 
-    private static int segmentLineIntersect(Coord a, Coord b, Coord vector) {
-        return (a.x * vector.y - a.y * vector.x) * (b.x * vector.y - b.y * vector.x);
-    }
-
-    public Coord multiply(int m) {
-        x *= m;
-        y *= m;
-        return this;
-    }
 
     public static Coord fromDirection(Direction direction) {
         switch (direction) {

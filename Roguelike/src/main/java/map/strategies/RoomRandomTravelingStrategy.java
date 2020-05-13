@@ -3,8 +3,7 @@ package map.strategies;
 import map.MapOfObjects;
 import map.roomSystem.Passage;
 import map.roomSystem.Room;
-import map.roomSystem.RoomSystem;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import util.Coord;
 
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import static util.Util.generate;
 
 public class RoomRandomTravelingStrategy extends RoomSwitchingStrategy {
 
-    public RoomRandomTravelingStrategy(Creature owner) {
+    public RoomRandomTravelingStrategy(Mob owner) {
         super(owner, new RoomRandomIterator(owner.map, owner.getLocation()));
     }
 

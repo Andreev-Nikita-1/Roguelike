@@ -2,9 +2,9 @@ package objects.creatures;
 
 import basicComponents.Controller;
 import gameplayOptions.DirectedOption;
+import inventory.Hero;
 import map.*;
 import menuLogic.Menu;
-import menuLogic.MenuAction;
 import objects.DamageableObject;
 import objects.InteractiveObject;
 import objects.MapObject;
@@ -12,27 +12,25 @@ import renderer.VisualPixel;
 import util.AccessNeighbourhood;
 import util.Coord;
 import util.Direction;
+import util.Pausable;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class HeroObject extends OnePixelMob {
-    public int speed;
-    public int fortitude;
+public class HeroObject extends OnePixelCreature implements Pausable {
     private int walkDelayX;
     private int walkDelayY;
     private int runDelayX;
     private int runDelayY;
-    private int attackDelay;
     private long lastMoveX;
     private long lastMoveY;
     public InteractiveObject interactiveObject;
+    public Hero hero;
+
 
     public Coord getLocation() {
         return location;
     }
 
-    @Override
     public synchronized void die() {
         deleteFromMap();
         try {
@@ -43,22 +41,19 @@ public class HeroObject extends OnePixelMob {
         Controller.drawMenu(Menu.mainMenu);
     }
 
-    public HeroObject(MapOfObjects map, Coord coord) {
+    public HeroObject(MapOfObjects map, Coord coord, Hero hero) {
         super(map, coord);
+        this.hero = hero;
+        hero.heroMap = map;
         location = coord;
-        updateSpeed(50);
-        fortitude = 50;
-        attackDelay = 100;
-        power = 20;
-        health = new AtomicInteger(100);
+        updateSpeed(hero.speed);
     }
 
-    public void updateSpeed(int newSpeed) {
-        speed = newSpeed;
+    public void updateSpeed(int speed) {
         walkDelayX = 5000 / speed;
         walkDelayY = (int) ((double) walkDelayX * 4 / 3);
-        runDelayX = walkDelayX / 3;
-        runDelayY = walkDelayY / 3;
+        runDelayX = walkDelayX / 2;
+        runDelayY = walkDelayY / 2;
     }
 
     public void makeMovement(DirectedOption option, long eventTime) {
@@ -92,7 +87,7 @@ public class HeroObject extends OnePixelMob {
     }
 
     public void makeAttack(DirectedOption option, long eventTime) {
-        if (eventTime - lastAttackTime >= attackDelay) {
+        if (eventTime - lastAttackTime >= hero.attackDelay) {
             attack(option.direction);
             lastAttackTime = eventTime;
         }
@@ -100,27 +95,22 @@ public class HeroObject extends OnePixelMob {
 
     @Override
     public void takeDamage(Damage damage) {
-        health.addAndGet(-(int) ((double) damage.value * (50 / fortitude)));
-        if (health.get() <= 0) {
+        hero.health.addAndGet(-(int) ((double) damage.value * (50 / hero.fortitude)));
+        if (hero.health.get() <= 0) {
             die();
         }
     }
 
-
-    public int enemyHealth = 0;
-    public long lastEnemyAttack = 0;
-
     @Override
     public void attack(Direction direction) {
-        Coord c = location.shifted(Coord.fromDirection(direction));
+        Coord c = location.shifted(direction);
         attackingCoords.clear();
         attackingCoords.add(c);
+        lastAttackTime = System.currentTimeMillis();
         if (!map.inside(c)) return;
         MapObject o = map.getObject(c);
         if (o instanceof DamageableObject) {
-            ((DamageableObject) o).takeDamage(new Damage(power));
-            enemyHealth = ((Creature) o).health.get();
-            lastEnemyAttack = System.currentTimeMillis();
+            ((DamageableObject) o).takeDamage(new Damage(hero.power));
         }
     }
 
@@ -138,9 +128,26 @@ public class HeroObject extends OnePixelMob {
         return pixelMap;
     }
 
+
     @Override
-    public int act() {
-        return 1000000000;
+    public HeroObject start() {
+        hero.start();
+        return this;
+    }
+
+    @Override
+    public void pause() {
+        hero.pause();
+    }
+
+    @Override
+    public void unpause() {
+        hero.unpause();
+    }
+
+    @Override
+    public void kill() {
+        hero.kill();
     }
 
     @Override

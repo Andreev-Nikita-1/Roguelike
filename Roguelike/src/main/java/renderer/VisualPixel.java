@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import static basicComponents.AppLogic.HERO_SYMBOL;
 import static com.googlecode.lanterna.TextColor.ANSI.RED;
+import static java.lang.Thread.sleep;
 import static renderer.Colors.*;
 
 public class VisualPixel {
@@ -65,6 +66,7 @@ public class VisualPixel {
             new PixelData(true, -9, COLOR25, 1, '\"'),
             new PixelData(false, -10, COLOR24, 1, ' '));
     public static final VisualPixel DUNGEON_WALL = new VisualPixel(
+//            new PixelData(true, 1, TextColor.ANSI.BLACK, 1, '*'),
             new PixelData(true, 1, TextColor.ANSI.BLACK, 1, '*'),
             new PixelData(false, 0, COLOR21, 1, ' '));
     public static final VisualPixel DUNGEON_BACKGROUND_EMPTY = new VisualPixel(

@@ -1,6 +1,7 @@
 package objects;
 
 import map.MapOfObjects;
+import util.Pausable;
 
 public abstract class MapObject {
     public final MapOfObjects map;
@@ -10,8 +11,8 @@ public abstract class MapObject {
     }
 
     public MapObject attachToMap() {
-        if (this instanceof PausableObject) {
-            map.pausableObjects.add((PausableObject) this);
+        if (this instanceof Pausable) {
+            map.pausableObjects.add((Pausable) this);
         }
         if (this instanceof DynamicVisualObject) {
             map.dynamicObjects.add((DynamicVisualObject) this);
@@ -23,7 +24,7 @@ public abstract class MapObject {
     }
 
     public void deleteFromMap() {
-        if (this instanceof PausableObject) {
+        if (this instanceof Pausable) {
             map.pausableObjects.remove(this);
         }
         if (this instanceof DynamicVisualObject) {

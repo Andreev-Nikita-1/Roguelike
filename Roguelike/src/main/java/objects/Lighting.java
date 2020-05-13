@@ -1,48 +1,78 @@
 package objects;
 
 import map.MapOfObjects;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import renderer.VisualPixel;
 import util.Coord;
 import util.Direction;
 import util.SomeLightingCodeFromInternet;
+import util.TimeIntervalActor;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static util.Coord.*;
 
-public class InternetCodeBasedLighting extends MapObject implements DynamicVisualObject {
+public class Lighting extends MapObject implements TimeIntervalActor, DynamicVisualObject {
 
-    private int radius;
+    private double radius;
     private SomeLightingCodeFromInternet code;
     private Set<Coord> visible = new HashSet<>();
 
-    public InternetCodeBasedLighting(MapOfObjects map, int radius) {
+    public volatile boolean lighted = true;
+
+    public Lighting(MapOfObjects map, int radius) {
         super(map);
         this.radius = radius;
-        Function<Coord, Boolean> blocksLight = c -> !(map.inside(c) && (!map.isTaken(c) || (map.getObject(c) instanceof Creature)));
+        Function<Coord, Boolean> blocksLight = c -> !(map.inside(c) && (!map.isTaken(c) || (map.getObject(c) instanceof Mob)));
         Consumer<Coord> setVisible = c -> visible.add(c);
         Function<Coord, Integer> getDistance = c -> (int) Coord.euqlideanScaled(c).doubleValue();
 
         code = new SomeLightingCodeFromInternet(blocksLight, setVisible, getDistance);
     }
 
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public void setDarknessLevel(double darknessLevel) {
+        this.darknessLevel = darknessLevel;
+    }
+
+
+    private double darknessLevel = 0;
+    private double phase = 0;
+    private double amplitude = 0.02;
+
+    public void turnOnDarkness() {
+        lighted = false;
+        amplitude = 0.0;
+        darknessLevel = 1.0;
+    }
+
+    public void turnOffDarkness() {
+        lighted = true;
+        amplitude = 0.02;
+    }
 
     private double transparency(double dist) {
         double t = Math.max(1.0 / ((dist / radius) * (dist / radius) + 1), 0.5);
         t = 2 - 2 * t;
-        return t;
+        if (t < 1)
+            t = Math.min(Math.max(t + amplitude * Math.sin(phase / 5.0), 0), 1);
+        return 1 - ((1 - t) * (1 - darknessLevel));
     }
 
     @Override
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
         visible.clear();
-        code.Compute(new Coord(map.getHeroLocation()), radius);
+        code.Compute(new Coord(map.getHeroLocation()), (int) Math.ceil(radius));
         Map<Coord, VisualPixel> pixelMap = new HashMap<>();
         for (int i = leftUp.x; i < rightDown.x; i++) {
             for (int j = leftUp.y; j < rightDown.y; j++) {
@@ -56,10 +86,10 @@ public class InternetCodeBasedLighting extends MapObject implements DynamicVisua
                 } else {
                     if (!visible.contains(c)) {
                         for (Direction direction : Direction.getDirections()) {
-                            Coord neighbour = c.shifted(Coord.fromDirection(direction));
+                            Coord neighbour = c.shifted(direction);
                             if (visible.contains(neighbour)
                                     && (map.inside(neighbour)
-                                    && (!map.isTaken(neighbour) || (map.getObject(neighbour) instanceof Creature)))) {
+                                    && (!map.isTaken(neighbour) || (map.getObject(neighbour) instanceof Mob)))) {
                                 dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation()));
                             }
                         }
@@ -71,5 +101,38 @@ public class InternetCodeBasedLighting extends MapObject implements DynamicVisua
             }
         }
         return pixelMap;
+    }
+
+    @Override
+    public int act() {
+        if (lighted) {
+            phase += 2.0 * Math.random();
+            return 75;
+        } else {
+            if (darknessLevel >= 0.99) {
+                darknessLevel -= 0.0005;
+            } else if (darknessLevel > 0.01) {
+                darknessLevel -= 0.005 * darknessLevel * darknessLevel;
+            }
+            return 30;
+        }
+    }
+
+    private AtomicBoolean paused = new AtomicBoolean(true);
+
+    @Override
+    public void setPaused(boolean paused) {
+        this.paused.set(paused);
+    }
+
+    @Override
+    public boolean getPaused() {
+        return paused.get();
+    }
+
+
+    @Override
+    public ScheduledExecutorService getScheduler() {
+        return map.scheduler;
     }
 }

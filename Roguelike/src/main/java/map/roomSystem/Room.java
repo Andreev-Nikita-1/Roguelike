@@ -21,7 +21,7 @@ public class Room extends MapObject {
     private int leftWallWidth;
     private int rightWallWidth;
     public List<Passage> passages = new ArrayList<>();
-    private RoomTextures textures;
+    public RoomTextures textures;
     private Wall upWall;
     private Wall downWall;
     private Wall rightWall;
@@ -103,9 +103,9 @@ public class Room extends MapObject {
                             .filter(passage -> passage.directedTo(this) == LEFT)
                             .collect(Collectors.toList())).attachToMap();
         }
-        background = textures.createBackground(map, location.shifted(new Coord(-leftWallWidth, -upWallWidth)),
-                size.y + upWallWidth + downWallWidth,
-                size.x + leftWallWidth + rightWallWidth
+        background = textures.createBackground(map, location,
+                size.y,
+                size.x
         ).attachToMap();
         return this;
     }

@@ -2,23 +2,22 @@ package objects.creatures;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import inventory.InventoryItem;
 import map.*;
 import map.strategies.CombinedStrategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
 import objects.items.Health;
-import objects.items.InventoryItemOnMap;
-import objects.items.Item;
+import objects.items.ItemOnMap;
 import renderer.VisualPixel;
 import util.*;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 
 
-public class Swordsman extends OnePixelMob implements DynamicVisualObject {
+public class Swordsman extends Mob implements DynamicVisualObject {
     private volatile int speedDelayX = 200;
     private volatile int speedDelayY = (int) ((double) 200 * 4 / 3);
     private volatile int attackDelay = 100;
@@ -33,7 +32,7 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
 
     @Override
     public void attack(Direction direction) {
-        Coord c = location.shifted(Coord.fromDirection(direction));
+        Coord c = location.shifted(direction);
         attackingCoords.clear();
         attackingCoords.add(c);
         lastAttackTime = System.currentTimeMillis();
@@ -46,24 +45,18 @@ public class Swordsman extends OnePixelMob implements DynamicVisualObject {
 
     @Override
     public synchronized void die() {
-        map.getCoordLock(location).lock();
+        Lock lock = map.getCoordLock(location);
+        lock.lock();
         try {
             deleteFromMap();
-            kill();
             generateItem().attachToMap();
         } finally {
-            map.getCoordLock(location).unlock();
+            lock.unlock();
         }
     }
 
-    private Item generateItem() {
-        if (Math.random() < 0.9) {
-            return new Health(map, location, (int) (Math.random() * 3 * power));
-        } else {
-            return new InventoryItemOnMap(map, location,
-                    Util.generate(new InventoryItem[]{InventoryItem.WEAPON,
-                            InventoryItem.FORTITUDE, InventoryItem.SPEED}));
-        }
+    private ItemOnMap generateItem() {
+        return new Health(map, location, (int) (Math.random() * 3 * power));
     }
 
     @Override

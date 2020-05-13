@@ -3,7 +3,7 @@ package map.strategies;
 
 import map.roomSystem.Passage;
 import map.roomSystem.Room;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import util.Coord;
 
 
@@ -11,7 +11,7 @@ public abstract class RoomSwitchingStrategy extends LocalTargetSwitchingStrategy
     protected RoomPassageIterator iterator;
 
 
-    public RoomSwitchingStrategy(Creature owner, RoomPassageIterator iterator) {
+    public RoomSwitchingStrategy(Mob owner, RoomPassageIterator iterator) {
         super(owner, iterator.initialTarget());
         this.iterator = iterator;
     }

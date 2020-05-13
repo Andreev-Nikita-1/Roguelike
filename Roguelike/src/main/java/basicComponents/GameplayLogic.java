@@ -2,12 +2,18 @@ package basicComponents;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import inventory.Inventory;
+import gameplayOptions.UseItemOption;
+import inventory.Hero;
+import inventory.InventoryWindow;
+import inventory.items.Item;
 import mapGenerator.DungeonGenerator;
 import mapGenerator.MapGenerator;
 import map.MapOfObjects;
 import renderer.MapRenderer;
+import com.googlecode.lanterna.input.KeyStroke;
 
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static basicComponents.GameplayLogic.GameplayState.*;
 
@@ -16,8 +22,8 @@ public class GameplayLogic {
 
     public static MapOfObjects currentMap;
     public static MapRenderer currentMapRenderer;
+    public static Hero currentHero;
 
-    public static Inventory inventory = new Inventory();
 
     private static int xSize = 200;
     private static int ySize = 200;
@@ -26,14 +32,28 @@ public class GameplayLogic {
     }
 
     public static void createMap(MapGenerator mapGenerator) {
-        currentMap = mapGenerator.generateMap();
+        currentHero = new Hero(0, 0, 0, new AtomicInteger(100), 0, 50, 10, 100, 50, 0);
+        currentMap = mapGenerator.generateMap(currentHero);
         currentMapRenderer = new MapRenderer(currentMap).fit();
+        currentHero.setMap(currentMap);
         currentMap.start();
     }
 
     public static void pause() {
         currentMap.pause();
         gameplayState = PAUSED;
+    }
+
+    public static void openInventory() {
+        currentMap.pause();
+        InventoryWindow.activate();
+        gameplayState = INVENTORY;
+    }
+
+    public static void closeInventory() {
+        currentMap.unpause();
+        InventoryWindow.deactivate();
+        gameplayState = PLAYING;
     }
 
     public static void unpause() {
@@ -49,6 +69,10 @@ public class GameplayLogic {
     }
 
     public static void handleOption(GameplayOption option, long eventTine) {
+        if (option instanceof UseItemOption) {
+            Item item = currentHero.taken[((UseItemOption) option).num];
+            if (item != null) item.use();
+        }
         if (option == GameplayOption.INTERACT) {
             currentMap.heroObject.interactWith();
         }
@@ -65,8 +89,12 @@ public class GameplayLogic {
         }
     }
 
+    public static void handleKeyStrokeInInventory(KeyStroke keyStroke) {
+        InventoryWindow.handleKeyStroke(keyStroke);
+    }
+
     public enum GameplayState {
-        NOT_STARTED, MAP_GENERATING, PLAYING, PAUSED
+        NOT_STARTED, MAP_GENERATING, PLAYING, PAUSED, INVENTORY
     }
 
 }

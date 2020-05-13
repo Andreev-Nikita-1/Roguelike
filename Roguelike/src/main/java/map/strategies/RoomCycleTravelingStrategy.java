@@ -2,17 +2,17 @@ package map.strategies;
 
 import map.roomSystem.Passage;
 import map.roomSystem.Room;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class RoomCycleTravelingStrategy extends RoomSwitchingStrategy {
-    public RoomCycleTravelingStrategy(Creature owner, List<Room> roomList, List<Passage> passageList) {
+    public RoomCycleTravelingStrategy(Mob owner, List<Room> roomList, List<Passage> passageList) {
         super(owner, new RoomCycleIterator(roomList, passageList, true));
     }
 
-    public RoomCycleTravelingStrategy(Creature owner, List<Room> roomList, List<Passage> passageList, boolean startFromRoom) {
+    public RoomCycleTravelingStrategy(Mob owner, List<Room> roomList, List<Passage> passageList, boolean startFromRoom) {
         super(owner, new RoomCycleIterator(roomList, passageList, startFromRoom));
     }
 

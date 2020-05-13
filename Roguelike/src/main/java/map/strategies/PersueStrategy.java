@@ -2,12 +2,11 @@ package map.strategies;
 
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import objects.MapObject;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import util.Direction;
 
 public class PersueStrategy extends Strategy {
-    public PersueStrategy(Creature owner) {
+    public PersueStrategy(Mob owner) {
         super(owner);
     }
 

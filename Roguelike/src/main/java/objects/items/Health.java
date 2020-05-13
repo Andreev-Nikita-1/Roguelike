@@ -8,7 +8,7 @@ import util.Coord;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Health extends Item {
+public class Health extends ItemOnMap {
 
     private int value;
 
@@ -20,7 +20,7 @@ public class Health extends Item {
     @Override
     public synchronized void update() {
         if (location.equals(map.getHeroLocation())) {
-            map.heroObject.health.addAndGet(value);
+            map.heroObject.hero.health.addAndGet(value);
             deleteFromMap();
         }
     }

@@ -1,13 +1,13 @@
 package map.strategies;
 
 import gameplayOptions.GameplayOption;
-import objects.creatures.Creature;
+import objects.creatures.Mob;
 import util.Coord;
 
 public class CombinedStrategy extends Strategy {
     private Strategy currentStrategy;
 
-    public CombinedStrategy(Creature owner) {
+    public CombinedStrategy(Mob owner) {
         super(owner);
     }
 
@@ -39,7 +39,7 @@ public class CombinedStrategy extends Strategy {
     }
 
     private void switchStrategy() {
-        if (currentStrategy instanceof PersueStrategy) {
+        if (currentStrategy instanceof PersueStrategy || currentStrategy == null) {
             currentStrategy = new RoomRandomTravelingStrategy(owner);
         } else {
             if (Math.random() < 0.1) {

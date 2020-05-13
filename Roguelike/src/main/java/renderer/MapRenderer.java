@@ -1,8 +1,11 @@
 package renderer;
 
+import basicComponents.GameplayLogic;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
+import gameplayOptions.GameplayOption;
+import inventory.items.Lamp;
 import objects.DynamicVisualObject;
 import objects.StaticVisualObject;
 import util.Coord;
@@ -10,6 +13,9 @@ import map.MapOfObjects;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.googlecode.lanterna.TextColor.ANSI.RED;
+
 
 public class MapRenderer {
     private MapOfObjects map;
@@ -58,19 +64,55 @@ public class MapRenderer {
 
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
-                Pixel pixel = pixelStacks[i + xLeftUp][j + yLeftUp].getPixel();
+                Pixel pixel = pixelStacks[i + xLeftUp][j + yLeftUp].getPixel()
+                        .darkness(!map.lighting.lighted)
+                        .noir(GameplayLogic.gameplayState == GameplayLogic.GameplayState.PAUSED
+                                || GameplayLogic.gameplayState == GameplayLogic.GameplayState.INVENTORY);
                 graphics.setCharacter(i, j, new TextCharacter(pixel.symbol,
                         pixel.symbolColor, pixel.backgroundColor));
             }
         }
-
-        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.health));
-        if (System.currentTimeMillis() - map.heroObject.lastEnemyAttack < 500) {
-            String str = String.valueOf(map.heroObject.enemyHealth) + String.valueOf((char) ((map.heroObject.enemyHealth < 20) ? 57356 : 57355));
-            graphics.putString(xSize - 1 - str.length(), 0, str);
-        }
-//        showUnicode(graphics);
+        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.hero.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.hero.health.get()));
+        //TODO
+//        graphics.setCharacter(3, 0,
+//                ((Lamp) GameplayLogic.currentHero.taken[0]).scale.getCharacter());
+//
+//        graphics.setCharacter(5, 0, firsy());
+//        graphics.setCharacter(6, 0, second());
     }
+
+
+    private TextColor black = new TextColor.RGB(50, 0, 0);
+
+    private TextCharacter firsy() {
+        double t = GameplayLogic.currentHero.health.get() / 100.0;
+        if (t > 0.5) {
+            return new TextCharacter((char) (9608), RED, black);
+        } else {
+            double r = 2 * t;
+            if (r == 0) {
+                return new TextCharacter(' ', black, black);
+            } else {
+                return new TextCharacter((char) (9608 + (1 - r) * 8), RED, black);
+            }
+        }
+    }
+
+
+    private TextCharacter second() {
+        double t = GameplayLogic.currentHero.health.get() / 100.0;
+        if (t <= 0.5) {
+            return new TextCharacter(' ', black, black);
+        } else {
+            double r = 2 * t - 1;
+            if (r == 0) {
+                return new TextCharacter(' ', black, black);
+            } else {
+                return new TextCharacter((char) (9608 + (1 - r) * 8), RED, black);
+            }
+        }
+    }
+
 
     public MapRenderer fit() {
         pixelStacksInitialize();

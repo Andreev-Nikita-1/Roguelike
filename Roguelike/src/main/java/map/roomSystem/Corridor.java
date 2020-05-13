@@ -8,11 +8,11 @@ public class Corridor extends Passage {
     }
 
     public Corridor(Room room1, Room room2) {
-        super(room1, room2);
+        super(room1, room2, 0);
     }
 
     public Corridor(Room room1, Room room2, int width, int bias) {
-        super(room1, room2, width, bias);
+        super(room1, room2, 0, width, bias);
     }
 
     public Corridor(Room room1, Room room2, int width) {
@@ -21,12 +21,15 @@ public class Corridor extends Passage {
         setWidthAndBias(width, bias);
     }
 
+
     @Override
     public Corridor attachToMap() {
+        super.attachToMap();
         return this;
     }
 
     @Override
     public void deleteFromMap() {
+        super.deleteFromMap();
     }
 }

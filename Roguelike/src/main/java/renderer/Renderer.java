@@ -5,7 +5,13 @@ import basicComponents.GameplayLogic;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
+import inventory.TextWindow;
+import inventory.InventoryWindow;
+import util.Coord;
 
+import java.util.Arrays;
+
+import static com.googlecode.lanterna.TextColor.ANSI.BLACK;
 import static renderer.Colors.*;
 
 public class Renderer {
@@ -18,11 +24,20 @@ public class Renderer {
             case MAP_GENERATING:
                 drawStartPicture(graphics);
                 break;
+            case INVENTORY:
+                GameplayLogic.currentMapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                drawInventoryWindow(graphics);
+                break;
             case PAUSED:
             case PLAYING:
                 GameplayLogic.currentMapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
                 break;
         }
+    }
+
+
+    public static void drawInventoryWindow(TextGUIGraphics graphics) {
+        InventoryWindow.draw(graphics);
     }
 
 
@@ -40,7 +55,7 @@ public class Renderer {
     }
 
     private static void drawLoading(TextGUIGraphics graphics, double percent) {
-        graphics.setBackgroundColor(TextColor.ANSI.BLACK);
+        graphics.setBackgroundColor(BLACK);
         graphics.fill(' ');
         int xSize = Controller.getTerminalSizeX();
         int ySize = Controller.getTerminalSizeY();

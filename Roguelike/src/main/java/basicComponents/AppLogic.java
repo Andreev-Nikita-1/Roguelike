@@ -2,6 +2,9 @@ package basicComponents;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import gameplayOptions.DirectedOption;
+import gameplayOptions.UseItemOption;
+import map.roomSystem.SeedBasedTextures;
+import mapGenerator.DungeonGenerator;
 import menuLogic.Menu;
 import menuLogic.RealAction;
 import gameplayOptions.GameplayOption;
@@ -21,28 +24,30 @@ public class AppLogic {
 
 
     public static void handleKeyStrokeOnMap(KeyStroke keyStroke) {
-        if (GameplayLogic.gameplayState != GameplayLogic.GameplayState.PLAYING) {
-            return;
-        }
-        switch (keyStroke.getKeyType()) {
-            case Escape:
-                GameplayLogic.pause();
-                Controller.drawMenu(mainMenu);
-                break;
-            case Tab:
-                GameplayLogic.pause();
-                Controller.drawMenu(inventory);
-                break;
-            case F1:
-                Renderer.page += 1;
-                break;
-            case F2:
-                Renderer.page -= 1;
-                break;
-            default:
-                GameplayOption option = getGameplayOption(keyStroke);
-                GameplayLogic.handleOption(option, keyStroke.getEventTime());
-                break;
+        if (GameplayLogic.gameplayState == GameplayLogic.GameplayState.PLAYING) {
+            switch (keyStroke.getKeyType()) {
+                case Escape:
+                    GameplayLogic.pause();
+                    Controller.drawMenu(mainMenu);
+                    break;
+                case Tab:
+                    GameplayLogic.openInventory();
+                    break;
+                default:
+                    GameplayOption option = getGameplayOption(keyStroke);
+                    GameplayLogic.handleOption(option, keyStroke.getEventTime());
+                    break;
+            }
+        } else if (GameplayLogic.gameplayState == GameplayLogic.GameplayState.INVENTORY) {
+            switch (keyStroke.getKeyType()) {
+                case Escape:
+                case Tab:
+                    GameplayLogic.closeInventory();
+                    break;
+                default:
+                    GameplayLogic.handleKeyStrokeInInventory(keyStroke);
+                    break;
+            }
         }
     }
 
@@ -52,8 +57,12 @@ public class AppLogic {
         boolean shift = keyStroke.isShiftDown();
         switch (keyStroke.getKeyType()) {
             case Character:
-                if (keyStroke.getCharacter() == ' ') {
+                char character = keyStroke.getCharacter();
+                if (character == ' ') {
                     return GameplayOption.INTERACT;
+                }
+                if (character > '0' && character < '4') {
+                    return new UseItemOption(character - '1');
                 }
             case ArrowDown:
                 if (alt) return DirectedOption.ATTACK_DOWN;
@@ -88,8 +97,6 @@ public class AppLogic {
         if (!mainMenu.getActions().contains(RealAction.continueGameAction)) {
             mainMenu.addAction(0, RealAction.continueGameAction);
         }
-        Menu.inventory = new Menu("INVENTORY");
-        Menu.inventory.addAction(RealAction.continueGameAction);
         GameplayLogic.createMapLevel1();
     }
 

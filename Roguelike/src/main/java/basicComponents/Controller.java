@@ -17,9 +17,11 @@ import menuLogic.MenuAction;
 import renderer.Renderer;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
 import static menuLogic.Menu.optionsMenu;
 
@@ -29,8 +31,8 @@ public class Controller {
     private static WindowBasedTextGUI gui;
     private static Window mainWindow;
     private static GameplayComponent component;
-
-    public static volatile int fontSize = 35;
+    private static final float fontSizeDefault = 40;
+    private static volatile float fontSize = fontSizeDefault;
 
     private Controller() {
     }
@@ -43,11 +45,13 @@ public class Controller {
         return gui.getScreen().getTerminalSize().getRows();
     }
 
-    public static void initialize() throws IOException {
+    public static void initialize() throws IOException, FontFormatException {
         terminal = new SwingTerminalFrame(AppLogic.MAIN_WINDOW_TITLE,
                 new TerminalSize(30, 13),
                 null,
-                new SwingTerminalFontConfiguration(false, AWTTerminalFontConfiguration.BoldMode.NOTHING, new Font("VL Gothic Regular", Font.PLAIN, fontSize)),
+                new SwingTerminalFontConfiguration(false,
+                        AWTTerminalFontConfiguration.BoldMode.NOTHING,
+                        Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/FONT.ttf")).deriveFont(fontSize)),
                 null,
                 TerminalEmulatorAutoCloseTrigger.CloseOnExitPrivateMode);
         TerminalScreen screen = new TerminalScreen(terminal);
@@ -57,11 +61,10 @@ public class Controller {
         mainWindow.setHints(Arrays.asList(Window.Hint.NO_DECORATIONS, Window.Hint.FULL_SCREEN));
         gui.addWindow(mainWindow);
         component = new GameplayComponent();
-
     }
 
     public static void zoomDefault() {
-        fontSize = 35;
+        fontSize = fontSizeDefault;
         update();
         drawMenu(optionsMenu);
     }
@@ -82,13 +85,14 @@ public class Controller {
     public static void update() {
         try {
             AppLogic.active = true;
-            terminal.close();
+            if (terminal != null)
+                terminal.close();
             initialize();
             terminal.setVisible(true);
             terminal.setExtendedState(terminal.MAXIMIZED_BOTH);
             gui.getScreen().startScreen();
             mainWindow.setComponent(component);
-        } catch (IOException e) {
+        } catch (IOException | FontFormatException e) {
         }
     }
 

@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-public class MapOfObjects implements Pausable {
+public class MapOfObjects {
     public int xSize;
     public int ySize;
     private MapObject[][] objectsMap;
@@ -23,11 +23,9 @@ public class MapOfObjects implements Pausable {
     private int lockSize = 10;
     public List<StaticVisualObject> staticObjects = new CopyOnWriteArrayList<>();
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
-    public List<Pausable> pausableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
     public AccessNeighbourhood heroAccessNeighbourhood;
     public RoomSystem roomSystem;
-    public ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
     public Lighting lighting;
 
     public MapOfObjects(int xSize, int ySize) {
@@ -126,38 +124,6 @@ public class MapOfObjects implements Pausable {
 
     public boolean accesible(Coord coord) {
         return inside(coord) && !isTaken(coord);
-    }
-
-    @Override
-    public MapOfObjects start() {
-        for (Pausable object : pausableObjects) {
-            object.start();
-        }
-        return this;
-    }
-
-    @Override
-    public void pause() {
-        for (Pausable object : pausableObjects) {
-            object.pause();
-        }
-        scheduler.shutdown();
-    }
-
-    @Override
-    public void unpause() {
-        scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-        for (Pausable object : pausableObjects) {
-            object.unpause();
-        }
-    }
-
-    @Override
-    public void kill() throws InterruptedException {
-        for (Pausable object : pausableObjects) {
-            object.kill();
-        }
-        scheduler.shutdown();
     }
 
     public class MapAreaLock extends ReentrantLock {

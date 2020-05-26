@@ -1,15 +1,15 @@
 package renderer;
 
-import com.googlecode.lanterna.TextColor;
+import java.awt.Color;
 
 import static java.lang.Thread.sleep;
 
 public class Pixel {
     public final char symbol;
-    public final TextColor symbolColor;
-    public final TextColor backgroundColor;
+    public final Color symbolColor;
+    public final Color backgroundColor;
 
-    public Pixel(char symbol, TextColor symbolColor, TextColor backgroundColor) {
+    public Pixel(char symbol, Color symbolColor, Color backgroundColor) {
         this.symbol = symbol;
         this.symbolColor = symbolColor;
         this.backgroundColor = backgroundColor;
@@ -20,30 +20,30 @@ public class Pixel {
     public Pixel darkness(boolean shouldBeApplied) {
         if (!shouldBeApplied) return this;
         if (darkness == null) {
-            int x = (symbolColor.toColor().getRed() + symbolColor.toColor().getGreen() + symbolColor.toColor().getBlue()) / 3;
-            TextColor symbolWB = new TextColor.RGB((int) (x * 27.0 / 100.0),
-                    (int) (x * 33.0 / 100.0),
-                    (int) (x * 40.0 / 100.0));
+            int x = (symbolColor.getRed() + symbolColor.getGreen() + symbolColor.getBlue()) / 3;
+            Color symbolWB = new Color((int) (x * 24.0 / 100.0),
+                    (int) (x * 32.0 / 100.0),
+                    (int) (x * 45.0 / 100.0));
 
-            x = (backgroundColor.toColor().getRed() + backgroundColor.toColor().getGreen() + backgroundColor.toColor().getBlue()) / 3;
-            TextColor backgroundWB = new TextColor.RGB((int) (x * 27.0 / 100.0),
-                    (int) (x * 33.0 / 100.0),
-                    (int) (x * 40.0 / 100.0));
+            x = (backgroundColor.getRed() + backgroundColor.getGreen() + backgroundColor.getBlue()) / 3;
+            Color backgroundWB = new Color((int) (x * 24.0 / 100.0),
+                    (int) (x * 32.0 / 100.0),
+                    (int) (x * 45.0 / 100.0));
             darkness = new Pixel(symbol, symbolWB, backgroundWB);
         }
         return darkness;
     }
 
     public Pixel inverse() {
-        int r = symbolColor.toColor().getRed();
-        int g = symbolColor.toColor().getGreen();
-        int b = symbolColor.toColor().getBlue();
-        TextColor symbolWB = new TextColor.RGB(255 - r, 255 - g, 255 - b);
+        int r = symbolColor.getRed();
+        int g = symbolColor.getGreen();
+        int b = symbolColor.getBlue();
+        Color symbolWB = new Color(255 - r, 255 - g, 255 - b);
 
-        r = backgroundColor.toColor().getRed();
-        g = backgroundColor.toColor().getGreen();
-        b = backgroundColor.toColor().getBlue();
-        TextColor backgroundWB = new TextColor.RGB(255 - r, 255 - g, 255 - b);
+        r = backgroundColor.getRed();
+        g = backgroundColor.getGreen();
+        b = backgroundColor.getBlue();
+        Color backgroundWB = new Color(255 - r, 255 - g, 255 - b);
 
 
         return new Pixel(symbol, symbolWB, backgroundWB);
@@ -69,6 +69,21 @@ public class Pixel {
         return (int) Math.max(Math.min(255, 15 + 15 * Math.sin(redLevel / a + b) + x), 0);
     }
 
+
+    Color testColor(int r, int g, int b) {
+        double A = 0.299;
+        double B = 0.587;
+        double C = 0.114;
+        double psi = redLevel / 50.0;
+        double fi = 6 * Math.sin(redLevel / 50.0 / 6);
+        double r1 = Math.cos(psi) * r + (Math.sqrt(B) / Math.sqrt(A)) * Math.sin(psi) * g;
+        double g1 = -(Math.sqrt(A) / Math.sqrt(B)) * Math.sin(psi) * r + Math.cos(psi) * g;
+        double g2 = Math.cos(fi) * g1 + (Math.sqrt(C) / Math.sqrt(B)) * Math.sin(fi) * b;
+        double b1 = -(Math.sqrt(C) / Math.sqrt(B)) * Math.sin(fi) * g1 + Math.cos(fi) * b;
+        return new Color((int) Math.min(255, Math.abs(r1)),
+                (int) Math.min(255, Math.abs(g2)), (int) Math.min(255, Math.abs(b1)));
+    }
+
     //TODO
     public static volatile int redLevel = 0;
     private static boolean run = false;
@@ -87,15 +102,17 @@ public class Pixel {
             }).start();
             run = true;
         }
-        int r = symbolColor.toColor().getRed();
-        int g = symbolColor.toColor().getGreen();
-        int b = symbolColor.toColor().getBlue();
-        TextColor symbolWB = new TextColor.RGB(f(r, 0), f(g, 1), f(b, 2));
+        int r = symbolColor.getRed();
+        int g = symbolColor.getGreen();
+        int b = symbolColor.getBlue();
+//        Color symbolWB = new Color(f(r, 0), f(g, 1), f(b, 2));
+        Color symbolWB = testColor(r, g, b);
 
-        r = backgroundColor.toColor().getRed();
-        g = backgroundColor.toColor().getGreen();
-        b = backgroundColor.toColor().getBlue();
-        TextColor backgroundWB = new TextColor.RGB(f(r, 0), f(g, 1), f(b, 2));
+        r = backgroundColor.getRed();
+        g = backgroundColor.getGreen();
+        b = backgroundColor.getBlue();
+//        Color backgroundWB = new Color(f(r, 0), f(g, 1), f(b, 2));
+        Color backgroundWB = testColor(r, g, b);
 
 
         return new Pixel(symbol, symbolWB, backgroundWB);
@@ -106,11 +123,11 @@ public class Pixel {
     public Pixel noir(boolean shouldBeApplied) {
         if (!shouldBeApplied) return this;
         if (noir == null) {
-            int x = (symbolColor.toColor().getRed() + symbolColor.toColor().getGreen() + symbolColor.toColor().getBlue()) / 3;
-            TextColor symbolWB = new TextColor.RGB(x, x, x);
+            int x = (symbolColor.getRed() + symbolColor.getGreen() + symbolColor.getBlue()) / 3;
+            Color symbolWB = new Color(x, x, x);
 
-            x = (backgroundColor.toColor().getRed() + backgroundColor.toColor().getGreen() + backgroundColor.toColor().getBlue()) / 3;
-            TextColor backgroundWB = new TextColor.RGB(x, x, x);
+            x = (backgroundColor.getRed() + backgroundColor.getGreen() + backgroundColor.getBlue()) / 3;
+            Color backgroundWB = new Color(x, x, x);
 
             noir = new Pixel(symbol, symbolWB, backgroundWB);
         }

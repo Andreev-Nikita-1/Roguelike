@@ -1,11 +1,9 @@
 package renderer;
 
-import basicComponents.GameplayLogic;
+import basicComponents.Game;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
-import gameplayOptions.GameplayOption;
-import inventory.items.Lamp;
 import objects.DynamicVisualObject;
 import objects.StaticVisualObject;
 import util.Coord;
@@ -14,16 +12,18 @@ import map.MapOfObjects;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.lanterna.TextColor.ANSI.RED;
+import static util.Util.convertColor;
 
 
 public class MapRenderer {
+    private Game game;
     private MapOfObjects map;
     private PixelStack[][] pixelStacks;
     private TerminalCoordinate terminalCoordinate;
 
-    public MapRenderer(MapOfObjects map) {
-        this.map = map;
+    public MapRenderer(Game game) {
+        this.game = game;
+        this.map = game.currentMap;
         pixelStacks = new PixelStack[map.xSize][map.ySize];
         terminalCoordinate = new TerminalCoordinate(new Coord(map.xSize, map.ySize));
     }
@@ -66,53 +66,23 @@ public class MapRenderer {
             for (int j = 0; j < ySize; j++) {
                 Pixel pixel = pixelStacks[i + xLeftUp][j + yLeftUp].getPixel()
                         .darkness(!map.lighting.lighted)
-                        .noir(GameplayLogic.gameplayState == GameplayLogic.GameplayState.PAUSED
-                                || GameplayLogic.gameplayState == GameplayLogic.GameplayState.INVENTORY);
+                        .noir(game.gameplayState == Game.GameplayState.PAUSED
+                                || game.gameplayState == Game.GameplayState.INVENTORY);
                 graphics.setCharacter(i, j, new TextCharacter(pixel.symbol,
-                        pixel.symbolColor, pixel.backgroundColor));
+                        convertColor(pixel.symbolColor), convertColor(pixel.backgroundColor)));
             }
         }
-        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.hero.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.hero.health.get()));
-        //TODO
-//        graphics.setCharacter(3, 0,
-//                ((Lamp) GameplayLogic.currentHero.taken[0]).scale.getCharacter());
-//
-//        graphics.setCharacter(5, 0, firsy());
-//        graphics.setCharacter(6, 0, second());
-    }
-
-
-    private TextColor black = new TextColor.RGB(50, 0, 0);
-
-    private TextCharacter firsy() {
-        double t = GameplayLogic.currentHero.health.get() / 100.0;
-        if (t > 0.5) {
-            return new TextCharacter((char) (9608), RED, black);
-        } else {
-            double r = 2 * t;
-            if (r == 0) {
-                return new TextCharacter(' ', black, black);
-            } else {
-                return new TextCharacter((char) (9608 + (1 - r) * 8), RED, black);
-            }
+//        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.hero.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.hero.health.get()));
+        graphics.putString(0, 0, String.valueOf(game.currentInventory.stats.getHealth()));
+        graphics.putString(5, 0, String.valueOf(game.currentInventory.stats.getStamina()));
+        try {
+            graphics.putString(10, 0, String.valueOf(game.currentInventory.weapon.durability));
+        } catch (NullPointerException e) {
         }
+//        graphics.setBackgroundColor(Renderer.convertColor(new Color(10, 10, 10)));
+//        graphics.setForegroundColor(Renderer.convertColor(new Color(50, 50, 50)));
+//        graphics.putString(0, 0, (char) (0x01DE) + "" + (char) (0x01AB) + "" + (char) (0x01AB) + "" + (char) (0x01AB1) + "" + (char) (0x01DF));
     }
-
-
-    private TextCharacter second() {
-        double t = GameplayLogic.currentHero.health.get() / 100.0;
-        if (t <= 0.5) {
-            return new TextCharacter(' ', black, black);
-        } else {
-            double r = 2 * t - 1;
-            if (r == 0) {
-                return new TextCharacter(' ', black, black);
-            } else {
-                return new TextCharacter((char) (9608 + (1 - r) * 8), RED, black);
-            }
-        }
-    }
-
 
     public MapRenderer fit() {
         pixelStacksInitialize();

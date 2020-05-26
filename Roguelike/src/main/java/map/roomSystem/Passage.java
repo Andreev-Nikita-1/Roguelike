@@ -1,5 +1,6 @@
 package map.roomSystem;
 
+import map.roomSystem.textures.RoomTextures;
 import objects.MapObject;
 import util.Coord;
 import util.Direction;
@@ -15,11 +16,8 @@ public abstract class Passage extends MapObject {
     public Room room1;
     public Room room2;
 
-    protected RoomTextures textures1;
-    protected RoomTextures textures2;
-    protected Background background1;
-    protected Background background2;
-    protected int texturesDepth;
+    protected RoomTextures textures;
+    protected Background background;
 
 
     public abstract boolean passable(int width);
@@ -67,56 +65,35 @@ public abstract class Passage extends MapObject {
         }
     }
 
-    public Passage(Room room1, Room room2, int texturesDepth) {
+    public Passage(Room room1, Room room2, RoomTextures textures) {
         super(room1.map);
         this.room1 = room1;
         this.room2 = room2;
-        this.texturesDepth = texturesDepth;
         room1.addPassage(this);
         room2.addPassage(this);
+        this.textures = textures;
         setWidestPassage();
     }
 
-    public Passage(Room room1, Room room2, int texturesDepth, int width, int bias) {
-        this(room1, room2, texturesDepth);
+    public Passage(Room room1, Room room2, RoomTextures textures, int width, int bias) {
+        this(room1, room2, textures);
         setWidthAndBias(width, bias);
     }
-
 
     @Override
     public Passage attachToMap() {
         super.attachToMap();
-        if (direction == DOWN || direction == RIGHT) {
-            textures1 = room1.textures.copy();
-            textures2 = room2.textures.copy();
-        } else {
-            textures2 = room1.textures.copy();
-            textures1 = room2.textures.copy();
-        }
-        int height1, width1, height2, width2;
-        Coord shift;
         if (direction.horizontal()) {
-            height1 = width;
-            height2 = width;
-            width1 = texturesDepth;
-            width2 = length - texturesDepth;
-            shift = new Coord(texturesDepth, 0);
+            background = textures.createBackground(map, location, width, length).attachToMap();
         } else {
-            width1 = width;
-            width2 = width;
-            height1 = texturesDepth;
-            height2 = length - texturesDepth;
-            shift = new Coord(0, texturesDepth);
+            background = textures.createBackground(map, location, length, width).attachToMap();
         }
-        background1 = textures1.createBackground(map, location, height1, width1).attachToMap();
-        background2 = textures2.createBackground(map, location.shifted(shift), height2, width2).attachToMap();
         return this;
     }
 
     @Override
     public void deleteFromMap() {
-        background1.deleteFromMap();
-        background2.deleteFromMap();
+        background.deleteFromMap();
         super.deleteFromMap();
     }
 

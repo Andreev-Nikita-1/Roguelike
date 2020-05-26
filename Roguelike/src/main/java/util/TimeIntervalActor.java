@@ -1,49 +1,47 @@
 package util;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public interface TimeIntervalActor extends Runnable, Pausable {
 
-
     int act();
 
-    void setPaused(boolean paused);
+    void setActive(boolean active);
 
-    boolean getPaused();
+    boolean isActive();
 
-    ScheduledExecutorService getScheduler();
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 
     @Override
     default void run() {
-        if (!getPaused()) {
+        if (isActive() && !paused.get()) {
             int delay = act();
-            getScheduler().schedule(this, delay, MILLISECONDS);
+            scheduler.schedule(this, delay, MILLISECONDS);
         }
     }
 
     @Override
     default TimeIntervalActor start() {
-        setPaused(false);
-        getScheduler().schedule(this, 0, MILLISECONDS);
+        setActive(true);
+        scheduler.schedule(this, 0, MILLISECONDS);
         return this;
     }
 
     @Override
     default void pause() {
-        setPaused(true);
     }
 
     @Override
     default void unpause() {
-        setPaused(false);
-        getScheduler().schedule(this, 0, MILLISECONDS);
+        scheduler.schedule(this, 0, MILLISECONDS);
     }
 
     @Override
     default void kill() {
-        setPaused(true);
+        setActive(false);
     }
 }
 

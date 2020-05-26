@@ -121,18 +121,13 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
     private AtomicBoolean paused = new AtomicBoolean(true);
 
     @Override
-    public void setPaused(boolean paused) {
-        this.paused.set(paused);
+    public void setActive(boolean active) {
+        this.paused.set(active);
     }
 
     @Override
-    public boolean getPaused() {
+    public boolean isActive() {
         return paused.get();
     }
 
-
-    @Override
-    public ScheduledExecutorService getScheduler() {
-        return map.scheduler;
-    }
 }

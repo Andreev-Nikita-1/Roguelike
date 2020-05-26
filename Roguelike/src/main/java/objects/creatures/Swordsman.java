@@ -7,8 +7,8 @@ import map.strategies.CombinedStrategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
-import objects.items.Health;
-import objects.items.ItemOnMap;
+import objects.stuff.Health;
+import objects.stuff.Stuff;
 import renderer.VisualPixel;
 import util.*;
 
@@ -18,8 +18,7 @@ import java.util.concurrent.locks.Lock;
 
 
 public class Swordsman extends Mob implements DynamicVisualObject {
-    private volatile int speedDelayX = 200;
-    private volatile int speedDelayY = (int) ((double) 200 * 4 / 3);
+    private volatile int speedDelay = 200;
     private volatile int attackDelay = 100;
 
 
@@ -34,12 +33,12 @@ public class Swordsman extends Mob implements DynamicVisualObject {
     public void attack(Direction direction) {
         Coord c = location.shifted(direction);
         attackingCoords.clear();
-        attackingCoords.add(c);
+        attackingCoords.put(c, power);
         lastAttackTime = System.currentTimeMillis();
         if (!map.inside(c)) return;
         MapObject o = map.getObject(c);
         if (o instanceof DamageableObject) {
-            ((DamageableObject) o).takeDamage(new Damage(power));
+            ((DamageableObject) o).takeDamage(power);
         }
     }
 
@@ -55,7 +54,7 @@ public class Swordsman extends Mob implements DynamicVisualObject {
         }
     }
 
-    private ItemOnMap generateItem() {
+    private Stuff generateItem() {
         return new Health(map, location, (int) (Math.random() * 3 * power));
     }
 
@@ -71,7 +70,7 @@ public class Swordsman extends Mob implements DynamicVisualObject {
                 case RUN:
                     if (move(((DirectedOption) action).direction)) {
                         int d = (((DirectedOption) action).action == DirectedOption.Action.WALK) ? 1 : 2;
-                        return ((DirectedOption) action).direction.horizontal() ? speedDelayX / d : speedDelayY / d;
+                        return speedDelay / d;
                     } else {
                         return 10;
                     }
@@ -84,8 +83,8 @@ public class Swordsman extends Mob implements DynamicVisualObject {
     }
 
     @Override
-    public void takeDamage(Damage damage) {
-        health.addAndGet(-damage.value);
+    public void takeDamage(int damage) {
+        health.addAndGet(-damage);
         if (health.get() <= 0) {
             die();
         }

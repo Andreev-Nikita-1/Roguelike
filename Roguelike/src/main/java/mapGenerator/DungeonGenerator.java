@@ -1,8 +1,9 @@
 package mapGenerator;
 
-import inventory.Hero;
+import hero.Inventory;
 import map.MapOfObjects;
 import map.roomSystem.*;
+import map.roomSystem.textures.*;
 import objects.Lighting;
 import objects.creatures.HeroObject;
 import objects.creatures.Swordsman;
@@ -19,17 +20,22 @@ public class DungeonGenerator extends MapGenerator {
     }
 
     @Override
-    public MapOfObjects generateMap(Hero hero) {
+    public MapOfObjects generateMap(Inventory inventory) {
         MapOfObjects map = new MapOfObjects(mapXSize, mapYSize);
-        map.heroObject = new HeroObject(map, new Coord(6, 6), hero).attachToMap();
+        map.heroObject = new HeroObject(map, new Coord(6, 6), inventory).attachToMap();
         new Swordsman(map, new Coord(7, 6)).attachToMap();
         RoomSystem roomSystem = new RoomSystem(map);
 
         Room[][] rooms = new Room[mapXSize / 8 + 3][mapYSize / 8 + 3];
         for (int i = 3; i < mapXSize - 8; i += 8) {
             for (int j = 3; j < mapYSize - 8; j += 8) {
-                Room room = new Room(map, new Coord(i, j), new Coord(5, 5), 3,
-                        new SeedBasedTextures.DungeonTextures((int) (Math.random() * 100)));
+                Room room;
+                if ((i / 8 + j / 8) % 2 == 0)
+                    room = new Room(map, new Coord(i, j), new Coord(5, 5), 3,
+                            new ReachCarpet1((int) (Math.random() * 100)));
+                else
+                    room = new Room(map, new Coord(i, j), new Coord(5, 5), 3,
+                            new StoneFloor1((int) (Math.random() * 100)));
                 rooms[(i - 2) / 8][(j - 2) / 8] = room;
                 roomSystem.addRoom(room);
                 if (Math.random() < 0.2) {
@@ -48,9 +54,11 @@ public class DungeonGenerator extends MapGenerator {
                     int width = (int) (Math.random() * (4 - bias)) + 1;
                     double rand = Math.random();
                     if (rand < 0.2) {
-                        roomSystem.addPassage(new Door(room1, room2, bias));
+                        roomSystem.addPassage(new Door(room1, room2,
+                                new ReachCarpet1((int) (Math.random() * 100)), bias));
                     } else if (rand < 0.7) {
-                        roomSystem.addPassage(new Corridor(room1, room2, bias, width));
+                        roomSystem.addPassage(new Corridor(room1, room2,
+                                new ParquetFloor((int) (Math.random() * 100)), bias, width));
                     }
                 }
                 if (room1 != null && room3 != null) {
@@ -58,18 +66,22 @@ public class DungeonGenerator extends MapGenerator {
                     int width = (int) (Math.random() * (4 - bias)) + 1;
                     double rand = Math.random();
                     if (rand < 0.2) {
-                        roomSystem.addPassage(new Door(room1, room3));
+                        roomSystem.addPassage(new Door(room1, room3,
+                                new ParquetFloor((int) (Math.random() * 100))));
                     } else if (rand < 0.7) {
-                        roomSystem.addPassage(new Corridor(room1, room3, width));
+                        roomSystem.addPassage(new Corridor(room1, room3,
+                                new ParquetFloor((int) (Math.random() * 100)), width));
                     }
                     if (room1.passages.isEmpty()) {
                         bias = (int) (Math.random() * 3);
                         width = (int) (Math.random() * (4 - bias)) + 1;
                         rand = Math.random();
                         if (rand < 0.4) {
-                            roomSystem.addPassage(new Door(room1, room3));
+                            roomSystem.addPassage(new Door(room1, room3,
+                                    new ParquetFloor((int) (Math.random() * 100))));
                         } else {
-                            roomSystem.addPassage(new Corridor(room1, room3, width));
+                            roomSystem.addPassage(new Corridor(room1, room3,
+                                    new ParquetFloor((int) (Math.random() * 100)), width));
                         }
                     }
                 }

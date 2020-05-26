@@ -1,9 +1,9 @@
 package map.roomSystem;
 
 import map.MapOfObjects;
+import map.roomSystem.textures.RoomTextures;
 import objects.MapObject;
 import util.Coord;
-import util.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class Room extends MapObject {
         if (upWallWidth > 0) {
             upWall = textures.createWall(map,
                     location.shifted(new Coord(0, -upWallWidth)),
-                    true,
+                    UP,
                     size.x,
                     upWallWidth,
                     passages.stream()
@@ -76,7 +76,7 @@ public class Room extends MapObject {
         if (downWallWidth > 0) {
             downWall = textures.createWall(map,
                     location.shifted(new Coord(0, size.y)),
-                    true,
+                    DOWN,
                     size.x,
                     downWallWidth,
                     passages.stream()
@@ -86,7 +86,7 @@ public class Room extends MapObject {
         if (rightWallWidth > 0) {
             rightWall = textures.createWall(map,
                     location.shifted(new Coord(size.x, -upWallWidth)),
-                    false,
+                    RIGHT,
                     size.y + upWallWidth + downWallWidth,
                     rightWallWidth,
                     passages.stream()
@@ -96,7 +96,7 @@ public class Room extends MapObject {
         if (leftWallWidth > 0) {
             leftWall = textures.createWall(map,
                     location.shifted(new Coord(-leftWallWidth, -upWallWidth)),
-                    false,
+                    LEFT,
                     size.y + upWallWidth + downWallWidth,
                     leftWallWidth,
                     passages.stream()

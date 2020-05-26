@@ -2,7 +2,10 @@ package objects.creatures;
 
 import basicComponents.Controller;
 import gameplayOptions.DirectedOption;
-import inventory.Hero;
+import hero.Inventory;
+import hero.stats.AttackVisitor;
+import hero.stats.DamageVisitor;
+import hero.stats.RunVisitor;
 import map.*;
 import menuLogic.Menu;
 import objects.DamageableObject;
@@ -16,15 +19,13 @@ import util.Pausable;
 
 import java.util.Map;
 
-public class HeroObject extends OnePixelCreature implements Pausable {
-    private int walkDelayX;
-    private int walkDelayY;
-    private int runDelayX;
-    private int runDelayY;
+public class HeroObject extends OnePixelCreature {
+    private int walkDelay = 100;
+    private int runDelay = 50;
     private long lastMoveX;
     private long lastMoveY;
     public InteractiveObject interactiveObject;
-    public Hero hero;
+    public Inventory inventory;
 
 
     public Coord getLocation() {
@@ -33,53 +34,40 @@ public class HeroObject extends OnePixelCreature implements Pausable {
 
     public synchronized void die() {
         deleteFromMap();
-        try {
-            map.kill();
-        } catch (InterruptedException e) {
-        }
+        Pausable.killGame();
         Menu.mainMenu.deleteAction(0);
         Controller.drawMenu(Menu.mainMenu);
     }
 
-    public HeroObject(MapOfObjects map, Coord coord, Hero hero) {
+    public HeroObject(MapOfObjects map, Coord coord, Inventory inventory) {
         super(map, coord);
-        this.hero = hero;
-        hero.heroMap = map;
+        this.inventory = inventory;
+        inventory.heroMap = map;
         location = coord;
-        updateSpeed(hero.speed);
     }
 
-    public void updateSpeed(int speed) {
-        walkDelayX = 5000 / speed;
-        walkDelayY = (int) ((double) walkDelayX * 4 / 3);
-        runDelayX = walkDelayX / 2;
-        runDelayY = walkDelayY / 2;
-    }
 
     public void makeMovement(DirectedOption option, long eventTime) {
         Direction direction = option.direction;
         int delay = 0;
+        switch (option.action) {
+            case RUN:
+                if (inventory.stats.getStamina() > 0) {
+                    inventory.stats.accept(new RunVisitor());
+                    delay = runDelay;
+                } else {
+                    delay = walkDelay;
+                }
+                break;
+            case WALK:
+                delay = walkDelay;
+                break;
+        }
         if (direction.horizontal()) {
-            switch (option.action) {
-                case RUN:
-                    delay = runDelayX;
-                    break;
-                case WALK:
-                    delay = walkDelayX;
-                    break;
-            }
             if (eventTime - lastMoveX >= delay && move(direction)) {
                 lastMoveX = eventTime;
             }
         } else {
-            switch (option.action) {
-                case RUN:
-                    delay = runDelayY;
-                    break;
-                case WALK:
-                    delay = walkDelayY;
-                    break;
-            }
             if (eventTime - lastMoveY >= delay && move(direction)) {
                 lastMoveY = eventTime;
             }
@@ -87,16 +75,16 @@ public class HeroObject extends OnePixelCreature implements Pausable {
     }
 
     public void makeAttack(DirectedOption option, long eventTime) {
-        if (eventTime - lastAttackTime >= hero.attackDelay) {
+        if (eventTime - lastAttackTime >= inventory.stats.getAttackDelay()) {
             attack(option.direction);
             lastAttackTime = eventTime;
         }
     }
 
     @Override
-    public void takeDamage(Damage damage) {
-        hero.health.addAndGet(-(int) ((double) damage.value * (50 / hero.fortitude)));
-        if (hero.health.get() <= 0) {
+    public void takeDamage(int damage) {
+        inventory.stats.accept(new DamageVisitor(damage));
+        if (inventory.stats.getHealth() <= 0) {
             die();
         }
     }
@@ -105,12 +93,13 @@ public class HeroObject extends OnePixelCreature implements Pausable {
     public void attack(Direction direction) {
         Coord c = location.shifted(direction);
         attackingCoords.clear();
-        attackingCoords.add(c);
+        attackingCoords.put(c, inventory.stats.getPower());
         lastAttackTime = System.currentTimeMillis();
         if (!map.inside(c)) return;
         MapObject o = map.getObject(c);
         if (o instanceof DamageableObject) {
-            ((DamageableObject) o).takeDamage(new Damage(hero.power));
+            inventory.stats.accept(new AttackVisitor());
+            ((DamageableObject) o).takeDamage(inventory.stats.getPower());
         }
     }
 
@@ -126,28 +115,6 @@ public class HeroObject extends OnePixelCreature implements Pausable {
         Map<Coord, VisualPixel> pixelMap = super.getPixels(leftUp, rightDown);
         pixelMap.put(location, VisualPixel.HERO);
         return pixelMap;
-    }
-
-
-    @Override
-    public HeroObject start() {
-        hero.start();
-        return this;
-    }
-
-    @Override
-    public void pause() {
-        hero.pause();
-    }
-
-    @Override
-    public void unpause() {
-        hero.unpause();
-    }
-
-    @Override
-    public void kill() {
-        hero.kill();
     }
 
     @Override

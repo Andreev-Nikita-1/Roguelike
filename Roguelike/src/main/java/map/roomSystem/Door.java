@@ -1,10 +1,12 @@
 package map.roomSystem;
 
-import com.googlecode.lanterna.TextColor;
+import map.roomSystem.textures.RoomTextures;
 import objects.*;
+import renderer.PixelData;
 import renderer.VisualPixel;
 import util.Coord;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +14,15 @@ import static map.roomSystem.Door.DoorState.*;
 import static renderer.VisualPixel.*;
 
 public class Door extends Passage implements DynamicVisualObject, InteractiveObject {
+    private static Color DOOR_COLOR = new Color(21, 8, 3);
+    private static final VisualPixel DOOR_CLOSED = new VisualPixel(
+            new PixelData(true, 10, DOOR_COLOR, 1, (char) 0x01E3));
+    private static final VisualPixel DOOR_OPEN_HORIZONTAL = new VisualPixel(
+            new PixelData(true, 5, DOOR_COLOR, 1, (char) 0x01E6));
+    private static final VisualPixel DOOR_OPEN_VERTICAl = new VisualPixel(
+            new PixelData(true, 5, DOOR_COLOR, 1, (char) 0x01E5));
+
+
     protected Coord doorCoord;
     protected DoorState state = CLOSED;
     protected boolean highlighted = false;
@@ -21,26 +32,25 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         return width <= 1 && state == OPEN;
     }
 
-    public Door(Room room1, Room room2) {
-        super(room1, room2, 0);
+    public Door(Room room1, Room room2, RoomTextures textures) {
+        super(room1, room2, textures);
         setWidthAndBias(1, width / 2);
         setDepth((length - 1) / 2);
     }
 
-    public Door(Room room1, Room room2, int bias) {
-        super(room1, room2, 0, 1, bias);
+    public Door(Room room1, Room room2, RoomTextures textures, int bias) {
+        super(room1, room2, textures, 1, bias);
         setDepth((length - 1) / 2);
     }
 
-    public Door(Room room1, Room room2, int bias, int depth) {
-        super(room1, room2, 0, 1, bias);
+    public Door(Room room1, Room room2, RoomTextures textures, int bias, int depth) {
+        super(room1, room2, textures, 1, bias);
         setDepth(depth);
     }
 
     public void setDepth(int depth) {
         Coord shift = direction.vertical() ?
                 new Coord(0, depth) : new Coord(depth, 0);
-        texturesDepth = depth;
         doorCoord = location.shifted(shift);
     }
 
@@ -131,7 +141,9 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
                     throw new IllegalStateException("Unexpected value: " + state);
             }
             if (highlighted) {
-                pixels.put(doorCoord, doorPixel.highlighted(TextColor.ANSI.GREEN, 0.1));
+                //TODO
+//                pixels.put(doorCoord, doorPixel.highlighted(Color.GREEN, 0.05));
+                pixels.put(doorCoord, doorPixel.brighter(2.5));
             } else {
                 pixels.put(doorCoord, doorPixel);
             }

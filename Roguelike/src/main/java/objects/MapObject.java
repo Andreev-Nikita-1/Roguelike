@@ -12,7 +12,7 @@ public abstract class MapObject {
 
     public MapObject attachToMap() {
         if (this instanceof Pausable) {
-            map.pausableObjects.add((Pausable) this);
+            ((Pausable) this).includeToGame();
         }
         if (this instanceof DynamicVisualObject) {
             map.dynamicObjects.add((DynamicVisualObject) this);
@@ -25,7 +25,7 @@ public abstract class MapObject {
 
     public void deleteFromMap() {
         if (this instanceof Pausable) {
-            map.pausableObjects.remove(this);
+            ((Pausable) this).deleteFromGame();
         }
         if (this instanceof DynamicVisualObject) {
             map.dynamicObjects.remove(this);

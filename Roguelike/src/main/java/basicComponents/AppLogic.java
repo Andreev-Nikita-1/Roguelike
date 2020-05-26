@@ -3,49 +3,43 @@ package basicComponents;
 import com.googlecode.lanterna.input.KeyStroke;
 import gameplayOptions.DirectedOption;
 import gameplayOptions.UseItemOption;
-import map.roomSystem.SeedBasedTextures;
-import mapGenerator.DungeonGenerator;
-import menuLogic.Menu;
 import menuLogic.RealAction;
 import gameplayOptions.GameplayOption;
-import renderer.Renderer;
 
 import static menuLogic.Menu.*;
 
 public class AppLogic {
     public static final String MAIN_WINDOW_TITLE = "GAME";
-
-    public static char HERO_SYMBOL = (char) 9977;
-
     public static volatile boolean active = true;
+    public static Game currentGame = new Game();
 
     private AppLogic() {
     }
 
 
     public static void handleKeyStrokeOnMap(KeyStroke keyStroke) {
-        if (GameplayLogic.gameplayState == GameplayLogic.GameplayState.PLAYING) {
+        if (currentGame.gameplayState == Game.GameplayState.PLAYING) {
             switch (keyStroke.getKeyType()) {
                 case Escape:
-                    GameplayLogic.pause();
+                    currentGame.pause();
                     Controller.drawMenu(mainMenu);
                     break;
                 case Tab:
-                    GameplayLogic.openInventory();
+                    currentGame.openInventory();
                     break;
                 default:
                     GameplayOption option = getGameplayOption(keyStroke);
-                    GameplayLogic.handleOption(option, keyStroke.getEventTime());
+                    currentGame.handleOption(option, keyStroke.getEventTime());
                     break;
             }
-        } else if (GameplayLogic.gameplayState == GameplayLogic.GameplayState.INVENTORY) {
+        } else if (currentGame.gameplayState == Game.GameplayState.INVENTORY) {
             switch (keyStroke.getKeyType()) {
                 case Escape:
                 case Tab:
-                    GameplayLogic.closeInventory();
+                    currentGame.closeInventory();
                     break;
                 default:
-                    GameplayLogic.handleKeyStrokeInInventory(keyStroke);
+                    currentGame.handleKeyStrokeInInventory(keyStroke);
                     break;
             }
         }
@@ -86,7 +80,7 @@ public class AppLogic {
     }
 
     public static void applyContinueAction() {
-        GameplayLogic.unpause();
+        currentGame.unpause();
     }
 
     public static void applyExitAction() {
@@ -97,7 +91,7 @@ public class AppLogic {
         if (!mainMenu.getActions().contains(RealAction.continueGameAction)) {
             mainMenu.addAction(0, RealAction.continueGameAction);
         }
-        GameplayLogic.createMapLevel1();
+        currentGame.createMapLevel1();
     }
 
     public static void applyLevel2Action() {

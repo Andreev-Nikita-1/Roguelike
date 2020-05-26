@@ -1,6 +1,6 @@
 package renderer;
 
-import com.googlecode.lanterna.TextColor;
+import java.awt.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,9 +49,9 @@ class PixelStack {
         Collections.sort(stack);
         for (int i = stack.size() - 1; i >= 0; i--) {
             PixelData pixelData = stack.get(i);
-            int r = pixelData.color.toColor().getRed();
-            int g = pixelData.color.toColor().getGreen();
-            int b = pixelData.color.toColor().getBlue();
+            int r = pixelData.color.getRed();
+            int g = pixelData.color.getGreen();
+            int b = pixelData.color.getBlue();
             double t = pixelData.transparency;
             r1 += t * k1 * r;
             g1 += t * k1 * g;
@@ -68,8 +68,8 @@ class PixelStack {
                 k2 *= (1 - t);
             }
         }
-        TextColor symbolColor = new TextColor.RGB((int) r1, (int) g1, (int) b1);
-        TextColor backgroundColor = new TextColor.RGB((int) r2, (int) g2, (int) b2);
+        Color symbolColor = new Color((int) r1, (int) g1, (int) b1);
+        Color backgroundColor = new Color((int) r2, (int) g2, (int) b2);
         return new Pixel(symbol, symbolColor, backgroundColor);
     }
 }

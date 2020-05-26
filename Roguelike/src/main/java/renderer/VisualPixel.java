@@ -1,92 +1,45 @@
 package renderer;
 
-import com.googlecode.lanterna.TextColor;
-
+import java.awt.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static basicComponents.AppLogic.HERO_SYMBOL;
-import static com.googlecode.lanterna.TextColor.ANSI.RED;
-import static java.lang.Thread.sleep;
-import static renderer.Colors.*;
-
 public class VisualPixel {
+
+
+    public static Color COLOR1 = new Color(0, 0, 102);
+    public static Color COLOR2 = new Color(255, 255, 204);
+    public static Color COLOR3 = new Color(255, 255, 153);
+    public static Color COLOR4 = new Color(225, 255, 175);
+    public static Color COLOR5 = new Color(204, 255, 204);
+    public static Color COLOR6 = new Color(102, 51, 0);
+    public static Color COLOR7 = new Color(204, 153, 0);
+    public static Color COLOR8 = new Color(153, 153, 102);
+    public static Color COLOR9 = new Color(204, 51, 0);
+    public static Color COLOR10 = new Color(153, 255, 102);
+    public static Color COLOR11 = new Color(102, 153, 0);
+    public static Color COLOR12 = new Color(0, 153, 51);
+    public static Color COLOR13 = new Color(0, 153, 255);
+    public static Color COLOR14 = new Color(26, 13, 0);
+    public static Color COLOR15 = new Color(204, 51, 0);
+    public static Color COLOR16 = new Color(0, 153, 255);
+    public static Color COLOR17 = new Color(255, 255, 255);
+    public static Color COLOR18 = new Color(0, 100, 0);
+    public static Color COLOR19 = new Color(95, 77, 57);
+    public static Color COLOR20 = new Color(60, 40, 30);
+    public static Color COLOR21 = new Color(10, 9, 8);
+    public static Color COLOR22 = new Color(19, 21, 22);
+    public static Color COLOR23 = new Color(22, 32, 21);
+    public static Color COLOR24 = new Color(30, 48, 52);
+    public static Color COLOR25 = new Color(26, 37, 39);
+    public static Color HERO_COLOR = Color.BLACK;
+    public static Color SWORDMEN_COLOR = Color.BLACK;
     public static final VisualPixel HERO = new VisualPixel(
-            new PixelData(true, 10, HERO_COLOR, 1, HERO_SYMBOL));
+            //TODO
+            new PixelData(true, 10, HERO_COLOR, 1, (char) 0x0146));
     public static final VisualPixel SWORDSMAN = new VisualPixel(
-            new PixelData(true, 10, SWORDMEN_COLOR, 1, (char) 555));
-    public static final VisualPixel ATTACK = new VisualPixel(
-            new PixelData(false, 19, RED, 0.3, ' '));
-    public static final VisualPixel INTERACT = new VisualPixel(
-            new PixelData(false, 19, TextColor.ANSI.GREEN, 0.1, ' '));
-    public static final VisualPixel DOOR_CLOSED = new VisualPixel(
-            new PixelData(true, 10, DOOR_SYMBOL_COLOR, 1, (char) 8782),
-            new PixelData(false, 9, DOOR_BACK_COLOR, 1, ' ')
-    );
-    public static final VisualPixel DOOR_OPEN_HORIZONTAL = new VisualPixel(
-            new PixelData(true, 5, DOOR_BACK_COLOR, 1, (char) 9601)
-    );
-    public static final VisualPixel DOOR_OPEN_VERTICAl = new VisualPixel(
-            new PixelData(true, 5, DOOR_BACK_COLOR, 1, (char) 9615)
-    );
-    public static final VisualPixel HEART = new VisualPixel(
-            new PixelData(true, 5, RED, 1, (char) 57355)
-    );
-    public static final VisualPixel HEART_CRACKED = new VisualPixel(
-            new PixelData(true, 5, RED, 1, (char) 57356)
-    );
-    public static final VisualPixel STUFF = new VisualPixel(
-            new PixelData(true, 5, COLOR7, 1, (char) 9975)
-    );
-    public static final VisualPixel LIGHT_1 = new VisualPixel(
-            new PixelData(false, 2, COLOR3, 0.2, ' '));
-    public static final VisualPixel LIGHT_2 = new VisualPixel(
-            new PixelData(false, 2, COLOR3, 0.1, ' '));
-    public static final VisualPixel LIGHT_3 = new VisualPixel(
-            new PixelData(false, 2, COLOR3, 0.05, ' '));
-    public static final VisualPixel DARKNESS_1 = new VisualPixel(
-            new PixelData(false, 20, TextColor.ANSI.BLACK, 0.5, ' '));
-    public static final VisualPixel DARKNESS_2 = new VisualPixel(
-            new PixelData(false, 20, TextColor.ANSI.BLACK, 0.7, ' '));
-    public static final VisualPixel DARKNESS_3 = new VisualPixel(
-            new PixelData(false, 20, TextColor.ANSI.BLACK, 0.9, ' '));
-    public static final VisualPixel DARKNESS_FULL = new VisualPixel(
-            new PixelData(false, 20, TextColor.ANSI.BLACK, 1, ' '));
-    public static final VisualPixel NIGHT_TREE_1 = new VisualPixel(
-            new PixelData(true, 5, COLOR22, 0.9, (char) 9195));
-    public static final VisualPixel NIGHT_TREE_2 = new VisualPixel(
-            new PixelData(true, 5, COLOR23, 0.9, (char) 9195));
-    public static final VisualPixel GRASS_BACKGROUND_EMPTY = new VisualPixel(
-            new PixelData(false, -10, COLOR24, 1, ' '));
-    public static final VisualPixel GRASS_BACKGROUND_1 = new VisualPixel(
-            new PixelData(true, -9, COLOR25, 1, '`'),
-            new PixelData(false, -10, COLOR24, 1, ' '));
-    public static final VisualPixel GRASS_BACKGROUND_2 = new VisualPixel(
-            new PixelData(true, -9, COLOR25, 1, '\"'),
-            new PixelData(false, -10, COLOR24, 1, ' '));
-    public static final VisualPixel DUNGEON_WALL = new VisualPixel(
-//            new PixelData(true, 1, TextColor.ANSI.BLACK, 1, '*'),
-            new PixelData(true, 1, TextColor.ANSI.BLACK, 1, '*'),
-            new PixelData(false, 0, COLOR21, 1, ' '));
-    public static final VisualPixel DUNGEON_BACKGROUND_EMPTY = new VisualPixel(
-            new PixelData(false, -10, COLOR20, 1, ' '));
-    public static final VisualPixel DUNGEON_BACKGROUND_1 = new VisualPixel(
-            new PixelData(true, -9, COLOR19, 1, '-'),
-            new PixelData(false, -10, COLOR20, 1, ' '));
-    public static final VisualPixel DUNGEON_BACKGROUND_2 = new VisualPixel(
-            new PixelData(true, -9, COLOR19, 1, '='),
-            new PixelData(false, -10, COLOR20, 1, ' '));
-
-
-    private static Map<Double, VisualPixel> darkness = new HashMap<>();
-
-    public static VisualPixel darkness(double transparency) {
-        if (!darkness.containsKey(transparency)) {
-            darkness.put(transparency, new VisualPixel(new PixelData(false, 20, TextColor.ANSI.BLACK, transparency, ' ')));
-        }
-        return darkness.get(transparency);
-    }
+            new PixelData(true, 10, SWORDMEN_COLOR, 1, (char) 0x017C));
 
     private List<PixelData> pixelDataList;
 
@@ -103,6 +56,26 @@ public class VisualPixel {
     }
 
 
+    private static Map<Integer, VisualPixel> attack = new HashMap<>();
+
+    public static VisualPixel attack(int power) {
+        if (!attack.containsKey(power)) {
+            attack.put(power,
+                    new VisualPixel(
+                            new PixelData(false, 19, Color.RED, 1 - 1.0 / (1 + power / 10.0), ' ')));
+        }
+        return attack.get(power);
+    }
+
+    private static Map<Double, VisualPixel> darkness = new HashMap<>();
+
+    public static VisualPixel darkness(double transparency) {
+        if (!darkness.containsKey(transparency)) {
+            darkness.put(transparency, new VisualPixel(new PixelData(false, 20, Color.BLACK, transparency, ' ')));
+        }
+        return darkness.get(transparency);
+    }
+
     private Map<VisualPixel, VisualPixel> combinedWith = new HashMap<>();
 
     public VisualPixel combinedWith(VisualPixel other) {
@@ -114,9 +87,9 @@ public class VisualPixel {
         return combinedWith.get(other);
     }
 
-    private Map<TextColor, Map<Double, VisualPixel>> highlighted = new HashMap<>();
+    private Map<Color, Map<Double, VisualPixel>> highlighted = new HashMap<>();
 
-    public VisualPixel highlighted(TextColor color, double transparency) {
+    public VisualPixel highlighted(Color color, double transparency) {
         if (!highlighted.containsKey(color) || !highlighted.get(color).containsKey(transparency)) {
             if (!highlighted.containsKey(color)) {
                 highlighted.put(color, new HashMap<>());
@@ -130,5 +103,20 @@ public class VisualPixel {
         return highlighted.get(color).get(transparency);
 
     }
+
+    private Map<Double, VisualPixel> brighter = new HashMap<>();
+
+    public VisualPixel brighter(double brightness) {
+        if (!brighter.containsKey(brightness)) {
+            brighter.put(brightness,
+                    new VisualPixel(this.getPixelDataList()
+                            .stream()
+                            .map(pixelData -> pixelData.changeBrightness(brightness))
+                            .collect(Collectors.toList())));
+        }
+        return brighter.get(brightness);
+    }
+
+
 }
 

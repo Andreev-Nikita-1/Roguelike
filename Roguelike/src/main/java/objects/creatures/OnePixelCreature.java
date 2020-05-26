@@ -14,7 +14,7 @@ import java.util.Set;
 public abstract class OnePixelCreature extends MapObject implements DynamicVisualObject, MovableObject, AttackingObject, DamageableObject {
 
     protected Coord location;
-    protected Set<Coord> attackingCoords = new HashSet<>();
+    protected Map<Coord, Integer> attackingCoords = new HashMap<>();
     protected volatile long lastAttackTime = 0;
 
     public Coord getLocation() {
@@ -66,9 +66,9 @@ public abstract class OnePixelCreature extends MapObject implements DynamicVisua
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
         Map<Coord, VisualPixel> pixelMap = new HashMap<>();
         if (System.currentTimeMillis() - lastAttackTime <= attackVisualizationPeriod) {
-            for (Coord c : attackingCoords) {
+            for (Coord c : attackingCoords.keySet()) {
                 if (c.between(leftUp, rightDown)) {
-                    pixelMap.put(c, VisualPixel.ATTACK);
+                    pixelMap.put(c, VisualPixel.attack(attackingCoords.get(c)));
                 }
             }
         }

@@ -12,7 +12,7 @@ public class DamageVisitor extends StatsVisitor {
     public void visit(HeroStats stats) {
         stats.health.addAndGet((int) (-damage * (0.5 + 0.5 / (1 + stats.getProtection() / 10.0))));
         if (stats.owner.shield == null) return;
-        stats.owner.shield.durability.addAndGet(-damage / 10);
+        stats.owner.shield.durability.addAndGet(-damage / 5);
         if (stats.owner.shield.durability.get() == 0) {
             stats.owner.shield.delete();
         }

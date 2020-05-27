@@ -38,10 +38,18 @@ public class Inventory {
 
     public void take(Item item) {
         item.setOwner(this);
+        if (item.baggagePlace != null) {
+            Coord place = item.baggagePlace;
+            if (baggage[place.x][place.y] == null) {
+                baggage[place.x][place.y] = item;
+                return;
+            }
+        }
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < 9; i++) {
                 if (baggage[i][j] == null) {
                     baggage[i][j] = item;
+                    item.baggagePlace = new Coord(i, j);
                     return;
                 }
             }
@@ -57,7 +65,10 @@ public class Inventory {
         if (next.between(Coord.ZERO, baggageSize.shifted(UP).shifted(LEFT))) {
             Item other = baggage[next.x][next.y];
             baggage[next.x][next.y] = item;
+            item.baggagePlace = next;
             baggage[current.x][current.y] = other;
+            if (other != null)
+                other.baggagePlace = new Coord(current);
         }
     }
 

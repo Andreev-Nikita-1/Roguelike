@@ -1,24 +1,29 @@
 package hero.items;
 
-import hero.inventoryWindow.InventoryText;
+import renderer.inventoryWindow.InventoryText;
 
 import java.awt.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
 
-import static hero.inventoryWindow.InventoryText.emptyText;
 
-public class Weapon extends Item {
-    public AtomicInteger durability;
-    public int maxDurability;
+import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
+import static util.Util.greenRedScale;
+import static util.Util.tightNumber;
+
+public class Weapon extends Equipment {
+    private static final Color SYMBOL_COLOR = new Color(196, 202, 206);
+    private static final char KNIFE_SYMBOL = (char) 0x0130;
+    private static final char SWORD_SYMBOL = (char) 0x0131;
+    private static final char AXE_SYMBOL = (char) 0x0132;
+    private static final char MORGENSTAR_SYMBOL = (char) 0x0133;
+
+
     Type weaponType;
-    public int power;
     public int attackDelay;
 
-    public Weapon(int durability, int power, int attackDelay, Type type) {
-        this.durability = new AtomicInteger(durability);
-        maxDurability = durability;
+    public Weapon(int durability, int power, int attackDelay, String name, Type type) {
+        super(durability, power, name);
         weaponType = type;
-        this.power = power;
         this.attackDelay = attackDelay;
     }
 
@@ -33,20 +38,34 @@ public class Weapon extends Item {
 
     @Override
     public InventoryText getText() {
-        return emptyText;
+        return new InventoryText(name,
+                "",
+                Arrays.asList("power: " + tightNumber(value),
+                        "delay: " + tightNumber(attackDelay),
+                        tightNumber(durability.get()) + "/" + tightNumber(maxDurability)),
+                Arrays.asList(Arrays.asList(TEXT_COLOR, TEXT_COLOR),
+                        Arrays.asList(TEXT_COLOR, TEXT_COLOR),
+                        Arrays.asList(greenRedScale(getDurabilityLevel()))));
     }
 
     @Override
     public Color getColor() {
-        return new Color(196, 202, 206);
+        return SYMBOL_COLOR;
     }
 
     @Override
     public char getSymbol() {
-        return (char) 0x0130;
+        switch (weaponType) {
+            case KNIFE:
+                return KNIFE_SYMBOL;
+            case AXE:
+                return AXE_SYMBOL;
+            case SWORD:
+                return SWORD_SYMBOL;
+            case MORGENSTAR:
+                return MORGENSTAR_SYMBOL;
+        }
+        return ' ';
     }
 
-    public double getDurabilityLevel() {
-        return durability.get() / (double) maxDurability;
-    }
 }

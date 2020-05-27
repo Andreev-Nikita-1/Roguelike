@@ -1,7 +1,8 @@
 package hero.items;
 
 import hero.Inventory;
-import hero.inventoryWindow.InventoryText;
+import renderer.inventoryWindow.InventoryText;
+import util.Coord;
 
 import java.awt.*;
 
@@ -10,6 +11,7 @@ public abstract class Item {
     public void applyTakenEffect(boolean taken) {
     }
 
+    public Coord baggagePlace;
     protected Inventory owner;
 
     public void setOwner(Inventory inventory) {

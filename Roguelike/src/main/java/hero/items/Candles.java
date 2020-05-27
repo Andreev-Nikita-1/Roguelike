@@ -1,11 +1,17 @@
 package hero.items;
 
-import hero.inventoryWindow.InventoryText;
+import renderer.inventoryWindow.InventoryText;
 import util.TimeIntervalActor;
+import util.Util;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
+import static util.Util.greenRedScale;
 
 
 public class Candles extends Item implements TimeIntervalActor {
@@ -100,17 +106,13 @@ public class Candles extends Item implements TimeIntervalActor {
     }
 
 
-    public volatile InventoryText text = new InventoryText("LAMP",
-            "This candle illuminates your path",
-            Arrays.asList(),
-            Arrays.asList()
-    );
-
     @Override
     public InventoryText getText() {
-        text.info = Arrays.asList();
-        text.infoColors = Arrays.asList();
-        return text;
+        return new InventoryText("CANDLE",
+                "Candles will illuminate your path",
+                Arrays.asList("left: " + Util.tightNumber(reservedCandles)),
+                Arrays.asList(Collections.nCopies(5, TEXT_COLOR),
+                        Arrays.asList(TEXT_COLOR, TEXT_COLOR)));
     }
 
     @Override

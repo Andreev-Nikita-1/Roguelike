@@ -9,6 +9,10 @@ public class HealthVisitor extends StatsVisitor {
 
     @Override
     public void visit(HeroStats stats) {
-        stats.health.addAndGet(toAdd);
+        if (stats.getMaxHealth() < stats.health.get() + toAdd) {
+            stats.health.set(stats.getMaxHealth());
+        } else {
+            stats.health.addAndGet(toAdd);
+        }
     }
 }

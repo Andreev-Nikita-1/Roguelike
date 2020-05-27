@@ -5,9 +5,10 @@ import gameplayOptions.GameplayOption;
 import gameplayOptions.UseItemOption;
 import hero.Inventory;
 import hero.items.Candles;
+import hero.items.Shield;
 import hero.items.Weapon;
 import hero.stats.HeroStats;
-import hero.inventoryWindow.InventoryWindow;
+import renderer.inventoryWindow.InventoryWindow;
 import hero.items.Item;
 import hero.stats.StaminaRestorer;
 import mapGenerator.DungeonGenerator;
@@ -35,13 +36,15 @@ public class Game {
 
 
     public void createMap(MapGenerator mapGenerator) {
-        currentInventory = new Inventory(new HeroStats(0, 0, 0, new AtomicInteger(100), 0, 50, 10, 100, 50, 50, 0));
+        currentInventory = new Inventory(new HeroStats(0, 10, 100, new AtomicInteger(100), 100, 50, 10, 100, 50, 50, 0));
         currentInventory.taken[0] = new Candles();
         currentInventory.taken[0].setOwner(currentInventory);
         ((Pausable) currentInventory.taken[0]).includeToGame();
         new StaminaRestorer(currentInventory.stats).includeToGame();
-        currentInventory.weapon = new Weapon(50, 50, 50, Weapon.Type.KNIFE);
+        currentInventory.weapon = new Weapon(10, 50, 50, "Super knife", Weapon.Type.KNIFE);
         currentInventory.weapon.setOwner(currentInventory);
+        currentInventory.shield = new Shield(500, 50, "Hyper shield", Shield.Type.SHIELD1);
+        currentInventory.shield.setOwner(currentInventory);
         currentMap = mapGenerator.generateMap(currentInventory);
         currentMapRenderer = new MapRenderer(this).fit();
         currentInventory.setMap(currentMap);

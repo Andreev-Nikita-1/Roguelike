@@ -13,7 +13,7 @@ public class HeroStats {
     int maxExp;
 
     AtomicInteger health;
-    int basicMaxHealth;
+    int maxHealth;
 
     double powerCoeffitent = 1;
     int basicPower = 10;
@@ -30,7 +30,7 @@ public class HeroStats {
         this.exp = exp;
         this.maxExp = maxExp;
         this.health = health;
-        this.basicMaxHealth = maxHealth;
+        this.maxHealth = maxHealth;
         this.stamina = new AtomicInteger(stamina);
         this.maxStamina = maxStamina;
         this.luck = luck;
@@ -41,18 +41,34 @@ public class HeroStats {
     }
 
 
+    public int getLevel() {
+        return level;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public int getMaxExp() {
+        return maxExp;
+    }
+
     public int getHealth() {
         return health.get();
     }
 
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
     public int getPower() {
         if (owner.weapon == null) return (int) (powerCoeffitent * basicPower);
-        return (int) (powerCoeffitent * (owner.weapon.power + basicPower));
+        return (int) (powerCoeffitent * (owner.weapon.value + basicPower));
     }
 
     public int getProtection() {
         if (owner.shield == null) return (int) (protectionCoeffitent * basicProtection);
-        return (int) (protectionCoeffitent * (owner.shield.protection + basicProtection));
+        return (int) (protectionCoeffitent * (owner.shield.value + basicProtection));
     }
 
     public int getAttackDelay() {

@@ -5,7 +5,7 @@ import basicComponents.Controller;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
-import hero.inventoryWindow.InventoryWindow;
+import renderer.inventoryWindow.InventoryWindow;
 import util.Util;
 
 import java.awt.Color;

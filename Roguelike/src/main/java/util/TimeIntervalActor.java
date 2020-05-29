@@ -1,5 +1,7 @@
 package util;
 
+import basicComponents.Game;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -13,11 +15,13 @@ public interface TimeIntervalActor extends Runnable, Pausable {
 
     boolean isActive();
 
+    Game getGame();
+
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 
     @Override
     default void run() {
-        if (isActive() && !paused.get()) {
+        if (isActive() && !getGame().paused.get()) {
             int delay = act();
             scheduler.schedule(this, delay, MILLISECONDS);
         }

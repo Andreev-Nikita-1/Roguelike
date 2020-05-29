@@ -1,8 +1,9 @@
 package objects.creatures;
 
+import basicComponents.AppLogic;
 import basicComponents.Controller;
 import gameplayOptions.DirectedOption;
-import hero.Inventory;
+import hero.Hero;
 import hero.stats.AttackVisitor;
 import hero.stats.DamageVisitor;
 import hero.stats.RunVisitor;
@@ -11,12 +12,14 @@ import menuLogic.Menu;
 import objects.DamageableObject;
 import objects.InteractiveObject;
 import objects.MapObject;
+import renderer.PixelData;
 import renderer.VisualPixel;
 import util.AccessNeighbourhood;
 import util.Coord;
 import util.Direction;
 import util.Pausable;
 
+import java.awt.*;
 import java.util.Map;
 
 public class HeroObject extends OnePixelCreature {
@@ -25,7 +28,7 @@ public class HeroObject extends OnePixelCreature {
     private long lastMoveX;
     private long lastMoveY;
     public InteractiveObject interactiveObject;
-    public Inventory inventory;
+    public Hero hero;
 
 
     public Coord getLocation() {
@@ -34,16 +37,16 @@ public class HeroObject extends OnePixelCreature {
 
     public synchronized void die() {
         deleteFromMap();
-        Pausable.killGame();
-        Menu.mainMenu.deleteAction(0);
-        Controller.drawMenu(Menu.mainMenu);
+        AppLogic.endGame();
     }
 
-    public HeroObject(MapOfObjects map, Coord coord, Inventory inventory) {
-        super(map, coord);
-        this.inventory = inventory;
-        inventory.heroMap = map;
+    public HeroObject(Coord coord) {
+        super(coord);
         location = coord;
+    }
+
+    public void setHero(Hero hero) {
+        this.hero = hero;
     }
 
 
@@ -52,8 +55,8 @@ public class HeroObject extends OnePixelCreature {
         int delay = 0;
         switch (option.action) {
             case RUN:
-                if (inventory.stats.getStamina() > 0) {
-                    inventory.stats.accept(new RunVisitor());
+                if (hero.stats.getStamina() > 0) {
+                    hero.stats.accept(new RunVisitor());
                     delay = runDelay;
                 } else {
                     delay = walkDelay;
@@ -75,7 +78,7 @@ public class HeroObject extends OnePixelCreature {
     }
 
     public void makeAttack(DirectedOption option, long eventTime) {
-        if (eventTime - lastAttackTime >= inventory.stats.getAttackDelay()) {
+        if (eventTime - lastAttackTime >= hero.stats.getAttackDelay()) {
             attack(option.direction);
             lastAttackTime = eventTime;
         }
@@ -83,8 +86,8 @@ public class HeroObject extends OnePixelCreature {
 
     @Override
     public void takeDamage(int damage) {
-        inventory.stats.accept(new DamageVisitor(damage));
-        if (inventory.stats.getHealth() <= 0) {
+        hero.stats.accept(new DamageVisitor(damage));
+        if (hero.stats.getHealth() <= 0) {
             die();
         }
     }
@@ -93,13 +96,13 @@ public class HeroObject extends OnePixelCreature {
     public void attack(Direction direction) {
         Coord c = location.shifted(direction);
         attackingCoords.clear();
-        attackingCoords.put(c, inventory.stats.getPower());
+        attackingCoords.put(c, hero.stats.getPower());
         lastAttackTime = System.currentTimeMillis();
         if (!map.inside(c)) return;
         MapObject o = map.getObject(c);
         if (o instanceof DamageableObject) {
-            inventory.stats.accept(new AttackVisitor());
-            ((DamageableObject) o).takeDamage(inventory.stats.getPower());
+            hero.stats.accept(new AttackVisitor());
+            ((DamageableObject) o).takeDamage(hero.stats.getPower());
         }
     }
 
@@ -110,16 +113,21 @@ public class HeroObject extends OnePixelCreature {
         }
     }
 
+
+    private static final Color HERO_COLOR = Color.BLACK;
+    private static final VisualPixel HERO_PIXEL = new VisualPixel(
+            new PixelData(true, 10, HERO_COLOR, 1, (char) 0x0146));
+
     @Override
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
         Map<Coord, VisualPixel> pixelMap = super.getPixels(leftUp, rightDown);
-        pixelMap.put(location, VisualPixel.HERO);
+        pixelMap.put(location, HERO_PIXEL);
         return pixelMap;
     }
 
     @Override
-    public HeroObject attachToMap() {
-        super.attachToMap();
+    public HeroObject attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         map.heroAccessNeighbourhood = new AccessNeighbourhood(map, location, 10);
         return this;
     }

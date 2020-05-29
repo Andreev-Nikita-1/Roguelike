@@ -5,15 +5,21 @@ import objects.StaticObject;
 import util.Coord;
 import renderer.VisualPixel;
 
+import java.util.Map;
+
 public class Background extends StaticObject {
 
-    public Background(MapOfObjects map, Coord location, VisualPixel[][] array) {
-        super(map, location, array, false);
+    public Background(Coord location, VisualPixel[][] array) {
+        super(location, array, false);
+    }
+
+    public Background(Coord location, Map<Coord, VisualPixel> pixelMap) {
+        super(location, pixelMap, false);
     }
 
 
     @Override
-    public Background attachToMap() {
-        return (Background) super.attachToMap();
+    public Background attachToMap(MapOfObjects map) {
+        return (Background) super.attachToMap(map);
     }
 }

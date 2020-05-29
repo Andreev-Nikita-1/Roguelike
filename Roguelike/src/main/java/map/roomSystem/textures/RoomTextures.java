@@ -4,10 +4,13 @@ import map.MapOfObjects;
 import map.roomSystem.Background;
 import map.roomSystem.Passage;
 import map.roomSystem.Wall;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import renderer.VisualPixel;
 import util.Coord;
 import util.Direction;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Random;
 
@@ -21,9 +24,9 @@ public abstract class RoomTextures {
         random = new Random(seed);
     }
 
-    public abstract Wall createWall(MapOfObjects map, Coord coord, Direction direction, int length, int width, List<Passage> passages);
+    public abstract Wall createWall(Coord coord, Direction direction, int length, int width, List<Passage> passages);
 
-    public abstract Background createBackground(MapOfObjects map, Coord coord, int hight, int width);
+    public abstract Background createBackground(Coord coord, int hight, int width);
 
     public static VisualPixel[][] cutOutPassages(VisualPixel[][] array, Coord coord, boolean horizontal, List<Passage> passages) {
         for (Passage passage : passages) {
@@ -49,5 +52,25 @@ public abstract class RoomTextures {
             }
         }
         return array;
+    }
+
+    public JSONObject getSnapshot() {
+        return new JSONObject()
+                .put("seed", seed)
+                .put("class", this.getClass().getName());
+    }
+
+    public static RoomTextures restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return (RoomTextures) Class
+                .forName(jsonObject.getString("class"))
+                .getConstructor(int.class)
+                .newInstance(jsonObject.getInt("seed"));
+    }
+
+    public static RoomTextures restoreSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return (RoomTextures) Class
+                .forName(jsonObject.getString("class"))
+                .getMethod("restoreFromSnapshot", JSONObject.class)
+                .invoke(null, jsonObject);
     }
 }

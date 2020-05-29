@@ -11,7 +11,7 @@ public class TakenWindow extends TileWindow {
 
     @Override
     public InventoryText getText() {
-        Item item = AppLogic.currentGame.currentInventory.taken[cursorPosition.x];
+        Item item = AppLogic.currentGame.hero.inventory.taken[cursorPosition.x];
         if (active && item != null) {
             return item.getText();
         }
@@ -20,6 +20,6 @@ public class TakenWindow extends TileWindow {
 
     @Override
     Item getItem(Coord position) {
-        return AppLogic.currentGame.currentInventory.taken[position.x];
+        return AppLogic.currentGame.hero.inventory.taken[position.x];
     }
 }

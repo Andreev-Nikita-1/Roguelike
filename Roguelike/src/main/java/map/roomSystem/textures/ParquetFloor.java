@@ -9,9 +9,6 @@ import util.Coord;
 import java.awt.*;
 
 public class ParquetFloor extends StoneWallsTextures {
-//    private static final Color SYMBOL_COLOR = new Color(64, 28, 0);
-//    private static final Color BACKGROUND_COLOR = new Color(88, 60, 48);
-//    private static final Color SYMBOL_COLOR = new Color(64, 28, 0);
     private static final Color SYMBOL_COLOR = new Color(96, 42, 0);
     private static final Color BACKGROUND_COLOR = new Color(132, 90, 72);
     private static VisualPixel VERTICAL_PLANKS = new VisualPixel(
@@ -28,13 +25,13 @@ public class ParquetFloor extends StoneWallsTextures {
     }
 
     @Override
-    public Background createBackground(MapOfObjects map, Coord coord, int hight, int width) {
+    public Background createBackground(Coord coord, int hight, int width) {
         VisualPixel[][] array = new VisualPixel[width][hight];
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
                 array[i][j] = ((i + j) % 2 == 0) ? VERTICAL_PLANKS : HORIZONTAL_PLANKS;
             }
         }
-        return new Background(map, coord, array);
+        return new Background(coord, array);
     }
 }

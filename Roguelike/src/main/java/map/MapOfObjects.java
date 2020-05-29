@@ -1,14 +1,18 @@
 package map;
 
+import basicComponents.Game;
 import map.roomSystem.Passage;
 import map.roomSystem.Room;
 import map.roomSystem.RoomSystem;
 import objects.*;
 import objects.creatures.HeroObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import util.AccessNeighbourhood;
 import util.Coord;
 import util.Pausable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -16,6 +20,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class MapOfObjects {
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Game game;
     public int xSize;
     public int ySize;
     private MapObject[][] objectsMap;
@@ -23,6 +32,7 @@ public class MapOfObjects {
     private int lockSize = 10;
     public List<StaticVisualObject> staticObjects = new CopyOnWriteArrayList<>();
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
+    public List<SnapshotableFromMap> snapshotableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
     public AccessNeighbourhood heroAccessNeighbourhood;
     public RoomSystem roomSystem;
@@ -144,5 +154,41 @@ public class MapOfObjects {
                 subscriber.update();
             }
         }
+    }
+
+
+    public JSONObject getSnapshot() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("xSize", xSize);
+        jsonObject.put("ySize", ySize);
+        jsonObject.put("xHero", heroObject.getLocation().x);
+        jsonObject.put("yHero", heroObject.getLocation().y);
+        jsonObject.put("roomSystem", roomSystem.getSnapshot());
+        JSONArray snapshots = new JSONArray();
+        for (SnapshotableFromMap snapshotable : snapshotableObjects) {
+            snapshots.put(snapshotable.getSnapshot());
+        }
+        jsonObject.put("snapshots", snapshots);
+        return jsonObject;
+    }
+
+    public static MapOfObjects restoreFromSnapshot(JSONObject jsonObject, Game game) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        MapOfObjects map = new MapOfObjects(
+                jsonObject.getInt("xSize"),
+                jsonObject.getInt("ySize"));
+        map.setGame(game);
+        map.heroObject = new HeroObject(
+                new Coord(jsonObject.getInt("xHero"),
+                        jsonObject.getInt("yHero")))
+                .attachToMap(map);
+        map.roomSystem = RoomSystem.restoreSnapshot(
+                jsonObject.getJSONObject("roomSystem")
+        ).attachToMap(map);
+        JSONArray snapshots = jsonObject.getJSONArray("snapshots");
+        for (int i = 0; i < snapshots.length(); i++) {
+            ((MapObject) SnapshotableFromMap.restoreSnapshot(snapshots.getJSONObject(i))).attachToMap(map);
+        }
+        map.lighting = (Lighting) new Lighting(7).attachToMap(map);
+        return map;
     }
 }

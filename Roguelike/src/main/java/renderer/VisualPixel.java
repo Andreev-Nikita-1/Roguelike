@@ -7,40 +7,6 @@ import java.util.stream.Stream;
 
 public class VisualPixel {
 
-
-    public static Color COLOR1 = new Color(0, 0, 102);
-    public static Color COLOR2 = new Color(255, 255, 204);
-    public static Color COLOR3 = new Color(255, 255, 153);
-    public static Color COLOR4 = new Color(225, 255, 175);
-    public static Color COLOR5 = new Color(204, 255, 204);
-    public static Color COLOR6 = new Color(102, 51, 0);
-    public static Color COLOR7 = new Color(204, 153, 0);
-    public static Color COLOR8 = new Color(153, 153, 102);
-    public static Color COLOR9 = new Color(204, 51, 0);
-    public static Color COLOR10 = new Color(153, 255, 102);
-    public static Color COLOR11 = new Color(102, 153, 0);
-    public static Color COLOR12 = new Color(0, 153, 51);
-    public static Color COLOR13 = new Color(0, 153, 255);
-    public static Color COLOR14 = new Color(26, 13, 0);
-    public static Color COLOR15 = new Color(204, 51, 0);
-    public static Color COLOR16 = new Color(0, 153, 255);
-    public static Color COLOR17 = new Color(255, 255, 255);
-    public static Color COLOR18 = new Color(0, 100, 0);
-    public static Color COLOR19 = new Color(95, 77, 57);
-    public static Color COLOR20 = new Color(60, 40, 30);
-    public static Color COLOR21 = new Color(10, 9, 8);
-    public static Color COLOR22 = new Color(19, 21, 22);
-    public static Color COLOR23 = new Color(22, 32, 21);
-    public static Color COLOR24 = new Color(30, 48, 52);
-    public static Color COLOR25 = new Color(26, 37, 39);
-    public static Color HERO_COLOR = Color.BLACK;
-    public static Color SWORDMEN_COLOR = Color.BLACK;
-    public static final VisualPixel HERO = new VisualPixel(
-            //TODO
-            new PixelData(true, 10, HERO_COLOR, 1, (char) 0x0146));
-    public static final VisualPixel SWORDSMAN = new VisualPixel(
-            new PixelData(true, 10, SWORDMEN_COLOR, 1, (char) 0x017C));
-
     private List<PixelData> pixelDataList;
 
     public VisualPixel(List<PixelData> pixelData) {

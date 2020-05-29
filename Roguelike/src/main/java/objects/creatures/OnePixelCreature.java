@@ -21,14 +21,14 @@ public abstract class OnePixelCreature extends MapObject implements DynamicVisua
         return location;
     }
 
-    public OnePixelCreature(MapOfObjects map, Coord location) {
-        super(map);
+    public OnePixelCreature(Coord location) {
+        super();
         this.location = location;
     }
 
     @Override
-    public OnePixelCreature attachToMap() {
-        super.attachToMap();
+    public OnePixelCreature attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         map.setObject(this, location);
         return this;
     }

@@ -14,13 +14,13 @@ public class RandomFloor extends StoneWallsTextures {
     }
 
     @Override
-    public Background createBackground(MapOfObjects map, Coord coord, int hight, int width) {
+    public Background createBackground(Coord coord, int hight, int width) {
         VisualPixel[][] array = new VisualPixel[width][hight];
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
                 array[i][j] = generator.generate(random.nextDouble());
             }
         }
-        return new Background(map, coord, array);
+        return new Background(coord, array);
     }
 }

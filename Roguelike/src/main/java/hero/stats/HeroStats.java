@@ -1,12 +1,13 @@
 package hero.stats;
 
 import hero.Inventory;
+import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HeroStats {
 
-    Inventory owner;
+    Inventory ownerInventory;
 
     int level;
     int exp;
@@ -15,9 +16,18 @@ public class HeroStats {
     AtomicInteger health;
     int maxHealth;
 
-    double powerCoeffitent = 1;
+
+    double getPowerCoeffitent() {
+        return 1 + level / 10.0;
+    }
+
     int basicPower = 10;
-    double protectionCoeffitent = 1;
+
+
+    public double getProtectionCoeffitent() {
+        return 1 + level / 10.0;
+    }
+
     int basicProtection = 10;
 
     AtomicInteger stamina;
@@ -25,7 +35,7 @@ public class HeroStats {
     int luck;
 
 
-    public HeroStats(int level, int exp, int maxExp, AtomicInteger health, int maxHealth, int protection, int power, int attackDelay, int stamina, int maxStamina, int luck) {
+    private HeroStats(int level, int exp, int maxExp, AtomicInteger health, int maxHealth, int stamina, int maxStamina, int luck) {
         this.level = level;
         this.exp = exp;
         this.maxExp = maxExp;
@@ -34,6 +44,11 @@ public class HeroStats {
         this.stamina = new AtomicInteger(stamina);
         this.maxStamina = maxStamina;
         this.luck = luck;
+    }
+
+    public HeroStats() {
+        this(0, 0, 100, new AtomicInteger(100),
+                100, 50, 50, 0);
     }
 
     public void accept(StatsVisitor visitor) {
@@ -62,25 +77,55 @@ public class HeroStats {
     }
 
     public int getPower() {
-        if (owner.weapon == null) return (int) (powerCoeffitent * basicPower);
-        return (int) (powerCoeffitent * (owner.weapon.value + basicPower));
+        if (ownerInventory.weapon == null) return (int) (getPowerCoeffitent() * basicPower);
+        return (int) (getPowerCoeffitent() * (ownerInventory.weapon.value + basicPower));
     }
 
     public int getProtection() {
-        if (owner.shield == null) return (int) (protectionCoeffitent * basicProtection);
-        return (int) (protectionCoeffitent * (owner.shield.value + basicProtection));
+        if (ownerInventory.shield == null) return (int) (getProtectionCoeffitent() * basicProtection);
+        return (int) (getProtectionCoeffitent() * (ownerInventory.shield.value + basicProtection));
     }
 
     public int getAttackDelay() {
-        if (owner.weapon == null) return 200;
-        return owner.weapon.attackDelay;
+        if (ownerInventory.weapon == null) return 200;
+        return ownerInventory.weapon.attackDelay;
     }
 
-    public void setOwner(Inventory owner) {
-        this.owner = owner;
+    public void setOwnerInventory(Inventory ownerInventory) {
+        this.ownerInventory = ownerInventory;
     }
 
     public int getStamina() {
         return stamina.get();
+    }
+
+    public int getMaxStamina() {
+        return maxStamina;
+    }
+
+
+    public JSONObject getSnapshot() {
+        return new JSONObject()
+                .put("level", level)
+                .put("exp", exp)
+                .put("maxExp", maxExp)
+                .put("health", health.get())
+                .put("maxHealth", maxHealth)
+                .put("stamina", stamina)
+                .put("maxStamina", maxStamina)
+                .put("luck", luck);
+    }
+
+    public static HeroStats restoreFromSnapshot(JSONObject jsonObject) {
+        return new HeroStats(
+                jsonObject.getInt("level"),
+                jsonObject.getInt("exp"),
+                jsonObject.getInt("maxExp"),
+                new AtomicInteger(jsonObject.getInt("health")),
+                jsonObject.getInt("maxHealth"),
+                jsonObject.getInt("stamina"),
+                jsonObject.getInt("maxStamina"),
+                jsonObject.getInt("luck")
+        );
     }
 }

@@ -1,18 +1,21 @@
 package hero;
 
+import basicComponents.Game;
 import hero.items.*;
-import hero.stats.HeroStats;
 import map.MapOfObjects;
+import objects.stuff.Candle;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import util.Coord;
 import util.Direction;
+import util.Pausable;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static util.Coord.LEFT;
 import static util.Coord.UP;
 
 public class Inventory {
-    public HeroStats stats;
-
-
     public static final Coord baggageSize = new Coord(8, 5);
     public Item[][] baggage = new Item[baggageSize.x][baggageSize.y];
     public Item[] taken = new Item[4];
@@ -26,18 +29,8 @@ public class Inventory {
         heroMap = map;
     }
 
-
-    public Inventory(HeroStats heroStats) {
-        this.stats = heroStats;
-        heroStats.setOwner(this);
-    }
-
-    private void updateStats() {
-
-    }
-
     public void take(Item item) {
-        item.setOwner(this);
+        item.setOwnerInventory(this);
         if (item.baggagePlace != null) {
             Coord place = item.baggagePlace;
             if (baggage[place.x][place.y] == null) {
@@ -48,8 +41,7 @@ public class Inventory {
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < 9; i++) {
                 if (baggage[i][j] == null) {
-                    baggage[i][j] = item;
-                    item.baggagePlace = new Coord(i, j);
+                    baggage[i][j] = item.setBaggagePlace(new Coord(i, j));
                     return;
                 }
             }
@@ -138,5 +130,91 @@ public class Inventory {
             shield.applyTakenEffect(false);
             shield = null;
         }
+    }
+
+    public void includeToGame(Game game) {
+        for (Item item : taken) {
+            if (item instanceof Pausable) {
+                ((Pausable) item).includeToGame(game);
+            }
+        }
+        for (Item[] col : baggage) {
+            for (Item item : col) {
+                if (item instanceof Pausable) {
+                    ((Pausable) item).includeToGame(game);
+                }
+            }
+        }
+        if (weapon instanceof Pausable) {
+            ((Pausable) weapon).includeToGame(game);
+        }
+        if (shield instanceof Pausable) {
+            ((Pausable) shield).includeToGame(game);
+        }
+    }
+
+    public void takeCandle() {
+        for (Item item : taken) {
+            if (item instanceof Candles) {
+                ((Candles) item).takeOneCandle();
+            }
+        }
+        for (Item[] col : baggage) {
+            for (Item item : col) {
+                if (item instanceof Candles) {
+                    ((Candles) item).takeOneCandle();
+                }
+            }
+        }
+    }
+
+    public JSONObject getSnapshot() {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray takenJson = new JSONArray();
+        JSONArray baggageJson = new JSONArray();
+        for (int i = 0; i < taken.length; i++) {
+            takenJson.put((taken[i] == null) ? "empty" : taken[i].getSnapshot());
+        }
+        for (int i = 0; i < baggageSize.x; i++) {
+            JSONArray col = new JSONArray();
+            for (int j = 0; j < baggageSize.y; j++) {
+                col.put((baggage[i][j] == null) ? "empty" : baggage[i][j].getSnapshot());
+            }
+            baggageJson.put(col);
+        }
+        jsonObject.put("weapon", (weapon == null) ? "empty" : weapon.getSnapshot());
+        jsonObject.put("shield", (shield == null) ? "empty" : shield.getSnapshot());
+        jsonObject.put("taken", takenJson);
+        jsonObject.put("baggage", baggageJson);
+        return jsonObject;
+    }
+
+
+    public static Inventory restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Inventory inventory = new Inventory();
+        if (!jsonObject.get("weapon").toString().equals("empty"))
+            inventory.weapon = Weapon.restoreFromSnapshot(jsonObject.getJSONObject("weapon"));
+        if (!jsonObject.get("shield").toString().equals("empty"))
+            inventory.shield = Shield.restoreFromSnapshot(jsonObject.getJSONObject("shield"));
+        for (int i = 0; i < inventory.taken.length; i++) {
+            String itemStr = jsonObject.getJSONArray("taken").get(i).toString();
+            if (!itemStr.equals("empty")) {
+                Item item = Item.restoreSnapshot(new JSONObject(itemStr));
+                inventory.taken[i] = item;
+                item.setOwnerInventory(inventory);
+            }
+        }
+        JSONArray baggageArray = jsonObject.getJSONArray("baggage");
+        for (int i = 0; i < baggageSize.x; i++) {
+            JSONArray col = baggageArray.getJSONArray(i);
+            for (int j = 0; j < baggageSize.y; j++) {
+                String itemStr = col.get(j).toString();
+                if (!itemStr.equals("empty")) {
+                    Item item = Item.restoreSnapshot(new JSONObject(itemStr));
+                    inventory.take(item);
+                }
+            }
+        }
+        return inventory;
     }
 }

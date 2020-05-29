@@ -11,8 +11,8 @@ import static util.Direction.*;
 import static util.Util.convertColor;
 
 public abstract class TileWindow extends CursorWindow {
-    static final Color EMPTY_SYMBOL_COLOR = new Color(40, 40, 40);
-    static final char EMPTY_SYMBOL = (char) 0x01F6;
+    public static final Color EMPTY_SYMBOL_COLOR = new Color(40, 40, 40);
+    public static final char EMPTY_SYMBOL = (char) 0x01F6;
 
     TileWindow(Coord location, Coord size) {
         super(location, size);

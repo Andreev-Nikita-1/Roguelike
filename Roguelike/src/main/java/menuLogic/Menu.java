@@ -9,24 +9,32 @@ import static menuLogic.RealAction.*;
 public class Menu {
 
     public static Menu mainMenu = new Menu("MAIN MENU");
-
-    public static Menu levelSelector = new Menu("SELECT LEVEL");
-
+    public static Menu activeGameMainMenu = new Menu("MAIN MENU");
     public static Menu optionsMenu = new Menu("OPTIONS");
+    public static Menu youDied = new Menu("YOU DIED");
+    public static Menu success = new Menu("SUCCESS");
 
     public static void InitializeMenus() {
         mainMenu.addAction(newGameAction);
+        mainMenu.addAction(loadGameAction);
         mainMenu.addAction(optionsAction);
         mainMenu.addAction(exit);
 
-        levelSelector.addAction(level1Action);
-        levelSelector.addAction(back(mainMenu));
+        activeGameMainMenu.addAction(continueGameAction);
+        activeGameMainMenu.addAction(saveGameAction);
+        activeGameMainMenu.addAction(loadGameAction);
+        activeGameMainMenu.addAction(newGameAction);
+        activeGameMainMenu.addAction(optionsAction);
+        activeGameMainMenu.addAction(exit);
 
+        youDied.addAction(diedAction);
+
+        success.addAction(okAction);
 
         optionsMenu.addAction(zoomIn);
         optionsMenu.addAction(zoomOut);
         optionsMenu.addAction(zoomDefault);
-        optionsMenu.addAction(back(mainMenu));
+        optionsMenu.addAction(back);
 
     }
 
@@ -35,14 +43,6 @@ public class Menu {
 
     public Menu(String title) {
         this.title = title;
-    }
-
-    public void addAction(int index, MenuAction action) {
-        this.actions.add(index, action);
-    }
-
-    public void deleteAction(int index) {
-        this.actions.remove(index);
     }
 
     public void addAction(MenuAction action) {

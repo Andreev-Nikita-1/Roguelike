@@ -1,28 +1,34 @@
 package hero.items;
 
+import basicComponents.Game;
+import org.json.JSONObject;
 import renderer.inventoryWindow.InventoryText;
+import util.Coord;
 import util.TimeIntervalActor;
 import util.Util;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
-import static util.Util.greenRedScale;
 
 
 public class Candles extends Item implements TimeIntervalActor {
     private final Color COLOR = new Color(255, 215, 131);
 
-    private int currentLevel = 50000;
-    private int maxLevel = 50000;
+    private int currentLevel = 10000;
+    private int maxLevel = 10000;
     private int reservedCandles = 1;
     private boolean switchedOn = true;
 
     private AtomicBoolean active = new AtomicBoolean(true);
+
+    public void takeOneCandle() {
+        reservedCandles++;
+    }
 
     @Override
     public void setActive(boolean active) {
@@ -34,32 +40,44 @@ public class Candles extends Item implements TimeIntervalActor {
         return active.get();
     }
 
+    @Override
+    public Game getGame() {
+        return ownerInventory.heroMap.game;
+    }
+
     public Candles() {
+    }
+
+    private Candles(int currentLevel, int maxLevel, int reservedCandles, boolean switchedOn) {
+        this.currentLevel = currentLevel;
+        this.maxLevel = maxLevel;
+        this.reservedCandles = reservedCandles;
+        this.switchedOn = switchedOn;
     }
 
     private void switchOn() {
         switchedOn = true;
-        owner.heroMap.lighting.turnOffDarkness();
+        ownerInventory.heroMap.lighting.turnOffDarkness();
         updateLighting();
     }
 
     private void switchOff() {
         switchedOn = false;
-        owner.heroMap.lighting.turnOnDarkness();
+        ownerInventory.heroMap.lighting.turnOnDarkness();
         updateLighting();
     }
 
     private void updateLighting() {
         if (switchedOn) {
             if (reservedCandles == 0) {
-                owner.heroMap.lighting.setRadius((currentLevel >= 500) ? 15 : 3 + currentLevel * 12.0 / 500);
-                owner.heroMap.lighting.setDarknessLevel((currentLevel >= 200) ? 0 : 1 - currentLevel / 200.0);
+                ownerInventory.heroMap.lighting.setRadius((currentLevel >= 500) ? 15 : 3 + currentLevel * 12.0 / 500);
+                ownerInventory.heroMap.lighting.setDarknessLevel((currentLevel >= 200) ? 0 : 1 - currentLevel / 200.0);
             } else {
-                owner.heroMap.lighting.setRadius((currentLevel >= 500) ? 15 : 10 + currentLevel * 5.0 / 500);
-                owner.heroMap.lighting.setDarknessLevel(0);
+                ownerInventory.heroMap.lighting.setRadius((currentLevel >= 500) ? 15 : 10 + currentLevel * 5.0 / 500);
+                ownerInventory.heroMap.lighting.setDarknessLevel(0);
             }
         } else {
-            owner.heroMap.lighting.setRadius(3);
+            ownerInventory.heroMap.lighting.setRadius(3);
         }
     }
 
@@ -126,4 +144,22 @@ public class Candles extends Item implements TimeIntervalActor {
         }
     }
 
+    @Override
+    public JSONObject getSnapshot() {
+        return super.getSnapshot()
+                .put("currentLevel", currentLevel)
+                .put("maxLevel", maxLevel)
+                .put("reserved", reservedCandles)
+                .put("switchedOn", switchedOn);
+    }
+
+    public static Candles restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return (Candles) new Candles(
+                jsonObject.getInt("currentLevel"),
+                jsonObject.getInt("maxLevel"),
+                jsonObject.getInt("reserved"),
+                jsonObject.getBoolean("switchedOn")
+        ).setBaggagePlace(new Coord(jsonObject.getInt("xBaggage"),
+                jsonObject.getInt("yBaggage")));
+    }
 }

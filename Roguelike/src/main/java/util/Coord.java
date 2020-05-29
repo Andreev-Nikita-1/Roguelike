@@ -53,50 +53,6 @@ public class Coord {
         return leftUp.x <= x && x <= rightDown.x && leftUp.y <= y && y <= rightDown.y;
     }
 
-    //TODO
-    public boolean pixelCrossedBySegment(Coord start, Coord finish) {
-        Coord vector = finish.relative(start).multiply(2);
-        Coord square = this.relative(start).multiply(2);
-        Coord[] vertex = new Coord[]{
-                square.shifted(new Coord(1, 1)),
-                square.shifted(new Coord(1, -1)),
-                square.shifted(new Coord(-1, 1)),
-                square.shifted(new Coord(-1, -1))
-        };
-        for (int i = 0; i < 4; i++) {
-            Coord v = vertex[i];
-            Coord w = vertex[(i + 1) % 4];
-            if (segmentLineIntersect(v, w, vector) <= 0
-                    && segmentLineIntersect(ZERO.relative(v), vector.relative(v), w.relative(v)) <= 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Direction walkTheLine(Coord start, Coord finish) {
-        if (this.equals(finish)) return null;
-        Direction xDirection = (finish.x - start.x > 0) ? Direction.RIGHT : Direction.LEFT;
-        Direction yDirection = (finish.y - start.y > 0) ? Direction.DOWN : Direction.UP;
-        for (Direction direction : new Direction[]{xDirection, yDirection}) {
-            if (this.shifted(fromDirection(direction)).pixelCrossedBySegment(start, finish)) {
-                shift(fromDirection(direction));
-                return direction;
-            }
-        }
-        return null;
-    }
-
-    private static int segmentLineIntersect(Coord a, Coord b, Coord vector) {
-        return (a.x * vector.y - a.y * vector.x) * (b.x * vector.y - b.y * vector.x);
-    }
-
-    public Coord multiply(int m) {
-        x *= m;
-        y *= m;
-        return this;
-    }
-
     public Direction properDirection(Coord target) {
         Coord vector = target.relative(this);
         if (Math.abs(vector.x) > Math.abs(vector.y)) {
@@ -140,10 +96,6 @@ public class Coord {
 
     public static Double euqlidean(Coord coord) {
         return Math.sqrt(coord.x * coord.x + coord.y * coord.y);
-    }
-
-    public static Double euqlideanScaled(Coord coord) {
-        return Math.sqrt(coord.x * coord.x + (double) coord.y * coord.y * 4 / 3);
     }
 
     @Override

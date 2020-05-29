@@ -31,13 +31,13 @@ public abstract class StoneWallsTextures extends RoomTextures {
     }
 
     @Override
-    public Wall createWall(MapOfObjects map, Coord coord, Direction direction, int length, int width, List<Passage> passages) {
+    public Wall createWall(Coord coord, Direction direction, int length, int width, List<Passage> passages) {
         VisualPixel[][] array = direction.vertical() ? new VisualPixel[length][width] : new VisualPixel[width][length];
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
                 array[i][j] = generator.generate(random.nextDouble());
             }
         }
-        return new Wall(map, coord, cutOutPassages(array, coord, direction.vertical(), passages));
+        return new Wall(coord, cutOutPassages(array, coord, direction.vertical(), passages));
     }
 }

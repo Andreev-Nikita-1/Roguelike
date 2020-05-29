@@ -1,8 +1,11 @@
 package hero.items;
 
+import org.json.JSONObject;
 import renderer.inventoryWindow.InventoryText;
+import util.Coord;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
@@ -59,4 +62,19 @@ public class Shield extends Equipment {
         return ' ';
     }
 
+
+    @Override
+    public JSONObject getSnapshot() {
+        return super.getSnapshot().put("type", shieldType.ordinal());
+    }
+
+    public static Shield restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return (Shield) new Shield(jsonObject.getInt("maxDurability"),
+                jsonObject.getInt("value"),
+                jsonObject.getString("name"),
+                Type.values()[jsonObject.getInt("type")]
+        ).setDurability(jsonObject.getInt("durability"))
+                .setBaggagePlace(new Coord(jsonObject.getInt("xBaggage"),
+                        jsonObject.getInt("yBaggage")));
+    }
 }

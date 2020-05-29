@@ -4,19 +4,21 @@ import map.MapOfObjects;
 import objects.DependingObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
+import objects.SnapshotableFromMap;
+import org.json.JSONObject;
 import util.Coord;
 
-public abstract class Stuff extends MapObject implements DependingObject, DynamicVisualObject {
+public abstract class Stuff extends MapObject implements DependingObject, DynamicVisualObject, SnapshotableFromMap {
     protected Coord location;
 
-    public Stuff(MapOfObjects map, Coord location) {
-        super(map);
+    public Stuff(Coord location) {
+        super();
         this.location = location;
     }
 
     @Override
-    public MapObject attachToMap() {
-        super.attachToMap();
+    public MapObject attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         map.subscribeOnCoord(this, location);
         return this;
     }
@@ -25,5 +27,13 @@ public abstract class Stuff extends MapObject implements DependingObject, Dynami
     public void deleteFromMap() {
         map.unsubscribeFromCoord(this, location);
         super.deleteFromMap();
+    }
+
+    @Override
+    public JSONObject getSnapshot() {
+        return new JSONObject()
+                .put("x", location.x)
+                .put("y", location.y)
+                .put("class", this.getClass().getName());
     }
 }

@@ -1,8 +1,11 @@
 package hero.items;
 
+import org.json.JSONObject;
 import renderer.inventoryWindow.InventoryText;
+import util.Coord;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 
@@ -68,4 +71,20 @@ public class Weapon extends Equipment {
         return ' ';
     }
 
+
+    @Override
+    public JSONObject getSnapshot() {
+        return super.getSnapshot().put("type", weaponType.ordinal()).put("delay", attackDelay);
+    }
+
+    public static Weapon restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return (Weapon) new Weapon(jsonObject.getInt("maxDurability"),
+                jsonObject.getInt("value"),
+                jsonObject.getInt("delay"),
+                jsonObject.getString("name"),
+                Type.values()[jsonObject.getInt("type")]
+        ).setDurability(jsonObject.getInt("durability"))
+                .setBaggagePlace(new Coord(jsonObject.getInt("xBaggage"),
+                        jsonObject.getInt("yBaggage")));
+    }
 }

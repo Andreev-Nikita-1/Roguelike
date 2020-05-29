@@ -62,7 +62,7 @@ public class StatsWindow extends CursorWindow {
             textGetter = protectionTextGetter;
         }
         if (textGetter != null) {
-            AppLogic.currentGame.currentInventory.stats.accept(textGetter);
+            AppLogic.currentGame.hero.stats.accept(textGetter);
             return textGetter.getText();
         }
         return InventoryText.EMPTY_TEXT;
@@ -86,18 +86,20 @@ public class StatsWindow extends CursorWindow {
                         i + inventoryWindowLocation.y + location.y, chars.get(i));
                 graphics.setForegroundColor(convertColor(InventoryText.TEXT_COLOR));
             }
-            int n = 100;
+            int n=0;
             switch (i) {
+                case 0:
+                    n = AppLogic.currentGame.hero.stats.getLevel();
+                    break;
                 case 1:
-                    n = AppLogic.currentGame.currentInventory.stats.getHealth();
+                    n = AppLogic.currentGame.hero.stats.getHealth();
                     break;
                 case 2:
-                    n = AppLogic.currentGame.currentInventory.stats.getPower();
+                    n = AppLogic.currentGame.hero.stats.getPower();
                     break;
                 case 3:
-                    n = AppLogic.currentGame.currentInventory.stats.getProtection();
+                    n = AppLogic.currentGame.hero.stats.getProtection();
                     break;
-
             }
             String str = Util.tightNumber(n);
             if (str.length() == 1) str = " " + str;

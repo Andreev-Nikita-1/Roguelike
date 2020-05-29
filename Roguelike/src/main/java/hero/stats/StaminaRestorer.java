@@ -1,5 +1,6 @@
 package hero.stats;
 
+import basicComponents.Game;
 import util.TimeIntervalActor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +18,7 @@ public class StaminaRestorer implements TimeIntervalActor {
         if (stats.stamina.get() < stats.maxStamina) {
             stats.stamina.addAndGet(Math.min(1, stats.maxStamina - stats.stamina.get()));
         }
-        return 100;
+        return 300;
     }
 
     @Override
@@ -28,5 +29,10 @@ public class StaminaRestorer implements TimeIntervalActor {
     @Override
     public boolean isActive() {
         return active.get();
+    }
+
+    @Override
+    public Game getGame() {
+        return stats.ownerInventory.heroMap.game;
     }
 }

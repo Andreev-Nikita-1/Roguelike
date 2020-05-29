@@ -14,8 +14,8 @@ public abstract class StaticObject extends MapObject implements StaticVisualObje
     protected Map<Coord, VisualPixel> pixels;
     protected Set<Coord> coords = new HashSet<>();
 
-    public StaticObject(MapOfObjects map, Coord location, VisualPixel[][] array, boolean substantial) {
-        super(map);
+    public StaticObject(Coord location, VisualPixel[][] array, boolean substantial) {
+        super();
         this.location = location;
         pixels = new HashMap<>();
         for (int i = 0; i < array.length; i++) {
@@ -30,9 +30,18 @@ public abstract class StaticObject extends MapObject implements StaticVisualObje
         }
     }
 
+    public StaticObject(Coord location, Map<Coord, VisualPixel> pixelMap, boolean substantial) {
+        super();
+        this.location = location;
+        pixels = pixelMap;
+        if (substantial) {
+            coords = pixels.keySet();
+        }
+    }
+
     @Override
-    public StaticObject attachToMap() {
-        super.attachToMap();
+    public StaticObject attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         for (Coord c : coords) {
             map.setObject(this, c);
         }

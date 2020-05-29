@@ -3,10 +3,14 @@ package map.roomSystem;
 import map.MapOfObjects;
 import map.roomSystem.textures.RoomTextures;
 import objects.MapObject;
+import org.json.JSONObject;
 import util.Coord;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static util.Direction.*;
@@ -28,14 +32,13 @@ public class Room extends MapObject {
     private Wall leftWall;
     private Background background;
 
-    public Room(MapOfObjects map,
-                Coord location, Coord size,
+    public Room(Coord location, Coord size,
                 int upWallWidth,
                 int downWallWidth,
                 int leftWallWidth,
                 int rightWallWidth,
                 RoomTextures textures) {
-        super(map);
+        super();
         this.location = location;
         this.size = size;
         this.rightDown = location.shifted(size).shift(Coord.UP).shift(Coord.LEFT);
@@ -46,11 +49,10 @@ public class Room extends MapObject {
         this.textures = textures;
     }
 
-    public Room(MapOfObjects map,
-                Coord location, Coord size,
+    public Room(Coord location, Coord size,
                 int wallWidth,
                 RoomTextures textures) {
-        this(map, location, size, wallWidth, wallWidth, wallWidth, wallWidth, textures);
+        this(location, size, wallWidth, wallWidth, wallWidth, wallWidth, textures);
     }
 
     public void addPassage(Passage passage) {
@@ -62,51 +64,53 @@ public class Room extends MapObject {
     }
 
     @Override
-    public Room attachToMap() {
+    public Room attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         if (upWallWidth > 0) {
-            upWall = textures.createWall(map,
+            upWall = textures.createWall(
                     location.shifted(new Coord(0, -upWallWidth)),
                     UP,
                     size.x,
                     upWallWidth,
                     passages.stream()
                             .filter(passage -> passage.directedTo(this) == UP)
-                            .collect(Collectors.toList())).attachToMap();
+                            .collect(Collectors.toList())).attachToMap(map);
         }
         if (downWallWidth > 0) {
-            downWall = textures.createWall(map,
+            downWall = textures.createWall(
                     location.shifted(new Coord(0, size.y)),
                     DOWN,
                     size.x,
                     downWallWidth,
                     passages.stream()
                             .filter(passage -> passage.directedTo(this) == DOWN)
-                            .collect(Collectors.toList())).attachToMap();
+                            .collect(Collectors.toList())).attachToMap(map);
         }
         if (rightWallWidth > 0) {
-            rightWall = textures.createWall(map,
+            rightWall = textures.createWall(
                     location.shifted(new Coord(size.x, -upWallWidth)),
                     RIGHT,
                     size.y + upWallWidth + downWallWidth,
                     rightWallWidth,
                     passages.stream()
                             .filter(passage -> passage.directedTo(this) == RIGHT)
-                            .collect(Collectors.toList())).attachToMap();
+                            .collect(Collectors.toList())).attachToMap(map);
         }
         if (leftWallWidth > 0) {
-            leftWall = textures.createWall(map,
+            leftWall = textures.createWall(
                     location.shifted(new Coord(-leftWallWidth, -upWallWidth)),
                     LEFT,
                     size.y + upWallWidth + downWallWidth,
                     leftWallWidth,
                     passages.stream()
                             .filter(passage -> passage.directedTo(this) == LEFT)
-                            .collect(Collectors.toList())).attachToMap();
+                            .collect(Collectors.toList())).attachToMap(map);
         }
-        background = textures.createBackground(map, location,
+        background = textures.createBackground(
+                location,
                 size.y,
                 size.x
-        ).attachToMap();
+        ).attachToMap(map);
         return this;
     }
 
@@ -128,5 +132,31 @@ public class Room extends MapObject {
         rightWall.deleteFromMap();
         leftWall.deleteFromMap();
         background.deleteFromMap();
+    }
+
+    public JSONObject getSnapshot() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("x", location.x);
+        jsonObject.put("y", location.y);
+        jsonObject.put("xSize", size.x);
+        jsonObject.put("ySize", size.y);
+        jsonObject.put("up", upWallWidth);
+        jsonObject.put("down", downWallWidth);
+        jsonObject.put("left", leftWallWidth);
+        jsonObject.put("right", rightWallWidth);
+        jsonObject.put("textures", textures.getSnapshot());
+        return jsonObject;
+    }
+
+    public static Room restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        return new Room(
+                new Coord(jsonObject.getInt("x"), jsonObject.getInt("y")),
+                new Coord(jsonObject.getInt("xSize"), jsonObject.getInt("ySize")),
+                jsonObject.getInt("up"),
+                jsonObject.getInt("down"),
+                jsonObject.getInt("left"),
+                jsonObject.getInt("right"),
+                RoomTextures.restoreSnapshot(jsonObject.getJSONObject("textures"))
+        );
     }
 }

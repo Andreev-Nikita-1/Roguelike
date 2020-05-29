@@ -1,10 +1,12 @@
 package hero.items;
 
 import hero.Inventory;
+import org.json.JSONObject;
 import renderer.inventoryWindow.InventoryText;
 import util.Coord;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class Item {
 
@@ -12,36 +14,41 @@ public abstract class Item {
     }
 
     public Coord baggagePlace;
-    protected Inventory owner;
+    protected Inventory ownerInventory;
 
-    public void setOwner(Inventory inventory) {
-        owner = inventory;
+    public void setOwnerInventory(Inventory inventory) {
+        ownerInventory = inventory;
+    }
+
+    public Item setBaggagePlace(Coord coord) {
+        baggagePlace = coord;
+        return this;
     }
 
     public abstract void use();
 
     public void delete() {
-        for (int i = 0; i < owner.taken.length; i++) {
-            if (owner.taken[i] == this) {
+        for (int i = 0; i < ownerInventory.taken.length; i++) {
+            if (ownerInventory.taken[i] == this) {
                 applyTakenEffect(false);
-                owner.taken[i] = null;
+                ownerInventory.taken[i] = null;
                 return;
             }
         }
-        if (owner.weapon == this) {
+        if (ownerInventory.weapon == this) {
             applyTakenEffect(false);
-            owner.weapon = null;
+            ownerInventory.weapon = null;
             return;
         }
-        if (owner.shield == this) {
+        if (ownerInventory.shield == this) {
             applyTakenEffect(false);
-            owner.shield = null;
+            ownerInventory.shield = null;
             return;
         }
-        for (int i = 0; i < owner.baggageSize.x; i++) {
-            for (int j = 0; j < owner.baggageSize.y; j++) {
-                if (owner.baggage[i][j] == this) {
-                    owner.baggage[i][j] = null;
+        for (int i = 0; i < ownerInventory.baggageSize.x; i++) {
+            for (int j = 0; j < ownerInventory.baggageSize.y; j++) {
+                if (ownerInventory.baggage[i][j] == this) {
+                    ownerInventory.baggage[i][j] = null;
                     return;
                 }
             }
@@ -53,4 +60,18 @@ public abstract class Item {
     public abstract Color getColor();
 
     public abstract char getSymbol();
+
+    public JSONObject getSnapshot() {
+        return new JSONObject()
+                .put("xBaggage", (baggagePlace == null) ? 0 : baggagePlace.x)
+                .put("yBaggage", (baggagePlace == null) ? 0 : baggagePlace.y)
+                .put("class", this.getClass().getName());
+    }
+
+    public static Item restoreSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return (Item) Class
+                .forName(jsonObject.getString("class"))
+                .getMethod("restoreFromSnapshot", JSONObject.class)
+                .invoke(null, jsonObject);
+    }
 }

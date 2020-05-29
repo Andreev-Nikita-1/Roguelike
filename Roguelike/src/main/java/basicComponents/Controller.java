@@ -6,7 +6,9 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.*;
+import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
@@ -15,15 +17,17 @@ import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import menuLogic.Menu;
 import menuLogic.MenuAction;
 import renderer.Renderer;
+import util.TimeIntervalActor;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.concurrent.*;
 
-import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
-import static menuLogic.Menu.optionsMenu;
+import static menuLogic.Menu.*;
 
 public class Controller {
 
@@ -110,7 +114,14 @@ public class Controller {
         }
     }
 
+    public static Menu lastMenu;
+    public static Menu currentMenu;
+
     public static void drawMenu(Menu menu) {
+        if (menu != currentMenu) {
+            lastMenu = currentMenu;
+            currentMenu = menu;
+        }
         ActionListDialogBuilder builder = new ActionListDialogBuilder();
         builder.setTitle(menu.getTitle());
         builder.setCanCancel(false);
@@ -122,6 +133,44 @@ public class Controller {
         gui.addWindow(dialog);
     }
 
+    public static void drawSaveGameDialog() {
+        TextInputDialogBuilder builder = new TextInputDialogBuilder();
+        builder.setTitle("SAVE GAME");
+        TextInputDialog dialog = builder.build();
+        dialog.setSize(new TerminalSize((int) (getTerminalSizeX() / 1.5), 5));
+        dialog.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING, Window.Hint.FIXED_SIZE));
+        new Thread(() -> {
+            String saveName = dialog.showDialog(gui);
+            if (saveName != null) {
+                AppLogic.saveGame(saveName);
+                drawMenu(success);
+            } else {
+                drawMenu(activeGameMainMenu);
+            }
+        }).start();
+    }
+
+    public static void drawFileDialog() {
+        var list = AppLogic.getSaves();
+        Table<String> table = new Table<>("save", "time");
+        table.getTableModel().addRow("back", "");
+        for (var map : list) {
+            table.getTableModel().addRow(map.name, map.date);
+        }
+        BasicWindow window = new BasicWindow();
+        window.setSize(new TerminalSize((int) (getTerminalSizeX() / 1.5), (int) (getTerminalSizeY() / 1.5)));
+        window.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING, Window.Hint.FIXED_SIZE));
+        window.setComponent(table);
+        gui.addWindow(window);
+        table.setSelectAction(() -> {
+            if (table.getSelectedRow() == 0) {
+                Controller.drawMenu(currentMenu);
+            } else {
+                AppLogic.loadGame(list.get(table.getSelectedRow() - 1).name);
+            }
+            gui.removeWindow(window);
+        });
+    }
 
     static class GameplayComponent extends AbstractInteractableComponent<GameplayComponent> {
 

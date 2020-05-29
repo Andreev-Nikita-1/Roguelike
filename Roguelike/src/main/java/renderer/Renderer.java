@@ -5,12 +5,14 @@ import basicComponents.Controller;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
+import map.roomSystem.textures.VisualPixelGenerator;
 import renderer.inventoryWindow.InventoryWindow;
 import util.Util;
 
 import java.awt.Color;
-
-import static renderer.VisualPixel.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 
 public class Renderer {
@@ -18,65 +20,35 @@ public class Renderer {
     public static volatile int page = 0;
 
     public static void render(TextGUIGraphics graphics) {
-        switch (AppLogic.currentGame.gameplayState) {
+        switch (AppLogic.gameplayState) {
             case NOT_STARTED:
             case MAP_GENERATING:
+            case KILLED:
                 drawStartPicture(graphics);
                 break;
             case INVENTORY:
-                AppLogic.currentGame.currentMapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
-                drawInventoryWindow(graphics);
+                AppLogic.currentGame.mapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                InventoryWindow.draw(graphics);
                 break;
             case PAUSED:
             case PLAYING:
-                AppLogic.currentGame.currentMapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                AppLogic.currentGame.mapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                TopBar.draw(graphics);
                 break;
         }
     }
 
-
-    public static void drawInventoryWindow(TextGUIGraphics graphics) {
-        InventoryWindow.draw(graphics);
-    }
-
-
     private static void drawStartPicture(TextGUIGraphics graphics) {
+        Color SYMBOL_COLOR = new Color(40, 40, 40);
+        Color BACK_COLOR = new Color(20, 20, 20);
+        Random random = new Random(0);
         for (int i = 0; i < Controller.getTerminalSizeX(); i++) {
             for (int j = 0; j < Controller.getTerminalSizeY(); j++) {
-                Color color1 = COLOR23;
-                Color color2 = COLOR22;
-                if ((i + j) % 2 == 0) {
-                    color1 = color2;
-                }
-                graphics.setCharacter(i, j, new TextCharacter('#', Util.convertColor(color1), Util.convertColor(color2)));
+                char symbol = (char) (0x01A7 + random.nextDouble() * 5);
+                graphics.setCharacter(i, j, new TextCharacter(symbol,
+                        Util.convertColor(SYMBOL_COLOR),
+                        Util.convertColor(BACK_COLOR)));
             }
         }
     }
-//TODO
-//    private static void drawLoading(TextGUIGraphics graphics, double percent) {
-//        graphics.setBackgroundColor(convertColor(Color.BLACK));
-//        graphics.fill(' ');
-//        int xSize = Controller.getTerminalSizeX();
-//        int ySize = Controller.getTerminalSizeY();
-//        int percentInt = (int) (percent * 100 + 1);
-//        String text = "CREATING MAP " + String.valueOf(percentInt) + "%";
-//        if (percentInt <= 50) {
-//            graphics.setBackgroundColor(convertColor(Color.Bla));
-//            graphics.setForegroundColor(new Color(255, 255, 255));
-//            int ind = (int) (percent * 32) + 1;
-//            graphics.putString((int) (xSize / 2) - 8, (int) (ySize / 2), text.substring(0, ind));
-//            graphics.setBackgroundColor(new Color(255, 255, 255));
-//            graphics.setForegroundColor(new Color(0, 0, 0));
-//            graphics.putString((int) (xSize / 2) - 8 + ind, (int) (ySize / 2), text.substring(ind));
-//        } else if (percentInt <= 99) {
-//            graphics.setBackgroundColor(new Color(0, 0, 0));
-//            graphics.setForegroundColor(new Color(255, 255, 255));
-//            int ind = (int) ((percent - 0.5) * 24);
-//            graphics.putString((int) (xSize / 2) - 8 + ind, (int) (ySize / 2), text.substring(ind));
-//        } else {
-//            graphics.setBackgroundColor(new Color(0, 0, 0));
-//            graphics.setForegroundColor(new Color(255, 255, 255));
-//            graphics.putString((int) (xSize / 2) + 4, (int) (ySize / 2), "100%");
-//        }
-//    }
 }

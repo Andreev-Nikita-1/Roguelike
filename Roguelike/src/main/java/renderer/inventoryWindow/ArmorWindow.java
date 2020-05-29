@@ -19,17 +19,17 @@ public class ArmorWindow extends TileWindow {
 
     @Override
     Item getItem(Coord position) {
-        return (position.x == 0) ? AppLogic.currentGame.currentInventory.weapon : AppLogic.currentGame.currentInventory.shield;
+        return (position.x == 0) ? AppLogic.currentGame.hero.inventory.weapon : AppLogic.currentGame.hero.inventory.shield;
     }
 
     @Override
     public InventoryText getText() {
         if (cursorPosition.x == 0) {
-            Weapon weapon = AppLogic.currentGame.currentInventory.weapon;
+            Weapon weapon = AppLogic.currentGame.hero.inventory.weapon;
             if (weapon != null) return weapon.getText();
             return InventoryText.NO_WEAPON;
         } else {
-            Shield shield = AppLogic.currentGame.currentInventory.shield;
+            Shield shield = AppLogic.currentGame.hero.inventory.shield;
             if (shield != null) return shield.getText();
             return InventoryText.NO_SHIELD;
         }
@@ -47,7 +47,7 @@ public class ArmorWindow extends TileWindow {
     void draw(TextGUIGraphics graphics, Coord inventoryWindowLocation) {
         super.draw(graphics, inventoryWindowLocation);
         graphics.setBackgroundColor(convertColor(new Color(100, 100, 100)));
-        Weapon weapon = AppLogic.currentGame.currentInventory.weapon;
+        Weapon weapon = AppLogic.currentGame.hero.inventory.weapon;
         if (weapon != null) {
             graphics.setForegroundColor(convertColor(greenRedScale(weapon.getDurabilityLevel())));
             graphics.setCharacter(inventoryWindowLocation.x + location.x - 1,
@@ -58,7 +58,7 @@ public class ArmorWindow extends TileWindow {
                     inventoryWindowLocation.y + location.y,
                     ' ');
         }
-        Shield shield = AppLogic.currentGame.currentInventory.shield;
+        Shield shield = AppLogic.currentGame.hero.inventory.shield;
         if (shield != null) {
             graphics.setForegroundColor(convertColor(greenRedScale(shield.getDurabilityLevel())));
             graphics.setCharacter(inventoryWindowLocation.x + location.x + 2,

@@ -1,7 +1,6 @@
 package hero.stats;
 
 import hero.items.Shield;
-import hero.items.Weapon;
 import renderer.inventoryWindow.InventoryText;
 import util.Util;
 
@@ -19,12 +18,12 @@ public class ProtectionTextGetter extends TextVisitor {
         List<Color> firstColors = new ArrayList<>();
         firstColors.add(TEXT_COLOR);
         firstColors.add(STATS_COLOR);
-        info.add("basic: " + Util.tightNumber(stats.basicProtection));
+        info.add("basic: " + Util.tightNumber((int) (stats.basicProtection * stats.getProtectionCoeffitent())));
         colors.add(firstColors);
-        Shield shield = stats.owner.shield;
+        Shield shield = stats.ownerInventory.shield;
         if (shield != null) {
             info.add("shield: " + Util.tightNumber(shield.value)
-                    + " " + (char) 0x008A + Util.tightNumber((int) (stats.powerCoeffitent * 100)) + "%");
+                    + " " + (char) 0x008A + Util.tightNumber((int) (stats.getPowerCoeffitent() * 100)) + "%");
             List<Color> secondColors = new ArrayList<>();
             secondColors.add(TEXT_COLOR);
             secondColors.add(TEXT_COLOR);
@@ -33,7 +32,7 @@ public class ProtectionTextGetter extends TextVisitor {
         }
         text = new InventoryText(
                 "PROTECTION",
-                "",
+                "Your protection absorbs some of the damage taken",
                 info, colors);
     }
 }

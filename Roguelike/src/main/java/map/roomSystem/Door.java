@@ -1,12 +1,15 @@
 package map.roomSystem;
 
+import map.MapOfObjects;
 import map.roomSystem.textures.RoomTextures;
 import objects.*;
+import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
 import util.Coord;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +29,7 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     protected Coord doorCoord;
     protected DoorState state = CLOSED;
     protected boolean highlighted = false;
+    protected int depth;
 
     @Override
     public boolean passable(int width) {
@@ -49,6 +53,7 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     }
 
     public void setDepth(int depth) {
+        this.depth = depth;
         Coord shift = direction.vertical() ?
                 new Coord(0, depth) : new Coord(depth, 0);
         doorCoord = location.shifted(shift);
@@ -107,8 +112,8 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     }
 
     @Override
-    public Door attachToMap() {
-        super.attachToMap();
+    public Door attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         map.setObject(this, doorCoord);
         map.subscribeOnCoords(this, doorCoord, 3);
         update();
@@ -141,8 +146,6 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
                     throw new IllegalStateException("Unexpected value: " + state);
             }
             if (highlighted) {
-                //TODO
-//                pixels.put(doorCoord, doorPixel.highlighted(Color.GREEN, 0.05));
                 pixels.put(doorCoord, doorPixel.brighter(2.5));
             } else {
                 pixels.put(doorCoord, doorPixel);
@@ -154,5 +157,30 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     protected enum DoorState {
         CLOSED,
         OPEN
+    }
+
+
+    public JSONObject getSnapshot() {
+        JSONObject jsonObject = super.getSnapshot();
+        jsonObject.put("depth", depth);
+        return jsonObject;
+    }
+
+    public static Passage restoreFromSnapshot(JSONObject jsonObject, RoomSystem system) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Coord room1Location = new Coord(jsonObject.getInt("xRoom1"), jsonObject.getInt("yRoom1"));
+        Coord room2Location = new Coord(jsonObject.getInt("xRoom2"), jsonObject.getInt("yRoom2"));
+        Room room1 = null;
+        Room room2 = null;
+        for (Room room : system.rooms) {
+            if (room.location.equals(room1Location)) room1 = room;
+            if (room.location.equals(room2Location)) room2 = room;
+        }
+        return (Passage) Class
+                .forName(jsonObject.getString("class"))
+                .getConstructor(Room.class, Room.class, RoomTextures.class, int.class, int.class)
+                .newInstance(room1, room2,
+                        RoomTextures.restoreSnapshot(jsonObject.getJSONObject("textures")),
+                        jsonObject.getInt("width"),
+                        jsonObject.getInt("depth"));
     }
 }

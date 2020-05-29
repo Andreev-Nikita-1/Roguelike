@@ -10,11 +10,11 @@ public class DamageVisitor extends StatsVisitor {
 
     @Override
     public void visit(HeroStats stats) {
-        stats.health.addAndGet((int) (-damage * (0.5 + 0.5 / (1 + stats.getProtection() / 10.0))));
-        if (stats.owner.shield == null) return;
-        stats.owner.shield.durability.addAndGet(-damage / 5);
-        if (stats.owner.shield.durability.get() == 0) {
-            stats.owner.shield.delete();
+        stats.health.addAndGet((int) (-damage * (0.5 + 0.5 / (1 + stats.getProtection() / 50.0))));
+        if (stats.ownerInventory.shield == null) return;
+        stats.ownerInventory.shield.durability.addAndGet(-damage / 5);
+        if (stats.ownerInventory.shield.durability.get() == 0) {
+            stats.ownerInventory.shield.delete();
         }
     }
 }

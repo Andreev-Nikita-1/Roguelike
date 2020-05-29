@@ -172,9 +172,9 @@ public class InventoryWindow {
 
     private static void moveItem(Direction direction) {
         if (currentWindow == baggage) {
-            AppLogic.currentGame.currentInventory.shiftItemInBaggage(currentWindow.cursorPosition, direction);
+            AppLogic.currentGame.hero.inventory.shiftItemInBaggage(currentWindow.cursorPosition, direction);
         } else if (currentWindow == taken) {
-            AppLogic.currentGame.currentInventory.shiftTakenItems(currentWindow.cursorPosition.x, direction);
+            AppLogic.currentGame.hero.inventory.shiftTakenItems(currentWindow.cursorPosition.x, direction);
         }
     }
 
@@ -185,15 +185,15 @@ public class InventoryWindow {
         switch (keyStroke.getKeyType()) {
             case Enter:
                 if (currentWindow == taken)
-                    AppLogic.currentGame.currentInventory.takeOffItemInTaken(currentWindow.cursorPosition.x);
+                    AppLogic.currentGame.hero.inventory.takeOffItemInTaken(currentWindow.cursorPosition.x);
                 if (currentWindow == armor) {
                     if (currentWindow.cursorPosition.x == 0)
-                        AppLogic.currentGame.currentInventory.takeOffWeapon();
+                        AppLogic.currentGame.hero.inventory.takeOffWeapon();
                     else
-                        AppLogic.currentGame.currentInventory.takeOffShield();
+                        AppLogic.currentGame.hero.inventory.takeOffShield();
                 }
                 if (currentWindow == baggage)
-                    AppLogic.currentGame.currentInventory.putOnItemInBaggage(currentWindow.cursorPosition);
+                    AppLogic.currentGame.hero.inventory.putOnItemInBaggage(currentWindow.cursorPosition);
                 textWindow.setText(currentWindow.getText());
                 break;
             case ArrowUp:

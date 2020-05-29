@@ -6,11 +6,9 @@ import util.Util;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
-import static util.Util.tightNumber;
 
 
 public class PowerTextGetter extends TextVisitor {
@@ -21,12 +19,12 @@ public class PowerTextGetter extends TextVisitor {
         List<Color> firstColors = new ArrayList<>();
         firstColors.add(TEXT_COLOR);
         firstColors.add(STATS_COLOR);
-        info.add("basic: " + Util.tightNumber(stats.basicPower));
+        info.add("basic: " + Util.tightNumber((int) (stats.basicPower * stats.getPowerCoeffitent())));
         colors.add(firstColors);
-        Weapon weapon = stats.owner.weapon;
+        Weapon weapon = stats.ownerInventory.weapon;
         if (weapon != null) {
             info.add("weapon: " + Util.tightNumber(weapon.value)
-                    + " " + (char) 0x008A + Util.tightNumber((int) (stats.powerCoeffitent * 100)) + "%");
+                    + " " + (char) 0x008A + Util.tightNumber((int) (stats.getPowerCoeffitent() * 100)) + "%");
             List<Color> secondColors = new ArrayList<>();
             secondColors.add(TEXT_COLOR);
             secondColors.add(TEXT_COLOR);
@@ -35,7 +33,7 @@ public class PowerTextGetter extends TextVisitor {
         }
         text = new InventoryText(
                 "POWER",
-                "",
+                "The more power you have, the more damage you deal to the enemy",
                 info, colors);
     }
 }

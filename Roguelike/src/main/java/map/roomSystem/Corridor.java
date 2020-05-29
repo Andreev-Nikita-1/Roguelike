@@ -1,5 +1,6 @@
 package map.roomSystem;
 
+import map.MapOfObjects;
 import map.roomSystem.textures.RoomTextures;
 
 public class Corridor extends Passage {
@@ -21,17 +22,5 @@ public class Corridor extends Passage {
         this(room1, room2, textures);
         int bias = (this.width - width) / 2;
         setWidthAndBias(width, bias);
-    }
-
-
-    @Override
-    public Corridor attachToMap() {
-        super.attachToMap();
-        return this;
-    }
-
-    @Override
-    public void deleteFromMap() {
-        super.deleteFromMap();
     }
 }

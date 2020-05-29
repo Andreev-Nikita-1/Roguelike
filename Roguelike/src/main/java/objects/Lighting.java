@@ -1,6 +1,6 @@
 package objects;
 
-import map.MapOfObjects;
+import basicComponents.Game;
 import objects.creatures.Mob;
 import renderer.VisualPixel;
 import util.Coord;
@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -27,13 +26,12 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
 
     public volatile boolean lighted = true;
 
-    public Lighting(MapOfObjects map, int radius) {
-        super(map);
+    public Lighting(int radius) {
+        super();
         this.radius = radius;
         Function<Coord, Boolean> blocksLight = c -> !(map.inside(c) && (!map.isTaken(c) || (map.getObject(c) instanceof Mob)));
         Consumer<Coord> setVisible = c -> visible.add(c);
-        Function<Coord, Integer> getDistance = c -> (int) Coord.euqlideanScaled(c).doubleValue();
-
+        Function<Coord, Integer> getDistance = c -> (int) Coord.euqlidean(c).doubleValue();
         code = new SomeLightingCodeFromInternet(blocksLight, setVisible, getDistance);
     }
 
@@ -90,11 +88,11 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
                             if (visible.contains(neighbour)
                                     && (map.inside(neighbour)
                                     && (!map.isTaken(neighbour) || (map.getObject(neighbour) instanceof Mob)))) {
-                                dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation()));
+                                dist = Coord.euqlidean(c.relative(map.getHeroLocation()));
                             }
                         }
                     } else {
-                        dist = Coord.euqlideanScaled(c.relative(map.getHeroLocation()));
+                        dist = Coord.euqlidean(c.relative(map.getHeroLocation()));
                     }
                 }
                 pixelMap.put(c, VisualPixel.darkness(transparency(dist)));
@@ -128,6 +126,11 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
     @Override
     public boolean isActive() {
         return paused.get();
+    }
+
+    @Override
+    public Game getGame() {
+        return map.game;
     }
 
 }

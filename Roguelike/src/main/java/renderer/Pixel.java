@@ -66,7 +66,7 @@ public class Pixel {
                 b = 4.0;
                 break;
         }
-        return (int) Math.max(Math.min(255, 15 + 15 * Math.sin(redLevel / a + b) + x), 0);
+        return (int) Math.max(Math.min(255, 15 + 15 * Math.sin(testPhase / a + b) + x), 0);
     }
 
 
@@ -74,8 +74,8 @@ public class Pixel {
         double A = 0.299;
         double B = 0.587;
         double C = 0.114;
-        double psi = redLevel / 50.0;
-        double fi = 6 * Math.sin(redLevel / 50.0 / 6);
+        double psi = testPhase / 50.0;
+        double fi = 6 * Math.sin(testPhase / 50.0 / 6);
         double r1 = Math.cos(psi) * r + (Math.sqrt(B) / Math.sqrt(A)) * Math.sin(psi) * g;
         double g1 = -(Math.sqrt(A) / Math.sqrt(B)) * Math.sin(psi) * r + Math.cos(psi) * g;
         double g2 = Math.cos(fi) * g1 + (Math.sqrt(C) / Math.sqrt(B)) * Math.sin(fi) * b;
@@ -85,14 +85,14 @@ public class Pixel {
     }
 
     //TODO
-    public static volatile int redLevel = 0;
+    public static volatile int testPhase = 0;
     private static boolean run = false;
 
     public Pixel test() {
         if (!run) {
             new Thread(() -> {
                 while (true) {
-                    redLevel++;
+                    testPhase++;
                     try {
                         sleep(75);
                     } catch (InterruptedException e) {
@@ -105,13 +105,11 @@ public class Pixel {
         int r = symbolColor.getRed();
         int g = symbolColor.getGreen();
         int b = symbolColor.getBlue();
-//        Color symbolWB = new Color(f(r, 0), f(g, 1), f(b, 2));
         Color symbolWB = testColor(r, g, b);
 
         r = backgroundColor.getRed();
         g = backgroundColor.getGreen();
         b = backgroundColor.getBlue();
-//        Color backgroundWB = new Color(f(r, 0), f(g, 1), f(b, 2));
         Color backgroundWB = testColor(r, g, b);
 
 

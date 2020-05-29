@@ -1,13 +1,17 @@
 package objects.stuff;
 
+import basicComponents.Game;
+import hero.items.Item;
 import hero.stats.HealthVisitor;
 import map.MapOfObjects;
+import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
 import util.Coord;
 import util.TimeIntervalActor;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,15 +32,15 @@ public class Health extends Stuff implements TimeIntervalActor {
 
     private int value;
 
-    public Health(MapOfObjects map, Coord location, int value) {
-        super(map, location);
+    public Health(Coord location, int value) {
+        super(location);
         this.value = value;
     }
 
     @Override
     public synchronized void update() {
         if (location.equals(map.getHeroLocation())) {
-            map.heroObject.inventory.stats.accept(new HealthVisitor(value));
+            map.heroObject.hero.stats.accept(new HealthVisitor(value));
             deleteFromMap();
         }
     }
@@ -57,14 +61,14 @@ public class Health extends Stuff implements TimeIntervalActor {
     }
 
 
-    private int phase = 0;
+    private double phase = 0;
     private double shift = 0;
 
     @Override
     public int act() {
-        shift = (0.2 * Math.sin(phase / 10));
-        phase++;
-        return 10;
+        shift = 0.1 * (1 + (Math.floor(phase) - phase));
+        phase += 0.1 / (1 + value / 10.0);
+        return 50;
     }
 
     @Override
@@ -74,5 +78,25 @@ public class Health extends Stuff implements TimeIntervalActor {
     @Override
     public boolean isActive() {
         return true;
+    }
+
+    @Override
+    public Game getGame() {
+        return map.game;
+    }
+
+
+    @Override
+    public JSONObject getSnapshot() {
+        return super.getSnapshot()
+                .put("value", value);
+    }
+
+    public static Health restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        return new Health(
+                new Coord(jsonObject.getInt("x"),
+                        jsonObject.getInt("y")),
+                jsonObject.getInt("value")
+        );
     }
 }

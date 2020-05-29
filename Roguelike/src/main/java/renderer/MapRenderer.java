@@ -1,5 +1,6 @@
 package renderer;
 
+import basicComponents.AppLogic;
 import basicComponents.Game;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
@@ -8,13 +9,10 @@ import objects.DynamicVisualObject;
 import objects.StaticVisualObject;
 import util.Coord;
 import map.MapOfObjects;
-import util.Util;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
-import static java.awt.Color.RED;
 import static util.Util.convertColor;
 
 
@@ -24,9 +22,8 @@ public class MapRenderer {
     private PixelStack[][] pixelStacks;
     private TerminalCoordinate terminalCoordinate;
 
-    public MapRenderer(Game game) {
-        this.game = game;
-        this.map = game.currentMap;
+    public MapRenderer(MapOfObjects map) {
+        this.map = map;
         pixelStacks = new PixelStack[map.xSize][map.ySize];
         terminalCoordinate = new TerminalCoordinate(new Coord(map.xSize, map.ySize));
     }
@@ -69,26 +66,12 @@ public class MapRenderer {
             for (int j = 0; j < ySize; j++) {
                 Pixel pixel = pixelStacks[i + xLeftUp][j + yLeftUp].getPixel()
                         .darkness(!map.lighting.lighted)
-                        .noir(game.gameplayState == Game.GameplayState.PAUSED
-                                || game.gameplayState == Game.GameplayState.INVENTORY);
+                        .noir(AppLogic.gameplayState == AppLogic.GameplayState.PAUSED
+                                || AppLogic.gameplayState == AppLogic.GameplayState.INVENTORY);
                 graphics.setCharacter(i, j, new TextCharacter(pixel.symbol,
                         convertColor(pixel.symbolColor), convertColor(pixel.backgroundColor)));
             }
         }
-//        graphics.putString(0, 0, String.valueOf((char) ((map.heroObject.hero.health.get() < 20) ? 57356 : 57355)) + String.valueOf(map.heroObject.hero.health.get()));
-        graphics.putString(0, 0, String.valueOf(game.currentInventory.stats.getHealth()));
-        graphics.putString(5, 0, String.valueOf(game.currentInventory.stats.getStamina()));
-        try {
-            graphics.putString(10, 0, String.valueOf(game.currentInventory.weapon.durability));
-        } catch (NullPointerException e) {
-        }
-        graphics.setBackgroundColor(convertColor(Color.BLACK));
-        graphics.setForegroundColor(convertColor(RED));
-        graphics.putString(0, 0, Util.horizontalScale(14,
-                game.currentInventory.stats.getHealth() / (double) game.currentInventory.stats.getMaxHealth()));
-//        graphics.setBackgroundColor(Renderer.convertColor(new Color(10, 10, 10)));
-//        graphics.setForegroundColor(Renderer.convertColor(new Color(50, 50, 50)));
-//        graphics.putString(0, 0, (char) (0x01DE) + "" + (char) (0x01AB) + "" + (char) (0x01AB) + "" + (char) (0x01AB1) + "" + (char) (0x01DF));
     }
 
     public MapRenderer fit() {
@@ -139,5 +122,4 @@ public class MapRenderer {
             }
         }
     }
-
 }

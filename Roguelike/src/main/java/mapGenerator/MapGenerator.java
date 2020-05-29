@@ -1,8 +1,9 @@
 package mapGenerator;
 
-import hero.Inventory;
+
+import basicComponents.Game;
 import map.MapOfObjects;
 
 public abstract class MapGenerator {
-    public abstract MapOfObjects generateMap(Inventory inventory);
+    public abstract MapOfObjects generateMap();
 }

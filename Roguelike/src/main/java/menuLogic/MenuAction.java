@@ -12,8 +12,4 @@ public abstract class MenuAction {
     public Runnable getAction() {
         return action;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

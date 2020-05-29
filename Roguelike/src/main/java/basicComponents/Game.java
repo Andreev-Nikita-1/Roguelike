@@ -3,116 +3,118 @@ package basicComponents;
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
 import gameplayOptions.UseItemOption;
+import hero.Hero;
 import hero.Inventory;
 import hero.items.Candles;
 import hero.items.Shield;
 import hero.items.Weapon;
 import hero.stats.HeroStats;
-import renderer.inventoryWindow.InventoryWindow;
+import objects.stuff.Candle;
+import org.json.JSONObject;
 import hero.items.Item;
 import hero.stats.StaminaRestorer;
-import mapGenerator.DungeonGenerator;
+import mapGenerator.DefaultGenerator;
 import mapGenerator.MapGenerator;
 import map.MapOfObjects;
 import renderer.MapRenderer;
-import com.googlecode.lanterna.input.KeyStroke;
 import util.Pausable;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static basicComponents.Game.GameplayState.*;
 
 public class Game {
-    public GameplayState gameplayState = NOT_STARTED;
-
-    public MapOfObjects currentMap;
-    public MapRenderer currentMapRenderer;
-    public Inventory currentInventory;
 
 
-    private static int xSize = 200;
-    private static int ySize = 200;
+    public AtomicBoolean paused = new AtomicBoolean(true);
+    public List<Pausable> pausables = new CopyOnWriteArrayList<>();
 
-
-    public void createMap(MapGenerator mapGenerator) {
-        currentInventory = new Inventory(new HeroStats(0, 10, 100, new AtomicInteger(100), 100, 50, 10, 100, 50, 50, 0));
-        currentInventory.taken[0] = new Candles();
-        currentInventory.taken[0].setOwner(currentInventory);
-        ((Pausable) currentInventory.taken[0]).includeToGame();
-        new StaminaRestorer(currentInventory.stats).includeToGame();
-        currentInventory.weapon = new Weapon(10, 50, 50, "Super knife", Weapon.Type.KNIFE);
-        currentInventory.weapon.setOwner(currentInventory);
-        currentInventory.shield = new Shield(500, 50, "Hyper shield", Shield.Type.SHIELD1);
-        currentInventory.shield.setOwner(currentInventory);
-        currentMap = mapGenerator.generateMap(currentInventory);
-        currentMapRenderer = new MapRenderer(this).fit();
-        currentInventory.setMap(currentMap);
-    }
+    public MapOfObjects map;
+    public MapRenderer mapRenderer;
+    public Hero hero;
 
     public void start() {
-        Pausable.startGame();
-        gameplayState = PLAYING;
+        paused.set(false);
+        for (Pausable pausable : pausables) {
+            pausable.start();
+        }
     }
 
     public void pause() {
-        Pausable.pauseGame();
-        gameplayState = PAUSED;
+        paused.set(true);
+        for (Pausable pausable : pausables) {
+            pausable.pause();
+        }
     }
 
-    public void openInventory() {
-        Pausable.pauseGame();
-        InventoryWindow.activate();
-        gameplayState = INVENTORY;
-    }
-
-    public void closeInventory() {
-        Pausable.unpauseGame();
-        InventoryWindow.deactivate();
-        gameplayState = PLAYING;
-    }
 
     public void unpause() {
-        Pausable.unpauseGame();
-        gameplayState = PLAYING;
+        paused.set(false);
+        for (Pausable pausable : pausables) {
+            pausable.unpause();
+        }
     }
 
 
-    public void createMapLevel1() {
-        gameplayState = MAP_GENERATING;
-        createMap(new DungeonGenerator(xSize, ySize));
-        start();
+    public void kill() {
+        paused.set(true);
+        for (Pausable pausable : pausables) {
+            pausable.kill();
+        }
+        pausables.clear();
+    }
+
+    public static JSONObject createNewGameSnapshot() {
+        Game game = new Game();
+        game.map = new DefaultGenerator(200, 200).generateMap();
+        game.hero = new Hero(new Inventory(), new HeroStats());
+        game.hero.inventory.taken[0] = new Candles();
+        return game.getSnapshot();
     }
 
     public void handleOption(GameplayOption option, long eventTine) {
         if (option instanceof UseItemOption) {
-            Item item = currentInventory.taken[((UseItemOption) option).num];
+            Item item = hero.inventory.taken[((UseItemOption) option).num];
             if (item != null) item.use();
         }
         if (option == GameplayOption.INTERACT) {
-            currentMap.heroObject.interactWith();
+            map.heroObject.interactWith();
         }
         if (option instanceof DirectedOption) {
             switch (((DirectedOption) option).action) {
                 case WALK:
                 case RUN:
-                    currentMap.heroObject.makeMovement((DirectedOption) option, eventTine);
+                    map.heroObject.makeMovement((DirectedOption) option, eventTine);
                     break;
                 case ATTACK:
-                    currentMap.heroObject.makeAttack(((DirectedOption) option), eventTine);
+                    map.heroObject.makeAttack(((DirectedOption) option), eventTine);
                     break;
             }
         }
     }
 
-    public void handleKeyStrokeInInventory(KeyStroke keyStroke) {
-        InventoryWindow.handleKeyStroke(keyStroke);
+
+    public JSONObject getSnapshot() {
+        return new JSONObject()
+                .put("map", map.getSnapshot())
+                .put("hero", hero.getSnapshot());
     }
 
-    public enum GameplayState {
-        NOT_STARTED, MAP_GENERATING, PLAYING, PAUSED, INVENTORY
+    public static Game restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Game game = new Game();
+        game.hero = Hero.restoreFromSnapshot(jsonObject.getJSONObject("hero"));
+        game.hero.inventory.includeToGame(game);
+        game.map = MapOfObjects.restoreFromSnapshot(jsonObject.getJSONObject("map"), game);
+        game.map.heroObject.setHero(game.hero);
+        game.hero.inventory.setMap(game.map);
+        new StaminaRestorer(game.hero.stats).includeToGame(game);
+        game.mapRenderer = new MapRenderer(game.map).fit();
+        return game;
     }
-
 }
 
 

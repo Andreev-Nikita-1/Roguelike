@@ -30,13 +30,13 @@ public abstract class LocalTargetSwitchingStrategy extends Strategy {
         }
 
         Direction direction = currentLocation.properDirection(target);
-        if (!map.accesible(currentLocation.shifted(direction))) {
-            AccessNeighbourhood neighbourhood = new AccessNeighbourhood(map, target, 15);
+        if (!owner.map.accesible(currentLocation.shifted(direction))) {
+            AccessNeighbourhood neighbourhood = new AccessNeighbourhood(owner.map, target, 15);
             direction = neighbourhood.accessibleDirection(currentLocation);
             neighbourhood.delete();
         }
 
-        if (direction == null || !map.accesible(currentLocation.shifted(direction))) {
+        if (direction == null || !owner.map.accesible(currentLocation.shifted(direction))) {
             return GameplayOption.NOTHING;
         } else {
             return new DirectedOption(WALK, direction);

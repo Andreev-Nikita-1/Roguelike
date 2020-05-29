@@ -1,6 +1,8 @@
 package hero.items;
 
 
+import org.json.JSONObject;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Equipment extends Item {
@@ -20,7 +22,22 @@ public abstract class Equipment extends Item {
     public void use() {
     }
 
+    public Equipment setDurability(int durability) {
+        this.durability = new AtomicInteger(durability);
+        return this;
+    }
+
     public double getDurabilityLevel() {
         return durability.get() / (double) maxDurability;
+    }
+
+    @Override
+    public JSONObject getSnapshot() {
+        JSONObject snapshot = super.getSnapshot();
+        snapshot.put("durability", durability.get());
+        snapshot.put("maxDurability", maxDurability);
+        snapshot.put("value", value);
+        snapshot.put("name", name);
+        return snapshot;
     }
 }

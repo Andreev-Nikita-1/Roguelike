@@ -1,9 +1,13 @@
 package map.roomSystem;
 
+import map.MapOfObjects;
 import map.roomSystem.textures.RoomTextures;
 import objects.MapObject;
+import org.json.JSONObject;
 import util.Coord;
 import util.Direction;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static util.Direction.*;
 
@@ -12,6 +16,7 @@ public abstract class Passage extends MapObject {
     public Direction direction;
     public Coord location;
     public int width;
+    public int bias;
     public int length;
     public Room room1;
     public Room room2;
@@ -23,6 +28,7 @@ public abstract class Passage extends MapObject {
     public abstract boolean passable(int width);
 
     public void setWidestPassage() {
+        bias = 0;
         Coord commonLengthY = segmentsIntersection(
                 new Coord(room1.location.y, room1.rightDown.y),
                 new Coord(room2.location.y, room2.rightDown.y));
@@ -66,7 +72,7 @@ public abstract class Passage extends MapObject {
     }
 
     public Passage(Room room1, Room room2, RoomTextures textures) {
-        super(room1.map);
+        super();
         this.room1 = room1;
         this.room2 = room2;
         room1.addPassage(this);
@@ -81,12 +87,12 @@ public abstract class Passage extends MapObject {
     }
 
     @Override
-    public Passage attachToMap() {
-        super.attachToMap();
+    public Passage attachToMap(MapOfObjects map) {
+        super.attachToMap(map);
         if (direction.horizontal()) {
-            background = textures.createBackground(map, location, width, length).attachToMap();
+            background = textures.createBackground(location, width, length).attachToMap(map);
         } else {
-            background = textures.createBackground(map, location, length, width).attachToMap();
+            background = textures.createBackground(location, length, width).attachToMap(map);
         }
         return this;
     }
@@ -105,6 +111,7 @@ public abstract class Passage extends MapObject {
     public void setWidthAndBias(int width, int bias) {
         setWidestPassage();
         this.width = width;
+        this.bias = bias;
         Coord shift = direction.vertical() ? new Coord(bias, 0) : new Coord(0, bias);
         location.shift(shift);
     }
@@ -148,5 +155,44 @@ public abstract class Passage extends MapObject {
             s2 = t;
         }
         return new Coord(s2.x, Math.min(s1.y, s2.y) - s2.x + 1);
+    }
+
+
+    public JSONObject getSnapshot() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("width", width);
+        jsonObject.put("bias", bias);
+        jsonObject.put("textures", textures.getSnapshot());
+        jsonObject.put("class", this.getClass().getName());
+        jsonObject.put("xRoom1", room1.location.x);
+        jsonObject.put("yRoom1", room1.location.y);
+        jsonObject.put("xRoom2", room2.location.x);
+        jsonObject.put("yRoom2", room2.location.y);
+        return jsonObject;
+    }
+
+    public static Passage restoreFromSnapshot(JSONObject jsonObject, RoomSystem system) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Coord room1Location = new Coord(jsonObject.getInt("xRoom1"), jsonObject.getInt("yRoom1"));
+        Coord room2Location = new Coord(jsonObject.getInt("xRoom2"), jsonObject.getInt("yRoom2"));
+        Room room1 = null;
+        Room room2 = null;
+        for (Room room : system.rooms) {
+            if (room.location.equals(room1Location)) room1 = room;
+            if (room.location.equals(room2Location)) room2 = room;
+        }
+        return (Passage) Class
+                .forName(jsonObject.getString("class"))
+                .getConstructor(Room.class, Room.class, RoomTextures.class, int.class, int.class)
+                .newInstance(room1, room2,
+                        RoomTextures.restoreSnapshot(jsonObject.getJSONObject("textures")),
+                        jsonObject.getInt("width"),
+                        jsonObject.getInt("bias"));
+    }
+
+    public static Passage restoreSnapshot(JSONObject jsonObject, RoomSystem system) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return (Passage) Class
+                .forName(jsonObject.getString("class"))
+                .getMethod("restoreFromSnapshot", JSONObject.class, RoomSystem.class)
+                .invoke(null, jsonObject, system);
     }
 }

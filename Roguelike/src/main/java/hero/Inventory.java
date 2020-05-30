@@ -55,8 +55,8 @@ public class Inventory {
                 return;
             }
         }
-        for (int j = 0; j < 2; j++) {
-            for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < baggageSize.y; j++) {
+            for (int i = 0; i < baggageSize.x; i++) {
                 if (baggage[i][j] == null) {
                     baggage[i][j] = item.setBaggagePlace(new Coord(i, j));
                     return;

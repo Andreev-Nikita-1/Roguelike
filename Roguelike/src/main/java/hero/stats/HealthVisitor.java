@@ -1,5 +1,8 @@
 package hero.stats;
 
+/**
+ * Adds value to health
+ */
 public class HealthVisitor extends StatsVisitor {
     int toAdd;
 

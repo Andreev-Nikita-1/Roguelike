@@ -3,9 +3,15 @@ package objects;
 import map.MapOfObjects;
 import util.Pausable;
 
+/**
+ * Based class for all objects on map
+ */
 public abstract class MapObject {
     public MapOfObjects map;
 
+    /**
+     * Method called to attach object to map. Can be overriden for all successors.
+     */
     public MapObject attachToMap(MapOfObjects map) {
         this.map = map;
         if (this instanceof Pausable && map.game != null) {
@@ -23,6 +29,9 @@ public abstract class MapObject {
         return this;
     }
 
+    /**
+     * Deletes object from map.
+     */
     public void deleteFromMap() {
         if (this instanceof Pausable && map.game != null) {
             ((Pausable) this).deleteFromGame(map.game);

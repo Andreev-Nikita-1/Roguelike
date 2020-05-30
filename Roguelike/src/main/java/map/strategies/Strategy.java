@@ -1,13 +1,15 @@
 package map.strategies;
 
 import gameplayOptions.GameplayOption;
-import map.MapOfObjects;
 import objects.creatures.Mob;
 
+/**
+ * Class, representing strategy for mob behaviour
+ */
 public abstract class Strategy {
-    protected Mob owner;
+    Mob owner;
 
-    public Strategy(Mob owner) {
+    Strategy(Mob owner) {
         this.owner = owner;
     }
 

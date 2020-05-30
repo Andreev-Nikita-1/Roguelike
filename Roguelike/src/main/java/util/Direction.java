@@ -1,5 +1,9 @@
 package util;
 
+
+/**
+ * This class represents direction
+ */
 public enum Direction {
     UP, DOWN, LEFT, RIGHT;
 
@@ -15,6 +19,9 @@ public enum Direction {
         return this == UP || this == DOWN;
     }
 
+    /**
+     * Opposite direction
+     */
     public Direction opposite() {
         switch (this) {
             case UP:

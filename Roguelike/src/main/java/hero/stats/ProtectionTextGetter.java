@@ -10,6 +10,9 @@ import java.util.List;
 
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
 
+/**
+ * Create InventoryText, that is shown, when cursor is focused on protection
+ */
 public class ProtectionTextGetter extends TextVisitor {
     @Override
     public void visit(HeroStats stats) {

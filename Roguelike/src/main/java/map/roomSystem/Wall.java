@@ -5,8 +5,9 @@ import renderer.VisualPixel;
 import map.MapOfObjects;
 import util.Coord;
 
-import java.util.List;
-
+/**
+ * Class for wall
+ */
 public class Wall extends StaticObject {
     public Wall(Coord coord, VisualPixel[][] array) {
         super(coord, array, true);

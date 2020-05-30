@@ -2,8 +2,6 @@ package objects.stuff;
 
 import basicComponents.Game;
 import hero.stats.ExperienceVisitor;
-import hero.stats.HealthVisitor;
-import map.MapOfObjects;
 import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -15,6 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Experience, that increases hero experience when taken
+ */
 public class Experience extends Stuff implements TimeIntervalActor {
 
     private static final Color COLOR = new Color(100, 252, 151);
@@ -36,6 +37,9 @@ public class Experience extends Stuff implements TimeIntervalActor {
         this.value = value;
     }
 
+    /**
+     * When hero moves to coordinate of this, his experience increases by value
+     */
     @Override
     public synchronized void update() {
         if (location.equals(map.getHeroLocation())) {
@@ -63,6 +67,10 @@ public class Experience extends Stuff implements TimeIntervalActor {
     private double phase = 0;
     private double shift = 0;
 
+
+    /**
+     * Dynamic animation
+     */
     @Override
     public int act() {
         shift = 0.1 * Math.sin(phase);

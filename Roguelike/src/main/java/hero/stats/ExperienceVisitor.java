@@ -1,5 +1,8 @@
 package hero.stats;
 
+/**
+ * Adds value to experience and increases level in case there is enough experience
+ */
 public class ExperienceVisitor extends StatsVisitor {
     int toAdd;
 

@@ -18,6 +18,10 @@ import java.util.function.Function;
 
 import static util.Coord.*;
 
+/**
+ * This class represents darkness to hide coordinates, which is not achievable by hero view.
+ * Has two states: when hero candle is switched on, or switched off
+ */
 public class Lighting extends MapObject implements TimeIntervalActor, DynamicVisualObject {
 
     private double radius;
@@ -26,6 +30,9 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
 
     public volatile boolean lighted = true;
 
+    /**
+     * @param radius - how far can the hero see
+     */
     public Lighting(int radius) {
         super();
         this.radius = radius;
@@ -35,10 +42,16 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
         code = new SomeLightingCodeFromInternet(blocksLight, setVisible, getDistance);
     }
 
+    /**
+     * Sets the radius
+     */
     public void setRadius(double radius) {
         this.radius = radius;
     }
 
+    /**
+     * Sets the darkness level
+     */
     public void setDarknessLevel(double darknessLevel) {
         this.darknessLevel = darknessLevel;
     }
@@ -48,12 +61,18 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
     private double phase = 0;
     private double amplitude = 0.02;
 
+    /**
+     * Turns on darkness
+     */
     public void turnOnDarkness() {
         lighted = false;
         amplitude = 0.0;
         darknessLevel = 1.0;
     }
 
+    /**
+     * Turns off darkness
+     */
     public void turnOffDarkness() {
         lighted = true;
         amplitude = 0.02;
@@ -67,6 +86,10 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
         return 1 - ((1 - t) * (1 - darknessLevel));
     }
 
+
+    /**
+     * Returns darkness pixels of certain transparency depending on distance to hero
+     */
     @Override
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
         visible.clear();
@@ -101,6 +124,10 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
         return pixelMap;
     }
 
+    /**
+     * Manages the dynamic effects of lighting: blazing fire when candle is switch on,
+     * or eye adaptation to the dark when candles switches off
+     */
     @Override
     public int act() {
         if (lighted) {
@@ -132,5 +159,4 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
     public Game getGame() {
         return map.game;
     }
-
 }

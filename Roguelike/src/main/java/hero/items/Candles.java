@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
 
 
+/**
+ * Candles, which is responsible for lighting
+ */
 public class Candles extends Item implements TimeIntervalActor {
     private final Color COLOR = new Color(255, 215, 131);
 
@@ -26,6 +29,9 @@ public class Candles extends Item implements TimeIntervalActor {
 
     private AtomicBoolean active = new AtomicBoolean(true);
 
+    /**
+     * Takes one candle, when hero finds it
+     */
     public void takeOneCandle() {
         reservedCandles++;
     }
@@ -55,18 +61,27 @@ public class Candles extends Item implements TimeIntervalActor {
         this.switchedOn = switchedOn;
     }
 
+    /**
+     * Switches on
+     */
     private void switchOn() {
         switchedOn = true;
         ownerInventory.heroMap.lighting.turnOffDarkness();
         updateLighting();
     }
 
+    /**
+     * Switches off
+     */
     private void switchOff() {
         switchedOn = false;
         ownerInventory.heroMap.lighting.turnOnDarkness();
         updateLighting();
     }
 
+    /**
+     * Updates lighting
+     */
     private void updateLighting() {
         if (switchedOn) {
             if (reservedCandles == 0) {
@@ -81,6 +96,9 @@ public class Candles extends Item implements TimeIntervalActor {
         }
     }
 
+    /**
+     * Decrease canlde level. When it runs out, take another one if there is at least one reserved, or switch off light
+     */
     @Override
     public synchronized int act() {
         if (switchedOn) {
@@ -114,6 +132,9 @@ public class Candles extends Item implements TimeIntervalActor {
             return (char) (0x00D9 + x * 30);
     }
 
+    /**
+     * Switches light
+     */
     @Override
     public synchronized void use() {
         if (!switchedOn && currentLevel > 0) {
@@ -133,6 +154,9 @@ public class Candles extends Item implements TimeIntervalActor {
                         Arrays.asList(TEXT_COLOR, TEXT_COLOR)));
     }
 
+    /**
+     * When placed in baggage, it turns off
+     */
     @Override
     public void applyTakenEffect(boolean status) {
         if (status) {
@@ -144,6 +168,9 @@ public class Candles extends Item implements TimeIntervalActor {
         }
     }
 
+    /**
+     * Takes snapshot
+     */
     @Override
     public JSONObject getSnapshot() {
         return super.getSnapshot()
@@ -153,6 +180,9 @@ public class Candles extends Item implements TimeIntervalActor {
                 .put("switchedOn", switchedOn);
     }
 
+    /**
+     * Restore candles from snapshot
+     */
     public static Candles restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return (Candles) new Candles(
                 jsonObject.getInt("currentLevel"),

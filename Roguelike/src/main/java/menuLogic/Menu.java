@@ -6,6 +6,9 @@ import java.util.List;
 import static menuLogic.LinkAction.*;
 import static menuLogic.RealAction.*;
 
+/**
+ * Class representing menu, containing option names and actions
+ */
 public class Menu {
 
     public static Menu mainMenu = new Menu("MAIN MENU");
@@ -14,9 +17,12 @@ public class Menu {
     public static Menu youDied = new Menu("YOU DIED");
     public static Menu success = new Menu("SUCCESS");
 
+    /**
+     * Method that construct all menus with commands
+     */
     public static void InitializeMenus() {
-        mainMenu.addAction(newGameAction);
         mainMenu.addAction(loadGameAction);
+        mainMenu.addAction(newGameAction);
         mainMenu.addAction(optionsAction);
         mainMenu.addAction(exit);
 
@@ -41,11 +47,11 @@ public class Menu {
     private String title;
     private List<MenuAction> actions = new ArrayList<>();
 
-    public Menu(String title) {
+    Menu(String title) {
         this.title = title;
     }
 
-    public void addAction(MenuAction action) {
+    void addAction(MenuAction action) {
         this.actions.add(action);
     }
 

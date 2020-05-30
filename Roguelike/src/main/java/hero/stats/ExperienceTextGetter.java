@@ -4,11 +4,13 @@ import renderer.inventoryWindow.InventoryText;
 import renderer.inventoryWindow.InventoryWindow;
 import util.Util;
 
-import java.awt.*;
 import java.util.Arrays;
 
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
 
+/**
+ * Create InventoryText, that is shown, when cursor is focused on experience
+ */
 public class ExperienceTextGetter extends TextVisitor {
 
     @Override

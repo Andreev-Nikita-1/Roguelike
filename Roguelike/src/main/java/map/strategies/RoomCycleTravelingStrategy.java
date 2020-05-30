@@ -7,6 +7,10 @@ import objects.creatures.Mob;
 import java.util.Iterator;
 import java.util.List;
 
+
+/**
+ * Strategy, that leads mob along a given rout cyclically
+ */
 public class RoomCycleTravelingStrategy extends RoomSwitchingStrategy {
     public RoomCycleTravelingStrategy(Mob owner, List<Room> roomList, List<Passage> passageList) {
         super(owner, new RoomCycleIterator(roomList, passageList, true));
@@ -23,7 +27,7 @@ public class RoomCycleTravelingStrategy extends RoomSwitchingStrategy {
         private List<Passage> passageList;
         private Iterator<Passage> passageIterator;
 
-        public RoomCycleIterator(List<Room> roomList, List<Passage> passageList, boolean mustSwitchRooms) {
+        RoomCycleIterator(List<Room> roomList, List<Passage> passageList, boolean mustSwitchRooms) {
             this.mustSwitchRooms = mustSwitchRooms;
             this.roomList = roomList;
             this.passageList = passageList;

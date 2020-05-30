@@ -1,16 +1,17 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Background;
 import org.json.JSONObject;
 import renderer.VisualPixel;
 import util.Coord;
-import util.Direction;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Generates background, consisting of two background of different textures. Used for passages background
+ */
 public class FusedBackground extends StoneWallsTextures {
     private RoomTextures first;
     private RoomTextures second;

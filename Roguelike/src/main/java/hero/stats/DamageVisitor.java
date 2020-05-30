@@ -1,6 +1,8 @@
 package hero.stats;
 
-
+/**
+ * Performs, when hero takes damage. Decrease durability of shield and deletes it, if durability runs out
+ */
 public class DamageVisitor extends StatsVisitor {
     int damage;
 

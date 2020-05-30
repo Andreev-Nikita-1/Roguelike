@@ -5,6 +5,9 @@ import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Stats, containing information of hero
+ */
 public class HeroStats {
 
     Inventory ownerInventory;
@@ -24,7 +27,7 @@ public class HeroStats {
     int basicPower = 10;
 
 
-    public double getProtectionCoeffitent() {
+    double getProtectionCoeffitent() {
         return 1 + level / 10.0;
     }
 
@@ -46,11 +49,17 @@ public class HeroStats {
         this.luck = luck;
     }
 
+    /**
+     * Creates default stats
+     */
     public HeroStats() {
         this(0, 0, 100, new AtomicInteger(100),
                 100, 50, 50, 0);
     }
 
+    /**
+     * Accepts StatsVisitor
+     */
     public void accept(StatsVisitor visitor) {
         visitor.visit(this);
     }
@@ -76,11 +85,17 @@ public class HeroStats {
         return maxHealth;
     }
 
+    /**
+     * Power calculated by (basicPower + weaponPower) * powerCoefficent
+     */
     public int getPower() {
         if (ownerInventory.weapon == null) return (int) (getPowerCoeffitent() * basicPower);
         return (int) (getPowerCoeffitent() * (ownerInventory.weapon.value + basicPower));
     }
 
+    /**
+     * Protection calculated by (basicProtection + shieldProtection) * protectionCoefficent
+     */
     public int getProtection() {
         if (ownerInventory.shield == null) return (int) (getProtectionCoeffitent() * basicProtection);
         return (int) (getProtectionCoeffitent() * (ownerInventory.shield.value + basicProtection));
@@ -104,6 +119,9 @@ public class HeroStats {
     }
 
 
+    /**
+     * Takes stats snapshot
+     */
     public JSONObject getSnapshot() {
         return new JSONObject()
                 .put("level", level)
@@ -116,6 +134,9 @@ public class HeroStats {
                 .put("luck", luck);
     }
 
+    /**
+     * Restores stats from snapshot
+     */
     public static HeroStats restoreFromSnapshot(JSONObject jsonObject) {
         return new HeroStats(
                 jsonObject.getInt("level"),

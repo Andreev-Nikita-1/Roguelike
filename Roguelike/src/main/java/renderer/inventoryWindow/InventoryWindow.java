@@ -13,6 +13,9 @@ import java.awt.*;
 import static util.Direction.*;
 import static util.Util.convertColor;
 
+/**
+ * This class is responsible for drawing inventory window
+ */
 public class InventoryWindow {
     static Coord size = new Coord(28, 15);
     public static Coord textWindowSize = new Coord(15, 11);
@@ -38,6 +41,9 @@ public class InventoryWindow {
     private static char right = (char) 0x01F2;
 
 
+    /**
+     * Draws background
+     */
     private static void drawBackground(TextGUIGraphics graphics) {
         int x = (Controller.getTerminalSizeX() - size.x) / 2;
         int y = (Controller.getTerminalSizeY() - size.y) / 2;
@@ -66,6 +72,9 @@ public class InventoryWindow {
     }
 
 
+    /**
+     * Draws inventory window
+     */
     public static void draw(TextGUIGraphics graphics) {
         int x = (Controller.getTerminalSizeX() - size.x) / 2;
         int y = (Controller.getTerminalSizeY() - size.y) / 2;
@@ -78,10 +87,16 @@ public class InventoryWindow {
         textWindow.draw(graphics, terminal);
     }
 
+    /**
+     * Deactivates inventory wondow
+     */
     public static void deactivate() {
         currentWindow.active = false;
     }
 
+    /**
+     * Activates inventory wondow
+     */
     public static void activate() {
         currentWindow = stats;
         currentWindow.acceptCursor(new Coord(0, 0));
@@ -90,6 +105,9 @@ public class InventoryWindow {
         textWindow.setText(currentWindow.getText());
     }
 
+    /**
+     * Switches active window, depending on current active window, moving cursor direction and current cursor position
+     */
     private static boolean switchWindow(Direction direction, Coord cursorPosition) {
         Subwindow prevWindow = currentWindow;
         currentWindow.active = false;
@@ -160,6 +178,9 @@ public class InventoryWindow {
         return prevWindow != currentWindow;
     }
 
+    /**
+     * Moves cursor
+     */
     private static void moveCursor(Direction direction) {
         if (!currentWindow.tryShift(direction)) {
             if (!switchWindow(direction, currentWindow.cursorPosition)) {
@@ -170,6 +191,9 @@ public class InventoryWindow {
         textWindow.setText(currentWindow.getText());
     }
 
+    /**
+     * Moves selected item in given direction
+     */
     private static void moveItem(Direction direction) {
         if (currentWindow == baggage) {
             AppLogic.currentGame.hero.inventory.shiftItemInBaggage(currentWindow.cursorPosition, direction);
@@ -178,6 +202,9 @@ public class InventoryWindow {
         }
     }
 
+    /**
+     * Handles pressed key
+     */
     public static void handleKeyStroke(KeyStroke keyStroke) {
         boolean ctrl = keyStroke.isCtrlDown();
         boolean alt = keyStroke.isAltDown();

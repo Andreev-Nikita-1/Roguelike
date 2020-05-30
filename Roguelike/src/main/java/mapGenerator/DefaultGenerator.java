@@ -1,13 +1,11 @@
 package mapGenerator;
 
-import hero.Hero;
 import hero.items.Item;
 import hero.items.Shield;
 import hero.items.Weapon;
 import map.MapOfObjects;
 import map.roomSystem.*;
 import map.roomSystem.textures.*;
-import objects.Lighting;
 import objects.creatures.HeroObject;
 import objects.creatures.ScaryMonster;
 
@@ -16,7 +14,6 @@ import objects.stuff.ItemHolder;
 import util.Coord;
 import util.Util;
 
-import java.lang.reflect.InvocationTargetException;
 
 public class DefaultGenerator extends MapGenerator {
     private int mapXSize;

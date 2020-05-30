@@ -11,9 +11,12 @@ import java.util.List;
 
 import static util.Util.generate;
 
-public class RoomRandomTravelingStrategy extends RoomSwitchingStrategy {
+/**
+ * Strategy, that dictates to choose next room randomly
+ */
+class RoomRandomTravelingStrategy extends RoomSwitchingStrategy {
 
-    public RoomRandomTravelingStrategy(Mob owner) {
+    RoomRandomTravelingStrategy(Mob owner) {
         super(owner, new RoomRandomIterator(owner.map, owner.getLocation()));
     }
 
@@ -22,7 +25,7 @@ public class RoomRandomTravelingStrategy extends RoomSwitchingStrategy {
         private boolean mustSwitchRooms;
         private int width = 1;
 
-        public RoomRandomIterator(MapOfObjects map, Coord location) {
+        RoomRandomIterator(MapOfObjects map, Coord location) {
             Room room = map.closestRoom(location);
             currentRoom = room;
             mustSwitchRooms = false;

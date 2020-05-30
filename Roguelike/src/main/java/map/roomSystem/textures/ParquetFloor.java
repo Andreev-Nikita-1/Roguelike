@@ -1,6 +1,5 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Background;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -8,6 +7,9 @@ import util.Coord;
 
 import java.awt.*;
 
+/**
+ * Generates plank floor
+ */
 public class ParquetFloor extends StoneWallsTextures {
     private static final Color SYMBOL_COLOR = new Color(96, 42, 0);
     private static final Color BACKGROUND_COLOR = new Color(132, 90, 72);

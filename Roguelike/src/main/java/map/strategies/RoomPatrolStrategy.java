@@ -7,12 +7,15 @@ import util.Coord;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mob will walk around in one room
+ */
 public class RoomPatrolStrategy extends LocalTargetSwitchingStrategy {
 
     private List<Coord> knots;
     private int ind = 0;
 
-    public RoomPatrolStrategy(Mob owner) {
+    RoomPatrolStrategy(Mob owner) {
         super(owner, owner.map.closestRoom(owner.getLocation()).center());
         Room room = owner.map.closestRoom(owner.getLocation());
         knots = new ArrayList<>();

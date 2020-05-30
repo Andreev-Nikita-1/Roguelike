@@ -1,5 +1,8 @@
 package hero.stats;
 
+/**
+ * Performs, when hero attacks someone. Decrease durability of weapon and deletes it, if durability runs out
+ */
 public class AttackVisitor extends StatsVisitor {
     @Override
     public void visit(HeroStats stats) {

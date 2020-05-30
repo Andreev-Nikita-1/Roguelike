@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import util.AccessNeighbourhood;
 import util.Coord;
-import util.Pausable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -18,8 +17,14 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-
+/**
+ * This class manages all objects on map
+ */
 public class MapOfObjects {
+
+    /**
+     * Sets game for this map
+     */
     public void setGame(Game game) {
         this.game = game;
     }
@@ -50,18 +55,33 @@ public class MapOfObjects {
         }
     }
 
+    /**
+     * When someone wants to modify map state (e.g. mob moving), it locks map area lock
+     */
     public MapAreaLock getCoordLock(Coord coord) {
         return lockMap[coord.x / lockSize][coord.y / lockSize];
     }
 
+
+    /**
+     * If DependingObject object subscribes on coordinate, every time someone unlocks map area lock, associated with this
+     * coordinate, method "update" calls on the object
+     */
     public void subscribeOnCoord(DependingObject object, Coord coord) {
         getCoordLock(coord).subscribe(object);
     }
 
+
+    /**
+     * Unsubscribing in terms of previous method
+     */
     public void unsubscribeFromCoord(DependingObject object, Coord coord) {
         getCoordLock(coord).unsubscribe(object);
     }
 
+    /**
+     * Subscribing on area of curtain radius around coordinate
+     */
     public void subscribeOnCoords(DependingObject object, Coord coord, int radius) {
         for (int i = -radius; i <= radius + lockSize; i += lockSize) {
             for (int j = -radius; j <= radius + lockSize; j += lockSize) {
@@ -72,6 +92,9 @@ public class MapOfObjects {
         }
     }
 
+    /**
+     * Unsubscribing in terms of previous method
+     */
     public void unsubscribeFromCoords(DependingObject object, Coord coord, int radius) {
         for (int i = -radius; i <= radius + lockSize; i += lockSize) {
             for (int j = -radius; j <= radius + lockSize; j += lockSize) {
@@ -82,6 +105,9 @@ public class MapOfObjects {
         }
     }
 
+    /**
+     * Returns room, which interior contains coordinate, or closest room, if coordinate is located in passage between rooms
+     */
     public Room closestRoom(Coord coord) {
         Room room = roomSystem.findOutRoom(coord);
         if (room != null) {
@@ -100,10 +126,18 @@ public class MapOfObjects {
         }
     }
 
+
+    /**
+     * Returns hero location
+     */
     public Coord getHeroLocation() {
         return heroObject.getLocation();
     }
 
+
+    /**
+     * Places firm object on the given coordinate map
+     */
     public boolean setObject(MapObject object, Coord c) {
         if (objectsMap[c.x][c.y] != null) {
             return false;
@@ -112,6 +146,9 @@ public class MapOfObjects {
         return true;
     }
 
+    /**
+     * Deletes firm object from the map on the given coordinate
+     */
     public boolean unsetObject(MapObject object, Coord c) {
         if (objectsMap[c.x][c.y] != object) {
             return false;
@@ -120,30 +157,47 @@ public class MapOfObjects {
         return true;
     }
 
+    /**
+     * Returns object, located on given coordinate
+     */
     public MapObject getObject(Coord c) {
         return objectsMap[c.x][c.y];
     }
 
+    /**
+     * Returns true if given coordinate is taken by firm object
+     */
     public boolean isTaken(Coord c) {
         return getObject(c) != null;
     }
 
+    /**
+     * Returns true if given coordinate is inside map frame
+     */
     public boolean inside(Coord coord) {
         return coord.x < xSize && coord.x >= 0 && coord.y < ySize && coord.y >= 0;
     }
 
+    /**
+     * Returns true if object can be placed on given coordinate
+     */
     public boolean accesible(Coord coord) {
         return inside(coord) && !isTaken(coord);
     }
 
+
+    /**
+     * This class represents lock for map area, and responsible for notifying objects, which subscribed on this area,
+     * when unlocking
+     */
     public class MapAreaLock extends ReentrantLock {
         private Set<DependingObject> subscribers = new CopyOnWriteArraySet<>();
 
-        public void subscribe(DependingObject object) {
+        void subscribe(DependingObject object) {
             subscribers.add(object);
         }
 
-        public void unsubscribe(DependingObject object) {
+        void unsubscribe(DependingObject object) {
             subscribers.remove(object);
         }
 
@@ -156,7 +210,9 @@ public class MapOfObjects {
         }
     }
 
-
+    /**
+     * Returns snapshot of the map
+     */
     public JSONObject getSnapshot() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("xSize", xSize);
@@ -172,6 +228,10 @@ public class MapOfObjects {
         return jsonObject;
     }
 
+
+    /**
+     * Restores map from the snapshot. You must give Game object, for all dynamic objects be active when game starts
+     */
     public static MapOfObjects restoreFromSnapshot(JSONObject jsonObject, Game game) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         MapOfObjects map = new MapOfObjects(
                 jsonObject.getInt("xSize"),

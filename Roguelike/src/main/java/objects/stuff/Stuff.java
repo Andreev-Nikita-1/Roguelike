@@ -8,10 +8,13 @@ import objects.SnapshotableFromMap;
 import org.json.JSONObject;
 import util.Coord;
 
+/**
+ * Class, representing stuff, that can be taken by hero
+ */
 public abstract class Stuff extends MapObject implements DependingObject, DynamicVisualObject, SnapshotableFromMap {
     protected Coord location;
 
-    public Stuff(Coord location) {
+    Stuff(Coord location) {
         super();
         this.location = location;
     }

@@ -4,9 +4,13 @@ import basicComponents.AppLogic;
 import hero.items.Item;
 import util.Coord;
 
+
+/**
+ * Window for hero baggage
+ */
 public class BaggageWindow extends TileWindow {
 
-    public BaggageWindow(Coord location, Coord size) {
+    BaggageWindow(Coord location, Coord size) {
         super(location, size);
     }
 

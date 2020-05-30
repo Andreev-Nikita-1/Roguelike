@@ -1,9 +1,7 @@
 package objects.stuff;
 
 import basicComponents.Game;
-import hero.items.Item;
 import hero.stats.HealthVisitor;
-import map.MapOfObjects;
 import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -15,6 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Health, that increases hero health when taken
+ */
 public class Health extends Stuff implements TimeIntervalActor {
 
 
@@ -37,6 +38,9 @@ public class Health extends Stuff implements TimeIntervalActor {
         this.value = value;
     }
 
+    /**
+     * When hero moves to coordinate of this, his health increases by value
+     */
     @Override
     public synchronized void update() {
         if (location.equals(map.getHeroLocation())) {
@@ -64,6 +68,9 @@ public class Health extends Stuff implements TimeIntervalActor {
     private double phase = 0;
     private double shift = 0;
 
+    /**
+     * Dynamic animation
+     */
     @Override
     public int act() {
         shift = 0.1 * (1 + (Math.floor(phase) - phase));

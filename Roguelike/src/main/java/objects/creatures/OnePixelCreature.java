@@ -7,10 +7,11 @@ import util.Coord;
 import util.Direction;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+/**
+ * Class for creature
+ */
 public abstract class OnePixelCreature extends MapObject implements DynamicVisualObject, MovableObject, AttackingObject, DamageableObject {
 
     protected Coord location;
@@ -21,7 +22,7 @@ public abstract class OnePixelCreature extends MapObject implements DynamicVisua
         return location;
     }
 
-    public OnePixelCreature(Coord location) {
+    OnePixelCreature(Coord location) {
         super();
         this.location = location;
     }
@@ -39,6 +40,9 @@ public abstract class OnePixelCreature extends MapObject implements DynamicVisua
         map.unsetObject(this, location);
     }
 
+    /**
+     * Moving
+     */
     @Override
     public synchronized boolean move(Direction direction) {
         if (direction == null) {
@@ -62,6 +66,9 @@ public abstract class OnePixelCreature extends MapObject implements DynamicVisua
         return false;
     }
 
+    /**
+     * Returns only attacking coordinates. Has to be called by successors
+     */
     @Override
     public Map<Coord, VisualPixel> getPixels(Coord leftUp, Coord rightDown) {
         Map<Coord, VisualPixel> pixelMap = new HashMap<>();

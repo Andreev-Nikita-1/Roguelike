@@ -10,7 +10,9 @@ import java.util.List;
 
 import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
 
-
+/**
+ * Create InventoryText, that is shown, when cursor is focused on power
+ */
 public class PowerTextGetter extends TextVisitor {
     @Override
     public void visit(HeroStats stats) {

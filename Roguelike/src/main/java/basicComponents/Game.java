@@ -6,15 +6,11 @@ import gameplayOptions.UseItemOption;
 import hero.Hero;
 import hero.Inventory;
 import hero.items.Candles;
-import hero.items.Shield;
-import hero.items.Weapon;
 import hero.stats.HeroStats;
-import objects.stuff.Candle;
 import org.json.JSONObject;
 import hero.items.Item;
 import hero.stats.StaminaRestorer;
 import mapGenerator.DefaultGenerator;
-import mapGenerator.MapGenerator;
 import map.MapOfObjects;
 import renderer.MapRenderer;
 import util.Pausable;
@@ -24,43 +20,70 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
+/**
+ * Class, representong the game. Contains hero and map, and
+ */
 public class Game {
 
 
+    /**
+     * State of game
+     */
     public AtomicBoolean paused = new AtomicBoolean(true);
+    /**
+     * Objects, which have to be paused, when pausing game
+     */
     public List<Pausable> pausables = new CopyOnWriteArrayList<>();
 
+    /**
+     * Current map
+     */
     public MapOfObjects map;
+    /**
+     * Current map renderer
+     */
     public MapRenderer mapRenderer;
+    /**
+     * Current hero
+     */
     public Hero hero;
 
-    public void start() {
+    /**
+     * Method to start the game
+     */
+    void start() {
         paused.set(false);
         for (Pausable pausable : pausables) {
             pausable.start();
         }
     }
 
-    public void pause() {
+    /**
+     * Method to pause the game
+     */
+    void pause() {
         paused.set(true);
         for (Pausable pausable : pausables) {
             pausable.pause();
         }
     }
 
-
-    public void unpause() {
+    /**
+     * Method to unpause game
+     */
+    void unpause() {
         paused.set(false);
         for (Pausable pausable : pausables) {
             pausable.unpause();
         }
     }
 
-
-    public void kill() {
+    /**
+     * Method to kill the game
+     */
+    void kill() {
         paused.set(true);
         for (Pausable pausable : pausables) {
             pausable.kill();
@@ -68,7 +91,10 @@ public class Game {
         pausables.clear();
     }
 
-    public static JSONObject createNewGameSnapshot() {
+    /**
+     * Creates snapshot of new game
+     */
+    static JSONObject createNewGameSnapshot() {
         Game game = new Game();
         game.map = new DefaultGenerator(200, 200).generateMap();
         game.hero = new Hero(new Inventory(), new HeroStats());
@@ -76,7 +102,10 @@ public class Game {
         return game.getSnapshot();
     }
 
-    public void handleOption(GameplayOption option, long eventTine) {
+    /**
+     * Handles gameplay option
+     */
+    void handleOption(GameplayOption option, long eventTine) {
         if (option instanceof UseItemOption) {
             Item item = hero.inventory.taken[((UseItemOption) option).num];
             if (item != null) item.use();
@@ -97,13 +126,18 @@ public class Game {
         }
     }
 
-
+    /**
+     * Takes snapshot of game
+     */
     public JSONObject getSnapshot() {
         return new JSONObject()
                 .put("map", map.getSnapshot())
                 .put("hero", hero.getSnapshot());
     }
 
+    /**
+     * Returns game, restored from snapshot
+     */
     public static Game restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Game game = new Game();
         game.hero = Hero.restoreFromSnapshot(jsonObject.getJSONObject("hero"));

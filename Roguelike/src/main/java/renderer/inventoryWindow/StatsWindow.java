@@ -15,10 +15,13 @@ import static util.Direction.DOWN;
 import static util.Direction.UP;
 import static util.Util.convertColor;
 
+/**
+ * Window with stats
+ */
 public class StatsWindow extends CursorWindow {
 
 
-    public StatsWindow(Coord location) {
+    StatsWindow(Coord location) {
         super(location, new Coord(3, 5));
     }
 
@@ -86,7 +89,7 @@ public class StatsWindow extends CursorWindow {
                         i + inventoryWindowLocation.y + location.y, chars.get(i));
                 graphics.setForegroundColor(convertColor(InventoryText.TEXT_COLOR));
             }
-            int n=0;
+            int n = 0;
             switch (i) {
                 case 0:
                     n = AppLogic.currentGame.hero.stats.getLevel();

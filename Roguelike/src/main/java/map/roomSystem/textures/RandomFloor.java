@@ -1,10 +1,12 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Background;
 import renderer.VisualPixel;
 import util.Coord;
 
+/**
+ * Generates floor from VisualPixelGenerator, using seed
+ */
 public class RandomFloor extends StoneWallsTextures {
     private VisualPixelGenerator generator;
 

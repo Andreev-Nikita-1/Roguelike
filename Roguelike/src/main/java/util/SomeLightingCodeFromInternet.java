@@ -5,6 +5,10 @@ import util.Coord;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+
+/**
+ * This code was taken from internet, and is responsible for computing coordinates, which is achievable by view from center coordinate
+ */
 public class SomeLightingCodeFromInternet {
 
 

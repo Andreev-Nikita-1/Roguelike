@@ -10,6 +10,9 @@ import java.awt.*;
 import static util.Direction.*;
 import static util.Util.convertColor;
 
+/**
+ * Window, which cursor can move within rectangle tile, containing items
+ */
 public abstract class TileWindow extends CursorWindow {
     public static final Color EMPTY_SYMBOL_COLOR = new Color(40, 40, 40);
     public static final char EMPTY_SYMBOL = (char) 0x01F6;
@@ -18,6 +21,9 @@ public abstract class TileWindow extends CursorWindow {
         super(location, size);
     }
 
+    /**
+     * Returns item in given position
+     */
     abstract Item getItem(Coord position);
 
     @Override

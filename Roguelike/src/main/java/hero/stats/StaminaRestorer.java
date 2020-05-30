@@ -5,6 +5,9 @@ import util.TimeIntervalActor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Launches at the beginning, and gradually restores stamina
+ */
 public class StaminaRestorer implements TimeIntervalActor {
     private AtomicBoolean active = new AtomicBoolean(true);
     HeroStats stats;

@@ -7,14 +7,24 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+/**
+ * This interface is implemented by most of dynamic objects in game.
+ * Has the method "act", which performs some actions and returns time delay, that must pass before it is called again
+ */
 public interface TimeIntervalActor extends Runnable, Pausable {
 
     int act();
 
+    /**
+     * When active, object will be paused or unpaused depending on the game state
+     */
     void setActive(boolean active);
 
     boolean isActive();
 
+    /**
+     * Those, who implements this interface, have to have game, on which it depends
+     */
     Game getGame();
 
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() - 1);

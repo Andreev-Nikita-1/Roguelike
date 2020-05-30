@@ -5,6 +5,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * This class consists of pixelData instances
+ */
 public class VisualPixel {
 
     private List<PixelData> pixelDataList;
@@ -17,13 +20,16 @@ public class VisualPixel {
         pixelDataList = new ArrayList<>(Arrays.asList(pixelDatas));
     }
 
-    public List<PixelData> getPixelDataList() {
+    List<PixelData> getPixelDataList() {
         return pixelDataList;
     }
 
 
     private static Map<Integer, VisualPixel> attack = new HashMap<>();
 
+    /**
+     * Returns VisualPixel instance for attack, which transparency depends on attack power
+     */
     public static VisualPixel attack(int power) {
         if (!attack.containsKey(power)) {
             attack.put(power,
@@ -35,6 +41,10 @@ public class VisualPixel {
 
     private static Map<Double, VisualPixel> darkness = new HashMap<>();
 
+
+    /**
+     * Returns VisualPixel instance for darkness, which transparency depends on darkness level
+     */
     public static VisualPixel darkness(double transparency) {
         if (!darkness.containsKey(transparency)) {
             darkness.put(transparency, new VisualPixel(new PixelData(false, 20, Color.BLACK, transparency, ' ')));
@@ -44,6 +54,9 @@ public class VisualPixel {
 
     private Map<VisualPixel, VisualPixel> combinedWith = new HashMap<>();
 
+    /**
+     * Concatenate two lists of PixelData
+     */
     public VisualPixel combinedWith(VisualPixel other) {
         if (!combinedWith.containsKey(other)) {
             combinedWith.put(other, new VisualPixel(Stream
@@ -55,6 +68,9 @@ public class VisualPixel {
 
     private Map<Color, Map<Double, VisualPixel>> highlighted = new HashMap<>();
 
+    /**
+     * Return copy of this, highlighted with given color
+     */
     public VisualPixel highlighted(Color color, double transparency) {
         if (!highlighted.containsKey(color) || !highlighted.get(color).containsKey(transparency)) {
             if (!highlighted.containsKey(color)) {
@@ -72,6 +88,9 @@ public class VisualPixel {
 
     private Map<Double, VisualPixel> brighter = new HashMap<>();
 
+    /**
+     * Return copy of this, with brighter color
+     */
     public VisualPixel brighter(double brightness) {
         if (!brighter.containsKey(brightness)) {
             brighter.put(brightness,

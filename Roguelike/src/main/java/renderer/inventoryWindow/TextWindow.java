@@ -11,24 +11,30 @@ import static util.Coord.DOWN;
 import static util.Coord.RIGHT;
 import static util.Util.convertColor;
 
+/**
+ * Window, which draws text, provided by active cursor window
+ */
 public class TextWindow extends Subwindow {
-    public volatile InventoryText text;
+    private volatile InventoryText text;
 
     private int bias = 0;
     private int lengthLines = 0;
 
-    public void setText(InventoryText text) {
+    void setText(InventoryText text) {
         this.text = text;
     }
 
-    public void resetBias() {
+    void resetBias() {
         bias = 0;
     }
 
-    public TextWindow(Coord location, Coord size) {
+    TextWindow(Coord location, Coord size) {
         super(location, size);
     }
 
+    /**
+     * Draws title
+     */
     private void drawTitle(TextGUIGraphics graphics, Coord inventoryWindowLocation) {
         graphics.setForegroundColor(convertColor(InventoryText.TEXT_COLOR));
         int bias = (size.x - text.title.length()) / 2;
@@ -40,6 +46,9 @@ public class TextWindow extends Subwindow {
                 inventoryWindowLocation.y + location.y, text.title);
     }
 
+    /**
+     * Draws background
+     */
     private void drawBackground(TextGUIGraphics graphics, Coord inventoryWindowLocation) {
         graphics.setBackgroundColor(convertColor(BACKGROUND_COLOR));
         for (int i = 0; i < size.x; i++) {
@@ -50,6 +59,9 @@ public class TextWindow extends Subwindow {
         }
     }
 
+    /**
+     * Draws text if it fits into frame
+     */
     private void drawFullText(TextGUIGraphics graphics, Coord inventoryWindowLocation, List<List<String>> lines) {
         int colorCounter = 0;
         Coord leftUp = inventoryWindowLocation.shifted(location).shifted(DOWN);
@@ -66,6 +78,9 @@ public class TextWindow extends Subwindow {
         }
     }
 
+    /**
+     * Draws part of text, starting from line number bias
+     */
     private void drawPartText(TextGUIGraphics graphics, Coord inventoryWindowLocation, List<List<String>> lines) {
         int colorCounter = 0;
         for (int j = 0; j < bias; j++) {
@@ -89,6 +104,9 @@ public class TextWindow extends Subwindow {
 
     private static final Color grayArrow = new Color(40, 40, 40);
 
+    /**
+     * Draws two arrows for scrolling large text
+     */
     private void drawFlipping(TextGUIGraphics graphics, Coord inventoryWindowLocation) {
         Color colorUp = (bias == 0) ? grayArrow : InventoryText.TEXT_COLOR;
         graphics.setForegroundColor(convertColor(colorUp));
@@ -101,6 +119,9 @@ public class TextWindow extends Subwindow {
                 String.valueOf(down));
     }
 
+    /**
+     * Draws info
+     */
     private void drawInfo(TextGUIGraphics graphics, Coord inventoryWindowLocation) {
         for (int j = 0; j < text.info.size(); j++) {
             String[] words = text.info.get(j).split(" ");
@@ -116,6 +137,9 @@ public class TextWindow extends Subwindow {
         }
     }
 
+    /**
+     * Draws full text window
+     */
     @Override
     public void draw(TextGUIGraphics graphics, Coord inventoryWindowLocation) {
         drawBackground(graphics, inventoryWindowLocation);
@@ -141,11 +165,15 @@ public class TextWindow extends Subwindow {
     static char up = (char) 0x01F8;
     static char down = (char) 0x01F9;
 
-    public void pgUp() {
+    /**
+     * Scrolls text
+     */
+
+    void pgUp() {
         if (bias > 0) bias--;
     }
 
-    public void pgDn() {
+    void pgDn() {
         if (bias < lengthLines - (size.y - 2 - text.info.size())) bias++;
     }
 }

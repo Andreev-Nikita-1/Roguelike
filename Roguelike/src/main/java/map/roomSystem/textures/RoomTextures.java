@@ -1,10 +1,8 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Background;
 import map.roomSystem.Passage;
 import map.roomSystem.Wall;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import renderer.VisualPixel;
 import util.Coord;
@@ -14,12 +12,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Class, that creates walls and background in a certain style
+ */
 public abstract class RoomTextures {
 
     protected int seed;
     protected Random random;
 
-    public RoomTextures(int seed) {
+    RoomTextures(int seed) {
         this.seed = seed;
         random = new Random(seed);
     }
@@ -28,7 +29,10 @@ public abstract class RoomTextures {
 
     public abstract Background createBackground(Coord coord, int hight, int width);
 
-    public static VisualPixel[][] cutOutPassages(VisualPixel[][] array, Coord coord, boolean horizontal, List<Passage> passages) {
+    /**
+     * Creates wall, considering passages
+     */
+    static VisualPixel[][] cutOutPassages(VisualPixel[][] array, Coord coord, boolean horizontal, List<Passage> passages) {
         for (Passage passage : passages) {
             Coord relativeLocation = passage.location.relative(coord);
             if (horizontal) {
@@ -54,12 +58,18 @@ public abstract class RoomTextures {
         return array;
     }
 
+    /**
+     * Creates snapshot
+     */
     public JSONObject getSnapshot() {
         return new JSONObject()
                 .put("seed", seed)
                 .put("class", this.getClass().getName());
     }
 
+    /**
+     * Restores textures from snapshot by default method. Can be overriden (just defined) by the successors
+     */
     public static RoomTextures restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         return (RoomTextures) Class
                 .forName(jsonObject.getString("class"))
@@ -67,6 +77,9 @@ public abstract class RoomTextures {
                 .newInstance(jsonObject.getInt("seed"));
     }
 
+    /**
+     * Restores textures from snapshot. Invokes method "restoreFromSnapshot" on saved class.
+     */
     public static RoomTextures restoreSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return (RoomTextures) Class
                 .forName(jsonObject.getString("class"))

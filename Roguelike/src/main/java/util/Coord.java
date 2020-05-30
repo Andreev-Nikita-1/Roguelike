@@ -2,6 +2,9 @@ package util;
 
 import java.util.Objects;
 
+/**
+ * This class represents a coordinate, containing pair of ints
+ */
 public class Coord {
 
     public static final Coord UP = new Coord(0, -1);
@@ -23,12 +26,18 @@ public class Coord {
         this.y = coord.y;
     }
 
+    /**
+     * Shifts this to shift vector
+     */
     public Coord shift(Coord shift) {
         this.x += shift.x;
         this.y += shift.y;
         return this;
     }
 
+    /**
+     * Returns shifted copy of this
+     */
     public Coord shifted(Coord shift) {
         return new Coord(this.x + shift.x, this.y + shift.y);
     }
@@ -41,18 +50,31 @@ public class Coord {
         return shift(fromDirection(direction));
     }
 
+    /**
+     * Returns relative location of this, relatively to other (just defference between this and other)
+     */
     public Coord relative(Coord other) {
         return new Coord(this.x - other.x, this.y - other.y);
     }
 
+    /**
+     * Returns true, if you can do at most one move from other, to achieve this
+     */
     public boolean near(Coord other) {
         return x == other.x && Math.abs(y - other.y) <= 1 || y == other.y && Math.abs(x - other.x) <= 1;
     }
 
+
+    /**
+     * Returns true if this is located in rectangle, which has vertices leftUp and rightDown
+     */
     public boolean between(Coord leftUp, Coord rightDown) {
         return leftUp.x <= x && x <= rightDown.x && leftUp.y <= y && y <= rightDown.y;
     }
 
+    /**
+     * Returns the direction to move, for achieving the target directly
+     */
     public Direction properDirection(Coord target) {
         Coord vector = target.relative(this);
         if (Math.abs(vector.x) > Math.abs(vector.y)) {
@@ -72,6 +94,9 @@ public class Coord {
     }
 
 
+    /**
+     * Converts Direction object to Coord object
+     */
     public static Coord fromDirection(Direction direction) {
         switch (direction) {
             case UP:
@@ -86,14 +111,24 @@ public class Coord {
         return Coord.ZERO;
     }
 
+    /**
+     * Manhattan metrics
+     */
     public static Double manhattan(Coord coord) {
         return Double.valueOf(Math.abs(coord.x) + Math.abs(coord.y));
     }
+
+    /**
+     * L-infinity metrics
+     */
 
     public static Double lInftyNorm(Coord coord) {
         return Double.valueOf(Math.max(Math.abs(coord.x), Math.abs(coord.y)));
     }
 
+    /**
+     * Euclidean metrics
+     */
     public static Double euqlidean(Coord coord) {
         return Math.sqrt(coord.x * coord.x + coord.y * coord.y);
     }

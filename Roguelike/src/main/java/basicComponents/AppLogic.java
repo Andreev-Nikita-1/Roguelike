@@ -19,8 +19,11 @@ import static basicComponents.AppLogic.GameplayState.*;
 import static menuLogic.Menu.*;
 import static util.Util.tightNumber;
 
+/**
+ * Class, responsible for application logic
+ */
 public class AppLogic {
-    public static final String MAIN_WINDOW_TITLE = "GAME";
+    static final String MAIN_WINDOW_TITLE = "GAME";
     public static volatile boolean active = true;
     public static Game currentGame = new Game();
     public static GameplayState gameplayState = NOT_STARTED;
@@ -28,19 +31,28 @@ public class AppLogic {
     private AppLogic() {
     }
 
-    public static void openInventory() {
+    /**
+     * Opens inventory
+     */
+    static void openInventory() {
         currentGame.pause();
         InventoryWindow.activate();
         gameplayState = INVENTORY;
     }
 
-    public static void closeInventory() {
+    /**
+     * Closes inventory
+     */
+    static void closeInventory() {
         InventoryWindow.deactivate();
         currentGame.unpause();
         gameplayState = PLAYING;
     }
 
-    public static void handleKeyStrokeOnMap(KeyStroke keyStroke) {
+    /**
+     * Handles key, when on map or in inventory window
+     */
+    static void handleKeyStrokeOnMap(KeyStroke keyStroke) {
         if (gameplayState == PLAYING) {
             switch (keyStroke.getKeyType()) {
                 case Escape:
@@ -69,6 +81,9 @@ public class AppLogic {
         }
     }
 
+    /**
+     * Returns gameplay option from key
+     */
     private static GameplayOption getGameplayOption(KeyStroke keyStroke) {
         boolean ctrl = keyStroke.isCtrlDown();
         boolean alt = keyStroke.isAltDown();
@@ -103,25 +118,40 @@ public class AppLogic {
         }
     }
 
+    /**
+     * Ends game, when hero is killed
+     */
     public static void endGame() {
         currentGame.kill();
         gameplayState = KILLED;
         Controller.drawMenu(youDied);
     }
 
+    /**
+     * Continues game
+     */
     public static void applyContinueAction() {
         currentGame.unpause();
         gameplayState = PLAYING;
     }
 
+    /**
+     * Stops application
+     */
     public static void applyExitAction() {
         System.exit(0);
     }
 
+    /**
+     * Possible states of the application
+     */
     public enum GameplayState {
         NOT_STARTED, MAP_GENERATING, PLAYING, PAUSED, INVENTORY, KILLED
     }
 
+    /**
+     * Restores and starts game from snapshot
+     */
     private static void restoreGame(JSONObject jsonObject) {
         try {
             currentGame = Game.restoreFromSnapshot(jsonObject);
@@ -132,6 +162,9 @@ public class AppLogic {
         gameplayState = PLAYING;
     }
 
+    /**
+     * Starts new game
+     */
     public static void applyNewGame() {
         if (currentGame != null) {
             currentGame.kill();
@@ -139,7 +172,10 @@ public class AppLogic {
         restoreGame(Game.createNewGameSnapshot());
     }
 
-    public static void saveGame(String name) {
+    /**
+     * Saves game in file "name.json"
+     */
+    static void saveGame(String name) {
         String snapshot = currentGame.getSnapshot().toString();
         try {
             new File("src/main/resources/saves").mkdir();
@@ -151,7 +187,10 @@ public class AppLogic {
         }
     }
 
-    public static void loadGame(String name) {
+    /**
+     * Loads and restores game from save
+     */
+    static void loadGame(String name) {
         if (currentGame != null) {
             currentGame.kill();
         }
@@ -170,7 +209,10 @@ public class AppLogic {
         }
     }
 
-    public static List<SaveInfo> getSaves() {
+    /**
+     * Returns list of saves
+     */
+    static List<SaveInfo> getSaves() {
         List<SaveInfo> saveInfos = new ArrayList<>();
         File[] saves = new File("src/main/resources/saves").listFiles();
         for (File file : saves) {
@@ -189,12 +231,15 @@ public class AppLogic {
         return saveInfos;
     }
 
+    /**
+     * Class for save name and date
+     */
     public static class SaveInfo {
-        public long time;
-        public String date;
-        public String name;
+        long time;
+        String date;
+        String name;
 
-        public SaveInfo(long time, String date, String name) {
+        SaveInfo(long time, String date, String name) {
             this.time = time;
             this.date = date;
             this.name = name;

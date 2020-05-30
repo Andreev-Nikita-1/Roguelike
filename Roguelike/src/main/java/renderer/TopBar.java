@@ -12,16 +12,20 @@ import java.awt.*;
 
 import static util.Util.convertColor;
 
+
+/**
+ * This class draws the top bar
+ */
 public class TopBar {
     private static final Color BACKGROUND_COLOR = Color.BLACK;
     private static final Color HEALTH_COLOR = new Color(150, 0, 0);
     private static final Color STAMINA_COLOR = new Color(0, 50, 150);
 
-    private static char rightScale(double level) {
+    private static char scale(double level) {
         return (char) (0x037D + (int) (level * 49));
     }
 
-    public static void draw(TextGUIGraphics graphics) {
+    static void draw(TextGUIGraphics graphics) {
         int xMax = Controller.getTerminalSizeX();
         graphics.setBackgroundColor(convertColor(BACKGROUND_COLOR));
         for (int i = 0; i < xMax; i++) {
@@ -49,7 +53,7 @@ public class TopBar {
         double level = stats.getStamina() / (double) stats.getMaxStamina();
         if (level < 1 && level > 0) {
             graphics.setForegroundColor(convertColor(STAMINA_COLOR));
-            graphics.setCharacter(xMax / 2 - 3, 0, rightScale(level));
+            graphics.setCharacter(xMax / 2 - 3, 0, scale(level));
         }
     }
 }

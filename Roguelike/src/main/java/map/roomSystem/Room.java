@@ -8,14 +8,14 @@ import util.Coord;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static util.Direction.*;
 
-
+/**
+ * Class for room, containing its geometry, textures
+ */
 public class Room extends MapObject {
     public Coord location;
     public Coord rightDown;
@@ -55,14 +55,23 @@ public class Room extends MapObject {
         this(location, size, wallWidth, wallWidth, wallWidth, wallWidth, textures);
     }
 
-    public void addPassage(Passage passage) {
+    /**
+     * Adds passage
+     */
+    void addPassage(Passage passage) {
         passages.add(passage);
     }
 
+    /**
+     * Returns center of the room
+     */
     public Coord center() {
         return new Coord((location.x + rightDown.x) / 2, (location.y + rightDown.y) / 2);
     }
 
+    /**
+     * Attach walls and background to map, using RoomTextures
+     */
     @Override
     public Room attachToMap(MapOfObjects map) {
         super.attachToMap(map);
@@ -114,6 +123,9 @@ public class Room extends MapObject {
         return this;
     }
 
+    /**
+     * Returns passage to another room, if exists
+     */
     public Passage passageTo(Room targetRoom, int minWidth) {
         for (Passage passage : passages) {
             if ((passage.room1 == this && passage.room2 == targetRoom
@@ -125,6 +137,9 @@ public class Room extends MapObject {
         return null;
     }
 
+    /**
+     * Deletes walls and background
+     */
     @Override
     public void deleteFromMap() {
         upWall.deleteFromMap();
@@ -134,6 +149,9 @@ public class Room extends MapObject {
         background.deleteFromMap();
     }
 
+    /**
+     * Takes snapshot
+     */
     public JSONObject getSnapshot() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("x", location.x);
@@ -148,6 +166,9 @@ public class Room extends MapObject {
         return jsonObject;
     }
 
+    /**
+     * Restores from snapshot
+     */
     public static Room restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         return new Room(
                 new Coord(jsonObject.getInt("x"), jsonObject.getInt("y")),

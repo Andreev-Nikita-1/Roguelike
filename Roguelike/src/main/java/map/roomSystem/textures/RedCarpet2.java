@@ -1,6 +1,5 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Background;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -8,6 +7,9 @@ import util.Coord;
 
 import java.awt.*;
 
+/**
+ * Generates red carpet 1
+ */
 public class RedCarpet2 extends StoneWallsTextures {
     private static final Color BACKGROUND_COLOR = new Color(148, 60, 48);
     private static final Color SYMBOL_COLOR = new Color(144, 16, 0);

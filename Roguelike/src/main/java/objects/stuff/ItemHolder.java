@@ -1,8 +1,6 @@
 package objects.stuff;
 
 import hero.items.Item;
-import hero.stats.HealthVisitor;
-import map.MapOfObjects;
 import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -12,6 +10,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class, that contain item, that can be taken by hero
+ */
 public class ItemHolder extends Stuff {
     Item item;
     VisualPixel pixel;
@@ -23,6 +24,9 @@ public class ItemHolder extends Stuff {
                 true, 8, item.getColor(), 1, item.getSymbol()));
     }
 
+    /**
+     * Puts item to hero inventory, when hero moves to coordinate of this
+     */
     @Override
     public void update() {
         if (location.equals(map.getHeroLocation())) {

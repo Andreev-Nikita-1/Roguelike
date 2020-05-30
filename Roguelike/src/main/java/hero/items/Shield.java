@@ -12,6 +12,9 @@ import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
 import static util.Util.greenRedScale;
 import static util.Util.tightNumber;
 
+/**
+ * Shield, which affects protection
+ */
 public class Shield extends Equipment {
     private static final Color SYMBOL_COLOR = new Color(199, 84, 1);
     private static final char SHIELD1_SYMBOL = (char) 0x0135;
@@ -30,9 +33,6 @@ public class Shield extends Equipment {
         SHIELD1, SHIELD2, SHIELD3
     }
 
-    @Override
-    public void use() {
-    }
 
     @Override
     public InventoryText getText() {
@@ -63,11 +63,17 @@ public class Shield extends Equipment {
     }
 
 
+    /**
+     * Returns shield snapshot
+     */
     @Override
     public JSONObject getSnapshot() {
         return super.getSnapshot().put("type", shieldType.ordinal());
     }
 
+    /**
+     * Restores shield from snapshot
+     */
     public static Shield restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return (Shield) new Shield(jsonObject.getInt("maxDurability"),
                 jsonObject.getInt("value"),

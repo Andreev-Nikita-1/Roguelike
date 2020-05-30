@@ -5,6 +5,9 @@ import util.Direction;
 import static util.Direction.*;
 import static gameplayOptions.DirectedOption.Action.*;
 
+/**
+ * Directed option, e.g. walking or attacking
+ */
 public class DirectedOption extends GameplayOption {
     public Direction direction;
     public Action action;

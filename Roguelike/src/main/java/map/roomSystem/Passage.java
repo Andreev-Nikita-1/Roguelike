@@ -11,6 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 
 import static util.Direction.*;
 
+/**
+ * Class for passage between rooms
+ */
 public abstract class Passage extends MapObject {
 
     public Direction direction;
@@ -25,9 +28,17 @@ public abstract class Passage extends MapObject {
     protected Background background;
 
 
+    /**
+     * Returns true, if mob can go through it
+     */
     public abstract boolean passable(int width);
 
-    public void setWidestPassage() {
+
+    /**
+     * Sets maximal width, equals to length of common wall of twe rooms,
+     * location, and length of the passage
+     */
+    void setWidestPassage() {
         bias = 0;
         Coord commonLengthY = segmentsIntersection(
                 new Coord(room1.location.y, room1.rightDown.y),
@@ -71,6 +82,9 @@ public abstract class Passage extends MapObject {
         }
     }
 
+    /**
+     * Creates passage with maximal width
+     */
     public Passage(Room room1, Room room2, RoomTextures textures) {
         super();
         this.room1 = room1;
@@ -81,11 +95,17 @@ public abstract class Passage extends MapObject {
         setWidestPassage();
     }
 
+    /**
+     * Creates passage with given width and bias, counted from the start of common wall in the direction of increasing coordinate
+     */
     public Passage(Room room1, Room room2, RoomTextures textures, int width, int bias) {
         this(room1, room2, textures);
         setWidthAndBias(width, bias);
     }
 
+    /**
+     * Attaches background
+     */
     @Override
     public Passage attachToMap(MapOfObjects map) {
         super.attachToMap(map);
@@ -97,18 +117,27 @@ public abstract class Passage extends MapObject {
         return this;
     }
 
+    /**
+     * Deletes background
+     */
     @Override
     public void deleteFromMap() {
         background.deleteFromMap();
         super.deleteFromMap();
     }
 
+    /**
+     * Returns coordinate of right down corner of the passage
+     */
     public Coord rightDown() {
         Coord shift = direction.horizontal() ? new Coord(length - 1, width - 1) : new Coord(width - 1, length - 1);
         return location.shifted(shift);
     }
 
-    public void setWidthAndBias(int width, int bias) {
+    /**
+     * Sets width and bias
+     */
+    void setWidthAndBias(int width, int bias) {
         setWidestPassage();
         this.width = width;
         this.bias = bias;
@@ -116,7 +145,10 @@ public abstract class Passage extends MapObject {
         location.shift(shift);
     }
 
-    public Direction directedTo(Room room) {
+    /**
+     * Return the direction, in which passage leads from given room
+     */
+    Direction directedTo(Room room) {
         if (room1 == room) {
             return direction;
         } else if (room2 == room) {
@@ -126,6 +158,9 @@ public abstract class Passage extends MapObject {
         }
     }
 
+    /**
+     * Returns coordinate in room interior, which is last before entering the passage
+     */
     public Coord entryLocation(Room room) {
         Coord shiftWidth = direction.horizontal() ? new Coord(-1, width / 2) : new Coord(width / 2, -1);
         Coord shiftLength = direction.horizontal() ? new Coord(length + 1, 0) : new Coord(0, length + 1);
@@ -137,6 +172,9 @@ public abstract class Passage extends MapObject {
     }
 
 
+    /**
+     * Returns room, to the other side of this passage
+     */
     public Room otherSideRoom(Room room) {
         if (room1 == room) {
             return room2;
@@ -144,6 +182,7 @@ public abstract class Passage extends MapObject {
             return room1;
         }
     }
+
 
     private static Coord segmentsIntersection(Coord s1, Coord s2) {
         if (s1.y < s2.x || s2.y < s1.x) {
@@ -158,6 +197,9 @@ public abstract class Passage extends MapObject {
     }
 
 
+    /**
+     * Takes snapshot
+     */
     public JSONObject getSnapshot() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("width", width);
@@ -171,6 +213,9 @@ public abstract class Passage extends MapObject {
         return jsonObject;
     }
 
+    /**
+     * Restores default passage from snapshot. Can be overriden (just defined) by the successors
+     */
     public static Passage restoreFromSnapshot(JSONObject jsonObject, RoomSystem system) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Coord room1Location = new Coord(jsonObject.getInt("xRoom1"), jsonObject.getInt("yRoom1"));
         Coord room2Location = new Coord(jsonObject.getInt("xRoom2"), jsonObject.getInt("yRoom2"));
@@ -189,6 +234,9 @@ public abstract class Passage extends MapObject {
                         jsonObject.getInt("bias"));
     }
 
+    /**
+     * Restores passage from snapshot. Invokes method "restoreFromSnapshot" on saved class.
+     */
     public static Passage restoreSnapshot(JSONObject jsonObject, RoomSystem system) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return (Passage) Class
                 .forName(jsonObject.getString("class"))

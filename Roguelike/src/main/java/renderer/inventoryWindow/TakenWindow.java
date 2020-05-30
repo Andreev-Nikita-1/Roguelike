@@ -4,8 +4,11 @@ import basicComponents.AppLogic;
 import hero.items.Item;
 import util.Coord;
 
+/**
+ * Window with four taken items
+ */
 public class TakenWindow extends TileWindow {
-    public TakenWindow(Coord location) {
+    TakenWindow(Coord location) {
         super(location, new Coord(4, 1));
     }
 

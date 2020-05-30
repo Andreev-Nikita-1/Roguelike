@@ -1,6 +1,5 @@
 package objects.stuff;
 
-import hero.stats.HealthVisitor;
 import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -11,14 +10,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * One candle, that can be taken by hero
+ */
 public class Candle extends Stuff {
-    public static final VisualPixel SYMBOL = new VisualPixel(new PixelData(true,
+    static final VisualPixel SYMBOL = new VisualPixel(new PixelData(true,
             8, new Color(255, 215, 131), 1, (char) 0x00F4));
 
     public Candle(Coord location) {
         super(location);
     }
 
+    /**
+     * Method called, when hero moves to the coordinate of this
+     */
     @Override
     public void update() {
         if (location.equals(map.getHeroLocation())) {

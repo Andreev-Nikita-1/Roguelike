@@ -5,6 +5,9 @@ import renderer.VisualPixel;
 
 import java.awt.*;
 
+/**
+ * Generates stone floor
+ */
 public class StoneFloor1 extends RandomFloor {
     private static final Color BACK_COLOR = new Color(90, 66, 50);
     private static final Color SYMBOL_COLOR = new Color(130, 92, 84);

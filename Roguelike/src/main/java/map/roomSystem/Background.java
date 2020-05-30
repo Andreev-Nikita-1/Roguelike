@@ -7,6 +7,9 @@ import renderer.VisualPixel;
 
 import java.util.Map;
 
+/**
+ * Class for background. Only applies to a specific rectangle, not whole map
+ */
 public class Background extends StaticObject {
 
     public Background(Coord location, VisualPixel[][] array) {

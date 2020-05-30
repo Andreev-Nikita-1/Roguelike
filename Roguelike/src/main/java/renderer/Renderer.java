@@ -14,11 +14,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ * Class, responsible for rendering map and inventory
+ */
 public class Renderer {
 
     public static volatile int page = 0;
 
+    /**
+     * Draws picture
+     */
     public static void render(TextGUIGraphics graphics) {
         switch (AppLogic.gameplayState) {
             case NOT_STARTED:
@@ -38,6 +43,9 @@ public class Renderer {
         }
     }
 
+    /**
+     * Draws start background
+     */
     private static void drawStartPicture(TextGUIGraphics graphics) {
         Color SYMBOL_COLOR = new Color(40, 40, 40);
         Color BACK_COLOR = new Color(20, 20, 20);

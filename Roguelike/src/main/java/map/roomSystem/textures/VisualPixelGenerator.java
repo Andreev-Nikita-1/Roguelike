@@ -6,11 +6,14 @@ import util.Util;
 
 import java.awt.Color;
 
+/**
+ * Generate VisualPixel with given background color, foreground color, weights, and range of character numbers
+ */
 public class VisualPixelGenerator {
     double[] weights;
     VisualPixel[] pixels;
 
-    public VisualPixelGenerator(VisualPixel back, Color color, int start, int level, int n, double[] weights) {
+    VisualPixelGenerator(VisualPixel back, Color color, int start, int level, int n, double[] weights) {
         this.weights = weights;
         pixels = new VisualPixel[n];
         for (int i = 0; i < n; i++) {
@@ -18,8 +21,10 @@ public class VisualPixelGenerator {
         }
     }
 
-
-    public VisualPixel generate(double random) {
+    /**
+     * Generates VisualPixel with given random number
+     */
+    VisualPixel generate(double random) {
         return Util.generate(weights, pixels, random);
     }
 }

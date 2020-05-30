@@ -3,7 +3,6 @@ package hero;
 import basicComponents.Game;
 import hero.items.*;
 import map.MapOfObjects;
-import objects.stuff.Candle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import util.Coord;
@@ -15,11 +14,26 @@ import java.lang.reflect.InvocationTargetException;
 import static util.Coord.LEFT;
 import static util.Coord.UP;
 
+/**
+ * Class for inventory. Contains all found items
+ */
 public class Inventory {
     public static final Coord baggageSize = new Coord(8, 5);
+    /**
+     * Baggage contains items, that is not taken
+     */
     public Item[][] baggage = new Item[baggageSize.x][baggageSize.y];
+    /**
+     * Taken items can ve used by hero or affects stats
+     */
     public Item[] taken = new Item[4];
+    /**
+     * Hero weapon
+     */
     public Weapon weapon;
+    /**
+     * Hero shield
+     */
     public Shield shield;
 
     public MapOfObjects heroMap;
@@ -29,6 +43,9 @@ public class Inventory {
         heroMap = map;
     }
 
+    /**
+     * Places item to baggage
+     */
     public void take(Item item) {
         item.setOwnerInventory(this);
         if (item.baggagePlace != null) {
@@ -48,6 +65,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Swaps two next items in baggage
+     */
     public void shiftItemInBaggage(Coord current, Direction direction) {
         Item item = baggage[current.x][current.y];
         if (item == null) {
@@ -64,6 +84,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Swaps two next taken items
+     */
     public void shiftTakenItems(int num, Direction direction) {
         if (taken[num] == null
                 || direction.vertical()
@@ -75,6 +98,9 @@ public class Inventory {
         taken[num + 1] = temp;
     }
 
+    /**
+     * Takes item from baggage
+     */
     public void putOnItemInBaggage(Coord c) {
         Item item = baggage[c.x][c.y];
         if (item == null) {
@@ -107,6 +133,9 @@ public class Inventory {
         item.applyTakenEffect(true);
     }
 
+    /**
+     * Puts taken item in baggage
+     */
     public void takeOffItemInTaken(int num) {
         Item item = taken[num];
         if (item != null) {
@@ -116,6 +145,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Puts taken weapon to baggage
+     */
     public void takeOffWeapon() {
         if (weapon != null) {
             take(weapon);
@@ -124,6 +156,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Puts taken shield to baggage
+     */
     public void takeOffShield() {
         if (shield != null) {
             take(shield);
@@ -132,6 +167,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Includes all pausable items to the game
+     */
     public void includeToGame(Game game) {
         for (Item item : taken) {
             if (item instanceof Pausable) {
@@ -153,6 +191,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Takes candle
+     */
     public void takeCandle() {
         for (Item item : taken) {
             if (item instanceof Candles) {
@@ -168,6 +209,9 @@ public class Inventory {
         }
     }
 
+    /**
+     * Takes snapshot of inventory, recursively taking snapshots of items
+     */
     public JSONObject getSnapshot() {
         JSONObject jsonObject = new JSONObject();
         JSONArray takenJson = new JSONArray();
@@ -190,12 +234,19 @@ public class Inventory {
     }
 
 
+    /**
+     * Restores inventory from snapshot
+     */
     public static Inventory restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Inventory inventory = new Inventory();
-        if (!jsonObject.get("weapon").toString().equals("empty"))
+        if (!jsonObject.get("weapon").toString().equals("empty")) {
             inventory.weapon = Weapon.restoreFromSnapshot(jsonObject.getJSONObject("weapon"));
-        if (!jsonObject.get("shield").toString().equals("empty"))
+            inventory.weapon.setOwnerInventory(inventory);
+        }
+        if (!jsonObject.get("shield").toString().equals("empty")) {
             inventory.shield = Shield.restoreFromSnapshot(jsonObject.getJSONObject("shield"));
+            inventory.shield.setOwnerInventory(inventory);
+        }
         for (int i = 0; i < inventory.taken.length; i++) {
             String itemStr = jsonObject.getJSONArray("taken").get(i).toString();
             if (!itemStr.equals("empty")) {

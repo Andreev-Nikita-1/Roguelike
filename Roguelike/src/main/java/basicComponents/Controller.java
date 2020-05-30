@@ -8,7 +8,6 @@ import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
@@ -17,20 +16,19 @@ import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import menuLogic.Menu;
 import menuLogic.MenuAction;
 import renderer.Renderer;
-import util.TimeIntervalActor;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
 import static menuLogic.Menu.*;
 
+/**
+ * Implementation of ViewController
+ */
 public class Controller {
-
     private static SwingTerminalFrame terminal;
     private static WindowBasedTextGUI gui;
     private static Window mainWindow;
@@ -49,7 +47,7 @@ public class Controller {
         return gui.getScreen().getTerminalSize().getRows();
     }
 
-    public static void initialize() throws IOException, FontFormatException {
+    private static void initialize() throws IOException, FontFormatException {
         terminal = new SwingTerminalFrame(AppLogic.MAIN_WINDOW_TITLE,
                 new TerminalSize(30, 13),
                 null,
@@ -67,18 +65,27 @@ public class Controller {
         component = new GameplayComponent();
     }
 
+    /**
+     * Sets default font size
+     */
     public static void zoomDefault() {
         fontSize = fontSizeDefault;
         update();
         drawMenu(optionsMenu);
     }
 
+    /**
+     * Increases font size
+     */
     public static void zoomIn() {
         fontSize += 5;
         update();
         drawMenu(optionsMenu);
     }
 
+    /**
+     * Decreases font size
+     */
     public static void zoomOut() {
         if (fontSize > 5)
             fontSize -= 5;
@@ -86,6 +93,9 @@ public class Controller {
         drawMenu(optionsMenu);
     }
 
+    /**
+     * Updates gui, when app starts, or when font size is changed
+     */
     public static void update() {
         try {
             AppLogic.active = true;
@@ -100,6 +110,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Cycle for updating screen and processing input
+     */
     public static void run() {
         while (AppLogic.active) {
             AppLogic.active = false;
@@ -115,8 +128,11 @@ public class Controller {
     }
 
     public static Menu lastMenu;
-    public static Menu currentMenu;
+    static Menu currentMenu;
 
+    /**
+     * Draws menu
+     */
     public static void drawMenu(Menu menu) {
         if (menu != currentMenu) {
             lastMenu = currentMenu;
@@ -133,6 +149,9 @@ public class Controller {
         gui.addWindow(dialog);
     }
 
+    /**
+     * Draws dialog for inputting save name
+     */
     public static void drawSaveGameDialog() {
         TextInputDialogBuilder builder = new TextInputDialogBuilder();
         builder.setTitle("SAVE GAME");
@@ -150,6 +169,9 @@ public class Controller {
         }).start();
     }
 
+    /**
+     * Draws dialog for choosing save game
+     */
     public static void drawFileDialog() {
         var list = AppLogic.getSaves();
         Table<String> table = new Table<>("save", "time");
@@ -172,6 +194,9 @@ public class Controller {
         });
     }
 
+    /**
+     * Class for component with map
+     */
     static class GameplayComponent extends AbstractInteractableComponent<GameplayComponent> {
 
         @Override
@@ -186,6 +211,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Class for rendering previous component
+     */
     static class MapRenderer implements InteractableRenderer<GameplayComponent> {
 
         @Override

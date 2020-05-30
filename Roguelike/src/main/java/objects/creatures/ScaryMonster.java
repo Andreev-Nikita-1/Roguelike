@@ -3,17 +3,12 @@ package objects.creatures;
 import basicComponents.Game;
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
-import hero.items.Weapon;
-import map.*;
 import map.strategies.CombinedStrategy;
-import map.strategies.RoomRandomTravelingStrategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
-import objects.SnapshotableFromMap;
 import objects.stuff.Experience;
 import objects.stuff.Health;
-import objects.stuff.ItemHolder;
 import objects.stuff.Stuff;
 import org.json.JSONObject;
 import renderer.PixelData;
@@ -24,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
-import static gameplayOptions.DirectedOption.WALK_LEFT;
 import static java.awt.Color.BLACK;
 
 
@@ -34,25 +28,25 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
     private Type type;
 
 
-    public static final VisualPixel GHOST_1 = new VisualPixel(
+    private static final VisualPixel GHOST_1 = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x017C));
-    public static final VisualPixel GHOST_2 = new VisualPixel(
+    private static final VisualPixel GHOST_2 = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x017D));
-    public static final VisualPixel GHOST_3 = new VisualPixel(
+    private static final VisualPixel GHOST_3 = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x017E));
-    public static final VisualPixel GHOST_TRANSPARENT = new VisualPixel(
+    private static final VisualPixel GHOST_TRANSPARENT = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x017F));
-    public static final VisualPixel GHOST_LITTLE = new VisualPixel(
+    private static final VisualPixel GHOST_LITTLE = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x0180));
-    public static final VisualPixel GRIM_REAPER_1 = new VisualPixel(
+    private static final VisualPixel GRIM_REAPER_1 = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x0181));
-    public static final VisualPixel GRIM_REAPER_2 = new VisualPixel(
+    private static final VisualPixel GRIM_REAPER_2 = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x0182));
-    public static final VisualPixel GRIM_REAPER_3 = new VisualPixel(
+    private static final VisualPixel GRIM_REAPER_3 = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x0183));
-    public static final VisualPixel IMP = new VisualPixel(
+    private static final VisualPixel IMP = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x0184));
-    public static final VisualPixel DEMENTOR = new VisualPixel(
+    private static final VisualPixel DEMENTOR = new VisualPixel(
             new PixelData(true, 10, BLACK, 1, (char) 0x0185));
 
 
@@ -60,6 +54,9 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         GHOST_1, GHOST_2, GHOST_3, GHOST_TRANSPARENT, GHOST_LITTLE, GRIM_REAPER_1, GRIM_REAPER_2, GRIM_REAPER_3, IMP, DEMENTOR
     }
 
+    /**
+     * Return new instance of given type
+     */
     public static ScaryMonster newMonster(Coord coord, Type type) {
         ScaryMonster answer = null;
         switch (type) {
@@ -114,6 +111,10 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         strategy = new CombinedStrategy(this);
     }
 
+
+    /**
+     * Attack method
+     */
     @Override
     public void attack(Direction direction) {
         Coord c = location.shifted(direction);
@@ -127,6 +128,10 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         }
     }
 
+
+    /**
+     * Die method
+     */
     @Override
     public synchronized void die() {
         Lock lock = map.getCoordLock(location);
@@ -139,6 +144,9 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         }
     }
 
+    /**
+     * Stuff, that appears when mob is slayed
+     */
     private Stuff generateItem() {
         if (Math.random() < 0.5) {
             return new Experience(location, (int) (Math.random() * 3 * power));
@@ -147,6 +155,9 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         }
     }
 
+    /**
+     * Acting, according to strategy
+     */
     @Override
     public int act() {
         GameplayOption action = strategy.getAction();
@@ -173,6 +184,9 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         return map.game;
     }
 
+    /**
+     * Taking damage method
+     */
     @Override
     public void takeDamage(int damage) {
         health.addAndGet(-damage);

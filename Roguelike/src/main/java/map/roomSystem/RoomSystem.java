@@ -6,12 +6,13 @@ import util.Coord;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.*;
 
+/**
+ * Class, containing information about rooms and passages between them
+ */
 public class RoomSystem extends MapObject {
 
     List<Room> rooms = new ArrayList<>();
@@ -21,14 +22,23 @@ public class RoomSystem extends MapObject {
         super();
     }
 
+    /**
+     * Adds room
+     */
     public void addRoom(Room room) {
         rooms.add(room);
     }
 
+    /**
+     * Adds passage
+     */
     public void addPassage(Passage passage) {
         passages.add(passage);
     }
 
+    /**
+     * Return room, which interior contains given coordinate
+     */
     public Room findOutRoom(Coord c) {
         for (Room room : rooms) {
             if (c.between(room.location, room.rightDown)) {
@@ -38,6 +48,9 @@ public class RoomSystem extends MapObject {
         return null;
     }
 
+    /**
+     * Return passage, which interior contains given coordinate
+     */
     public Passage findOutPassage(Coord c) {
         for (Passage passage : passages) {
             if (c.between(passage.location, passage.rightDown())) {
@@ -47,6 +60,9 @@ public class RoomSystem extends MapObject {
         return null;
     }
 
+    /**
+     * When RoomSystem attaches to map, all its rooms, passages, and their walls and backgrounds attache to map
+     */
     @Override
     public RoomSystem attachToMap(MapOfObjects map) {
         super.attachToMap(map);
@@ -60,6 +76,9 @@ public class RoomSystem extends MapObject {
         return this;
     }
 
+    /**
+     * Analogically to the previous
+     */
     @Override
     public void deleteFromMap() {
         for (Room room : rooms) {
@@ -71,6 +90,9 @@ public class RoomSystem extends MapObject {
     }
 
 
+    /**
+     * Takes snapshot of all room system, taking snapshots of rooms and passages recursively
+     */
     public JSONObject getSnapshot() {
         JSONObject jsonObject = new JSONObject();
         JSONArray roomsArray = new JSONArray();
@@ -86,6 +108,9 @@ public class RoomSystem extends MapObject {
         return jsonObject;
     }
 
+    /**
+     * Analogically to the previous, but restoring
+     */
     public static RoomSystem restoreSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         RoomSystem roomSystem = new RoomSystem();
         JSONArray roomsArray = jsonObject.getJSONArray("rooms");

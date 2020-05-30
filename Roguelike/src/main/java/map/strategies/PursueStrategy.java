@@ -5,11 +5,17 @@ import gameplayOptions.GameplayOption;
 import objects.creatures.Mob;
 import util.Direction;
 
-public class PersueStrategy extends Strategy {
-    public PersueStrategy(Mob owner) {
+/**
+ * Strategy, that dictates to pursue hero, when his AccessNeighbourhood allows to get him
+ */
+public class PursueStrategy extends Strategy {
+    PursueStrategy(Mob owner) {
         super(owner);
     }
 
+    /**
+     * Returns direction, provided by heroAccessNeighbourhood, if it is not null, NOTHING otherwise
+     */
     @Override
     public GameplayOption getAction() {
         Direction direction = owner.map.heroAccessNeighbourhood.accessibleDirection(owner.getLocation());

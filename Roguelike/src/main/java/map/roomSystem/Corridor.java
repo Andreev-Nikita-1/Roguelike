@@ -1,8 +1,10 @@
 package map.roomSystem;
 
-import map.MapOfObjects;
 import map.roomSystem.textures.RoomTextures;
 
+/**
+ * Empty corridor, almost the same as passage
+ */
 public class Corridor extends Passage {
 
     @Override

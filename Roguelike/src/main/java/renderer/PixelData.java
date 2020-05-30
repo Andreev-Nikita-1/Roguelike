@@ -2,6 +2,9 @@ package renderer;
 
 import java.awt.Color;
 
+/**
+ * This class contains basic visual data, for getting map image
+ */
 public class PixelData implements Comparable<PixelData> {
     public final boolean isSymbol;
     public final int level;
@@ -21,6 +24,12 @@ public class PixelData implements Comparable<PixelData> {
         this.transparency = transparency;
         this.symbol = symbol;
     }
+
+
+    /**
+     * Some visual effects
+     */
+
 
     public PixelData layOn(Color color, double transparency) {
         int r = (int) ((double) this.color.getRed() * (1 - transparency) + (double) color.getRed() * transparency);

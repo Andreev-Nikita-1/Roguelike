@@ -14,8 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static map.roomSystem.Door.DoorState.*;
-import static renderer.VisualPixel.*;
 
+/**
+ * Class for door
+ */
 public class Door extends Passage implements DynamicVisualObject, InteractiveObject {
     private static Color DOOR_COLOR = new Color(21, 8, 3);
     private static final VisualPixel DOOR_CLOSED = new VisualPixel(
@@ -26,15 +28,22 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
             new PixelData(true, 5, DOOR_COLOR, 1, (char) 0x01E5));
 
 
-    protected Coord doorCoord;
-    protected DoorState state = CLOSED;
-    protected boolean highlighted = false;
-    protected int depth;
+    Coord doorCoord;
+    DoorState state = CLOSED;
+    boolean highlighted = false;
+    int depth;
 
+    /**
+     * Returns true if open
+     */
     @Override
     public boolean passable(int width) {
         return width <= 1 && state == OPEN;
     }
+
+    /**
+     * Door is located at a distance od "depth", counting from passage location in the direction of increasing coordinate
+     */
 
     public Door(Room room1, Room room2, RoomTextures textures) {
         super(room1, room2, textures);
@@ -52,6 +61,9 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         setDepth(depth);
     }
 
+    /**
+     * Sets depth
+     */
     public void setDepth(int depth) {
         this.depth = depth;
         Coord shift = direction.vertical() ?
@@ -59,7 +71,10 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         doorCoord = location.shifted(shift);
     }
 
-    public boolean closeDoor() {
+    /**
+     * Closes door
+     */
+    boolean closeDoor() {
         if (state == CLOSED) return true;
         map.getCoordLock(doorCoord).lock();
         try {
@@ -73,8 +88,10 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         return false;
     }
 
-
-    public void openDoor() {
+    /**
+     * Opens door
+     */
+    void openDoor() {
         if (state == OPEN) return;
         map.getCoordLock(doorCoord).lock();
         try {
@@ -85,6 +102,9 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         }
     }
 
+    /**
+     * Method, called, when hero interact with it
+     */
     @Override
     public void interact() {
         switch (state) {
@@ -97,6 +117,9 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         }
     }
 
+    /**
+     * Checks is hero is near to the door
+     */
     @Override
     public void update() {
         if (doorCoord.near(map.heroObject.getLocation())
@@ -111,6 +134,9 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         }
     }
 
+    /**
+     * Attaches the door and the background to map
+     */
     @Override
     public Door attachToMap(MapOfObjects map) {
         super.attachToMap(map);
@@ -120,6 +146,10 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
         return this;
     }
 
+
+    /**
+     * Analogically to previous, but deletes
+     */
     @Override
     public void deleteFromMap() {
         super.deleteFromMap();
@@ -160,12 +190,18 @@ public class Door extends Passage implements DynamicVisualObject, InteractiveObj
     }
 
 
+    /**
+     * Takes snapshot
+     */
     public JSONObject getSnapshot() {
         JSONObject jsonObject = super.getSnapshot();
         jsonObject.put("depth", depth);
         return jsonObject;
     }
 
+    /**
+     * Resores door from snapshot
+     */
     public static Passage restoreFromSnapshot(JSONObject jsonObject, RoomSystem system) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Coord room1Location = new Coord(jsonObject.getInt("xRoom1"), jsonObject.getInt("yRoom1"));
         Coord room2Location = new Coord(jsonObject.getInt("xRoom2"), jsonObject.getInt("yRoom2"));

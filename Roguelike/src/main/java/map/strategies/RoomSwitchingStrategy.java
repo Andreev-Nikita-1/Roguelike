@@ -7,11 +7,14 @@ import objects.creatures.Mob;
 import util.Coord;
 
 
+/**
+ * Strategy, that leads mob from one room to another
+ */
 public abstract class RoomSwitchingStrategy extends LocalTargetSwitchingStrategy {
-    protected RoomPassageIterator iterator;
+    RoomPassageIterator iterator;
 
 
-    public RoomSwitchingStrategy(Mob owner, RoomPassageIterator iterator) {
+    RoomSwitchingStrategy(Mob owner, RoomPassageIterator iterator) {
         super(owner, iterator.initialTarget());
         this.iterator = iterator;
     }
@@ -21,15 +24,18 @@ public abstract class RoomSwitchingStrategy extends LocalTargetSwitchingStrategy
         target = iterator.nextTarget();
     }
 
+    /**
+     * Class, that alternates rooms and passages locations for having correct route
+     */
     protected abstract static class RoomPassageIterator {
-        public Room currentRoom;
-        public Passage currentPassage;
+        Room currentRoom;
+        Passage currentPassage;
 
-        public Coord initialTarget() {
+        Coord initialTarget() {
             return currentRoom.center();
         }
 
-        public Coord nextTarget() {
+        Coord nextTarget() {
             if (currentPassage == null) {
                 return currentRoom.center();
             } else {

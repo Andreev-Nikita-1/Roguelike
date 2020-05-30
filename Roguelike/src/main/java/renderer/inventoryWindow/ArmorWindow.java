@@ -12,8 +12,12 @@ import java.awt.*;
 import static util.Util.convertColor;
 import static util.Util.greenRedScale;
 
+
+/**
+ * Window for taken equipment
+ */
 public class ArmorWindow extends TileWindow {
-    public ArmorWindow(Coord location, Coord size) {
+    ArmorWindow(Coord location, Coord size) {
         super(location, size);
     }
 
@@ -34,6 +38,11 @@ public class ArmorWindow extends TileWindow {
             return InventoryText.NO_SHIELD;
         }
     }
+
+    /**
+     * Scales for representing durability of equipment
+     */
+
 
     private char leftScale(double level) {
         return (char) (0x0344 + (int) (level * 49));

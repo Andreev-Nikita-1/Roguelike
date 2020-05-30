@@ -1,20 +1,18 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Passage;
 import map.roomSystem.Wall;
-import map.roomSystem.textures.RoomTextures;
 import renderer.PixelData;
 import renderer.VisualPixel;
 import util.Coord;
 import util.Direction;
-import util.Util;
 
 import java.awt.*;
 import java.util.List;
 
-import static renderer.VisualPixel.*;
-
+/**
+ * Textures, that creates stone walls
+ */
 public abstract class StoneWallsTextures extends RoomTextures {
     private static final Color SYMBOL_COLOR = new Color(40, 40, 40);
     private static final Color BACK_COLOR = new Color(20, 20, 20);
@@ -24,7 +22,7 @@ public abstract class StoneWallsTextures extends RoomTextures {
 
     private VisualPixelGenerator generator;
 
-    public StoneWallsTextures(int seed) {
+    StoneWallsTextures(int seed) {
         super(seed);
         generator = new VisualPixelGenerator(BACK, SYMBOL_COLOR, 0x01A7, 1, 5,
                 new double[]{1.0 / 5, 1.0 / 5, 1.0 / 5, 1.0 / 5, 1.0 / 5});

@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This class contains PixelData instances, and can return Pixel instance by merging them
+ */
 class PixelStack {
 
     private List<PixelData> staticObjectsStack = new ArrayList<>();
@@ -13,24 +16,28 @@ class PixelStack {
     private Pixel staticPixel = null;
     private boolean changed = false;
 
-    public void insert(PixelData pixelData) {
+
+    void insert(PixelData pixelData) {
         currentStack.add(pixelData);
         changed = true;
     }
 
-    public void insertStaticPixel(PixelData pixelData) {
+    void insertStaticPixel(PixelData pixelData) {
         staticObjectsStack.add(pixelData);
     }
 
-    public void reset() {
+    void reset() {
         changed = false;
         currentStack = new ArrayList<>(staticObjectsStack);
     }
 
-    public void fitStaticPixel() {
+    void fitStaticPixel() {
         staticPixel = overlay(staticObjectsStack);
     }
 
+    /**
+     * Returns Pixel instance
+     */
     public Pixel getPixel() {
         if (!changed) {
             return staticPixel;
@@ -39,6 +46,9 @@ class PixelStack {
         }
     }
 
+    /**
+     * Merges all containing pixelDatas
+     */
     private static Pixel overlay(List<PixelData> stack) {
         double r1 = 0, g1 = 0, b1 = 0;
         double r2 = 0, g2 = 0, b2 = 0;

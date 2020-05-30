@@ -5,19 +5,33 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Class representing text for drawing in TextWindow
+ */
 public class InventoryText {
-    public String title;
-    public List<String> words;
-    public List<Color> wordsColors;
-    public List<String> info;
-    public List<List<Color>> infoWordsColors;
+    String title;
+    List<String> words;
+    List<Color> wordsColors;
+    List<String> info;
+    List<List<Color>> infoWordsColors;
 
     public static final Color TEXT_COLOR = Color.WHITE;
-    public static final InventoryText EMPTY_TEXT = new InventoryText("", "", new ArrayList<>(), new ArrayList<>());
-    public static final InventoryText NO_WEAPON = new InventoryText("", "No weapon", new ArrayList<>(), new ArrayList<>());
-    public static final InventoryText NO_SHIELD = new InventoryText("", "No shield", new ArrayList<>(), new ArrayList<>());
+    static final InventoryText EMPTY_TEXT = new InventoryText("", "", new ArrayList<>(), new ArrayList<>());
+    static final InventoryText NO_WEAPON = new InventoryText("", "No weapon", new ArrayList<>(), new ArrayList<>());
+    static final InventoryText NO_SHIELD = new InventoryText("", "No shield", new ArrayList<>(), new ArrayList<>());
 
-    public InventoryText(String title, String description, List<Color> wordsColors, List<String> info, List<List<Color>> infoWordsColors) {
+    /**
+     * @param title           - title on top
+     * @param description     - text which goes next
+     * @param wordsColors     - colors for every word in text
+     * @param info            - info lines below, e.g. durability level for equipment
+     * @param infoWordsColors - list which contains colors for every word in info line for all info lines
+     */
+    public InventoryText(String title,
+                         String description,
+                         List<Color> wordsColors,
+                         List<String> info,
+                         List<List<Color>> infoWordsColors) {
         this.title = title;
         this.words = Arrays.asList(description.split(" "));
         this.wordsColors = wordsColors;
@@ -26,14 +40,23 @@ public class InventoryText {
     }
 
 
-    public InventoryText(String title, String description, List<String> info, List<List<Color>> infoWordsColors) {
+    /**
+     * The same as previous, but text is colored by default
+     */
+    public InventoryText(String title,
+                         String description,
+                         List<String> info,
+                         List<List<Color>> infoWordsColors) {
         this(title, description, Collections.nCopies(description.split(" ").length, TEXT_COLOR), info, infoWordsColors);
     }
 
 
     private Map<Integer, List<List<String>>> lines = new HashMap<>();
 
-    public List<List<String>> lines(int width) {
+    /**
+     * Splits text in lines, for every line to have length at most "width"
+     */
+    List<List<String>> lines(int width) {
         if (!lines.containsKey(width)) {
             List<List<String>> result = new ArrayList<>();
             List<String> line = new ArrayList<>();

@@ -1,15 +1,15 @@
 package map.roomSystem.textures;
 
-import map.MapOfObjects;
 import map.roomSystem.Background;
-import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
 import util.Coord;
 
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Generates red carpet 1
+ */
 public class RedCarpet1 extends StoneWallsTextures {
 
     private static final Color BACKGROUND_COLOR = new Color(148, 60, 48);

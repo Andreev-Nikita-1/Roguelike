@@ -1,14 +1,12 @@
 package objects.creatures;
 
 import basicComponents.AppLogic;
-import basicComponents.Controller;
 import gameplayOptions.DirectedOption;
 import hero.Hero;
 import hero.stats.AttackVisitor;
 import hero.stats.DamageVisitor;
 import hero.stats.RunVisitor;
 import map.*;
-import menuLogic.Menu;
 import objects.DamageableObject;
 import objects.InteractiveObject;
 import objects.MapObject;
@@ -17,11 +15,13 @@ import renderer.VisualPixel;
 import util.AccessNeighbourhood;
 import util.Coord;
 import util.Direction;
-import util.Pausable;
 
 import java.awt.*;
 import java.util.Map;
 
+/**
+ * Class for hero object on map
+ */
 public class HeroObject extends OnePixelCreature {
     private int walkDelay = 100;
     private int runDelay = 50;
@@ -30,12 +30,17 @@ public class HeroObject extends OnePixelCreature {
     public InteractiveObject interactiveObject;
     public Hero hero;
 
-
+    /**
+     * Returns current location
+     */
     public Coord getLocation() {
         return location;
     }
 
-    public synchronized void die() {
+    /**
+     * Die method
+     */
+    synchronized void die() {
         deleteFromMap();
         AppLogic.endGame();
     }
@@ -45,11 +50,17 @@ public class HeroObject extends OnePixelCreature {
         location = coord;
     }
 
+    /**
+     * Sets hero
+     */
     public void setHero(Hero hero) {
         this.hero = hero;
     }
 
 
+    /**
+     * Method, called, when key for moving os pressed
+     */
     public void makeMovement(DirectedOption option, long eventTime) {
         Direction direction = option.direction;
         int delay = 0;
@@ -77,6 +88,9 @@ public class HeroObject extends OnePixelCreature {
         }
     }
 
+    /**
+     * Method, called, when key for attacking is pressed
+     */
     public void makeAttack(DirectedOption option, long eventTime) {
         if (eventTime - lastAttackTime >= hero.stats.getAttackDelay()) {
             attack(option.direction);
@@ -84,6 +98,9 @@ public class HeroObject extends OnePixelCreature {
         }
     }
 
+    /**
+     * Taking damage method
+     */
     @Override
     public void takeDamage(int damage) {
         hero.stats.accept(new DamageVisitor(damage));
@@ -92,6 +109,9 @@ public class HeroObject extends OnePixelCreature {
         }
     }
 
+    /**
+     * Attack method
+     */
     @Override
     public void attack(Direction direction) {
         Coord c = location.shifted(direction);
@@ -106,7 +126,9 @@ public class HeroObject extends OnePixelCreature {
         }
     }
 
-
+    /**
+     * Interact with interactible object. For doors only for now
+     */
     public void interactWith() {
         if (interactiveObject != null) {
             interactiveObject.interact();

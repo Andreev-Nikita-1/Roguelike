@@ -7,6 +7,9 @@ import util.Util;
 import java.awt.*;
 import java.util.Arrays;
 
+/**
+ * Create InventoryText, that is shown, when cursor is focused on health
+ */
 public class HealthTextGetter extends TextVisitor {
 
     @Override

@@ -13,6 +13,9 @@ import static renderer.inventoryWindow.InventoryText.TEXT_COLOR;
 import static util.Util.greenRedScale;
 import static util.Util.tightNumber;
 
+/**
+ * Weapon, which affects attack
+ */
 public class Weapon extends Equipment {
     private static final Color SYMBOL_COLOR = new Color(196, 202, 206);
     private static final char KNIFE_SYMBOL = (char) 0x0130;
@@ -33,10 +36,6 @@ public class Weapon extends Equipment {
 
     public enum Type {
         KNIFE, SWORD, AXE, MORGENSTAR
-    }
-
-    @Override
-    public void use() {
     }
 
     @Override
@@ -72,11 +71,17 @@ public class Weapon extends Equipment {
     }
 
 
+    /**
+     * Takes snapshot
+     */
     @Override
     public JSONObject getSnapshot() {
         return super.getSnapshot().put("type", weaponType.ordinal()).put("delay", attackDelay);
     }
 
+    /**
+     * Restores weapon from snapshot
+     */
     public static Weapon restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return (Weapon) new Weapon(jsonObject.getInt("maxDurability"),
                 jsonObject.getInt("value"),

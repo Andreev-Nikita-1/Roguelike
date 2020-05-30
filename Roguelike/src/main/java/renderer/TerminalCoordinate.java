@@ -2,6 +2,9 @@ package renderer;
 
 import util.Coord;
 
+/**
+ * This class is responsible for computing a frame, inside which objects on map will be drawn.
+ */
 class TerminalCoordinate {
 
     private Coord mapSize;
@@ -12,11 +15,14 @@ class TerminalCoordinate {
     private Coord heroPred = new Coord(Coord.ZERO);
     private double thresholdCoeff = 0.4;
 
-    public TerminalCoordinate(Coord mapSize) {
+    TerminalCoordinate(Coord mapSize) {
         this.mapSize = mapSize;
     }
 
-    public Coord getLeftUp(int newXSize, int newYSize, Coord heroLocation) {
+    /**
+     * Returns coordinate, which will be drawn in the left up corner of the terminal
+     */
+    Coord getLeftUp(int newXSize, int newYSize, Coord heroLocation) {
         if (size.x != newXSize || size.y != newYSize) {
             setFrame(newXSize, newYSize, heroLocation);
         } else {
@@ -64,7 +70,7 @@ class TerminalCoordinate {
         heroPred = new Coord(heroNew);
     }
 
-    public void setFrame(int newXSize, int newYSize, Coord heroLocation) {
+    private void setFrame(int newXSize, int newYSize, Coord heroLocation) {
         size = new Coord(newXSize, newYSize);
         threshold = new Coord((int) (thresholdCoeff * newXSize), (int) (thresholdCoeff * newYSize));
         heroPred = new Coord(heroLocation);

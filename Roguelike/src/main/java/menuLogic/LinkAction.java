@@ -4,13 +4,16 @@ import basicComponents.Controller;
 
 import static menuLogic.Menu.*;
 
-public class LinkAction extends MenuAction {
+/**
+ * LinkAction is used for going to another menu
+ */
+class LinkAction extends MenuAction {
 
-    public static LinkAction optionsAction = new LinkAction("options", optionsMenu);
-    public static LinkAction diedAction = new LinkAction("OK", mainMenu);
-    public static LinkAction okAction = new LinkAction("OK", activeGameMainMenu);
+    static LinkAction optionsAction = new LinkAction("options", optionsMenu);
+    static LinkAction diedAction = new LinkAction("OK", mainMenu);
+    static LinkAction okAction = new LinkAction("OK", activeGameMainMenu);
 
-    public LinkAction(String name, Menu linkMenu) {
+    LinkAction(String name, Menu linkMenu) {
         this.name = name;
         this.action = () -> Controller.drawMenu(linkMenu);
     }

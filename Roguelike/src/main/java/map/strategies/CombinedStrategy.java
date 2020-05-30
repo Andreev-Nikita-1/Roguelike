@@ -19,8 +19,8 @@ public class CombinedStrategy extends Strategy {
             switchStrategy();
         }
         if (owner.map.heroAccessNeighbourhood.accessible(owner.getLocation(), Coord::euqlidean, 5)) {
-            if (!(currentStrategy instanceof PersueStrategy)) {
-                currentStrategy = new PersueStrategy(owner);
+            if (!(currentStrategy instanceof PursueStrategy)) {
+                currentStrategy = new PursueStrategy(owner);
             }
         }
         GameplayOption option = currentStrategy.getAction();
@@ -39,7 +39,7 @@ public class CombinedStrategy extends Strategy {
     }
 
     private void switchStrategy() {
-        if (currentStrategy instanceof PersueStrategy || currentStrategy == null) {
+        if (currentStrategy instanceof PursueStrategy || currentStrategy == null) {
             currentStrategy = new RoomRandomTravelingStrategy(owner);
         } else {
             if (Math.random() < 0.1) {

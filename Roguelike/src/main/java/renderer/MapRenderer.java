@@ -15,7 +15,9 @@ import java.util.Map;
 
 import static util.Util.convertColor;
 
-
+/**
+ * Class, that renders a map
+ */
 public class MapRenderer {
     private Game game;
     private MapOfObjects map;
@@ -28,31 +30,9 @@ public class MapRenderer {
         terminalCoordinate = new TerminalCoordinate(new Coord(map.xSize, map.ySize));
     }
 
-    private void showUnicode(TextGUIGraphics graphics) {
-        graphics.setBackgroundColor(new TextColor.RGB(255, 255, 255));
-        graphics.setForegroundColor(new TextColor.RGB(0, 0, 0));
-        graphics.fill(' ');
-        TextColor color1 = new TextColor.RGB(0, 0, 0);
-        TextColor color2 = new TextColor.RGB(200, 200, 200);
-        int i, j;
-        for (j = 0; j < 20; j++) {
-            graphics.putString(j + 6, 0, String.valueOf(j % 10));
-        }
-        char k = (char) (40 + Renderer.page * 200);
-        for (i = 0; i < 10; i++) {
-            graphics.putString(0, i + 1, String.valueOf((int) k));
-            for (j = 0; j < 20; j++) {
-                if (k >= 32 && k != 7 * 16 + 15) {
-                    if ((i + j) % 2 == 0)
-                        graphics.setCharacter(j + 6, i + 1, new TextCharacter(k, color1, color2));
-                    else
-                        graphics.setCharacter(j + 6, i + 1, new TextCharacter(k, color2, color1));
-                }
-                k++;
-            }
-        }
-    }
-
+    /**
+     * Draws map
+     */
     public void drawMap(TextGUIGraphics graphics, int terminalSizeX, int terminalSizeY) {
         int xSize = Math.min(terminalSizeX, map.xSize);
         int ySize = Math.min(terminalSizeY, map.ySize);
@@ -74,6 +54,9 @@ public class MapRenderer {
         }
     }
 
+    /**
+     * Gets visual from static objects
+     */
     public MapRenderer fit() {
         pixelStacksInitialize();
         return this;

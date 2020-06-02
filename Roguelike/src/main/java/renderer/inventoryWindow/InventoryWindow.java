@@ -1,0 +1,259 @@
+package renderer.inventoryWindow;
+
+import basicComponents.AppLogic;
+import basicComponents.Controller;
+import com.googlecode.lanterna.gui2.TextGUIGraphics;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
+import hero.Inventory;
+import util.Coord;
+import util.Direction;
+
+import java.awt.*;
+
+import static util.Direction.*;
+import static util.Util.convertColor;
+
+/**
+ * This class is responsible for drawing inventory window
+ */
+public class InventoryWindow {
+    static Coord size = new Coord(28, 15);
+    public static Coord textWindowSize = new Coord(15, 11);
+
+    private InventoryWindow() {
+    }
+
+    private static CursorWindow baggage = new BaggageWindow(new Coord(2, 8), Inventory.baggageSize);
+    private static CursorWindow armor = new ArmorWindow(new Coord(7, 4), new Coord(2, 1));
+    private static CursorWindow taken = new TakenWindow(new Coord(6, 2));
+    private static CursorWindow stats = new StatsWindow(new Coord(2, 2));
+    private static TextWindow textWindow = new TextWindow(new Coord(11, 2), textWindowSize);
+
+    private static CursorWindow currentWindow;
+
+    private static char leftUp = (char) 0x01F1;
+    private static char up = (char) 0x01F4;
+    private static char rightUp = (char) 0x01EE;
+    private static char leftDown = (char) 0x01F0;
+    private static char down = (char) 0x01F5;
+    private static char rightDown = (char) 0x01EF;
+    private static char left = (char) 0x01F3;
+    private static char right = (char) 0x01F2;
+
+
+    /**
+     * Draws background
+     */
+    private static void drawBackground(TextGUIGraphics graphics) {
+        int x = (Controller.getTerminalSizeX() - size.x) / 2;
+        int y = (Controller.getTerminalSizeY() - size.y) / 2;
+        Color backColor = new Color(60, 55, 55);
+        Color foreColor = new Color(100, 100, 100);
+        graphics.setBackgroundColor(convertColor(backColor));
+        graphics.setForegroundColor(convertColor(foreColor));
+        for (int i = 0; i < size.x; i++) {
+            for (int j = 0; j < size.y; j++) {
+                graphics.putString(i + x,
+                        j + y, "" + (char) (0x0217));
+            }
+        }
+        for (int i = 1; i < size.x - 1; i++) {
+            graphics.setCharacter(i + x, y, up);
+            graphics.setCharacter(i + x, y + size.y - 1, down);
+        }
+        for (int i = 1; i < size.y - 1; i++) {
+            graphics.setCharacter(x, y + i, left);
+            graphics.setCharacter(size.x - 1 + x, y + i, right);
+        }
+        graphics.setCharacter(x, y, leftUp);
+        graphics.setCharacter(size.x - 1 + x, y, rightUp);
+        graphics.setCharacter(size.x - 1 + x, y + size.y - 1, rightDown);
+        graphics.setCharacter(x, y + size.y - 1, leftDown);
+    }
+
+
+    /**
+     * Draws inventory window
+     */
+    public static void draw(TextGUIGraphics graphics) {
+        int x = (Controller.getTerminalSizeX() - size.x) / 2;
+        int y = (Controller.getTerminalSizeY() - size.y) / 2;
+        drawBackground(graphics);
+        Coord terminal = new Coord(x, y);
+        stats.draw(graphics, terminal);
+        baggage.draw(graphics, terminal);
+        taken.draw(graphics, terminal);
+        armor.draw(graphics, terminal);
+        textWindow.draw(graphics, terminal);
+    }
+
+    /**
+     * Deactivates inventory wondow
+     */
+    public static void deactivate() {
+        currentWindow.active = false;
+    }
+
+    /**
+     * Activates inventory wondow
+     */
+    public static void activate() {
+        currentWindow = stats;
+        currentWindow.acceptCursor(new Coord(0, 0));
+        currentWindow.active = true;
+        textWindow.resetBias();
+        textWindow.setText(currentWindow.getText());
+    }
+
+    /**
+     * Switches active window, depending on current active window, moving cursor direction and current cursor position
+     */
+    private static boolean switchWindow(Direction direction, Coord cursorPosition) {
+        Subwindow prevWindow = currentWindow;
+        currentWindow.active = false;
+        if (baggage.equals(currentWindow)) {
+            if (direction == UP) {
+                if (cursorPosition.x < 4) {
+                    currentWindow = stats;
+                    currentWindow.acceptCursor(new Coord(0, 4));
+                } else {
+                    currentWindow = armor;
+                    if (cursorPosition.x < 6) {
+                        currentWindow.acceptCursor(new Coord(0, 0));
+                    } else {
+                        currentWindow.acceptCursor(new Coord(1, 0));
+                    }
+                }
+            }
+        } else if (armor.equals(currentWindow)) {
+            if (direction == UP) {
+                currentWindow = taken;
+                if (cursorPosition.x == 0) {
+                    currentWindow.acceptCursor(new Coord(1, 0));
+                } else {
+                    currentWindow.acceptCursor(new Coord(2, 0));
+                }
+            }
+            if (direction == LEFT) {
+                currentWindow = stats;
+                currentWindow.acceptCursor(new Coord(0, cursorPosition.y + 2));
+            }
+            if (direction == DOWN) {
+                currentWindow = baggage;
+                if (cursorPosition.x == 0) {
+                    currentWindow.acceptCursor(new Coord(5, 0));
+                } else {
+                    currentWindow.acceptCursor(new Coord(6, 0));
+                }
+            }
+        } else if (taken.equals(currentWindow)) {
+            if (direction == DOWN) {
+                currentWindow = armor;
+                if (cursorPosition.x < 2) {
+                    currentWindow.acceptCursor(new Coord(0, 0));
+                } else {
+                    currentWindow.acceptCursor(new Coord(1, 0));
+                }
+            }
+            if (direction == LEFT) {
+                currentWindow = stats;
+                currentWindow.acceptCursor(new Coord(0, 0));
+            }
+        } else if (stats.equals(currentWindow)) {
+            if (direction == DOWN) {
+                currentWindow = baggage;
+                currentWindow.acceptCursor(new Coord(0, 0));
+            }
+            if (direction == RIGHT) {
+                if (cursorPosition.y <= 1) {
+                    currentWindow = taken;
+                    currentWindow.acceptCursor(new Coord(0, 0));
+                } else {
+                    currentWindow = armor;
+                    currentWindow.acceptCursor(new Coord(0, 0));
+                }
+            }
+        }
+        currentWindow.active = true;
+        return prevWindow != currentWindow;
+    }
+
+    /**
+     * Moves cursor
+     */
+    private static void moveCursor(Direction direction) {
+        if (!currentWindow.tryShift(direction)) {
+            if (!switchWindow(direction, currentWindow.cursorPosition)) {
+                return;
+            }
+        }
+        textWindow.resetBias();
+        textWindow.setText(currentWindow.getText());
+    }
+
+    /**
+     * Moves selected item in given direction
+     */
+    private static void moveItem(Direction direction) {
+        if (currentWindow == baggage) {
+            AppLogic.currentGame.getHero().inventory.shiftItemInBaggage(currentWindow.cursorPosition, direction);
+        } else if (currentWindow == taken) {
+            AppLogic.currentGame.getHero().inventory.shiftTakenItems(currentWindow.cursorPosition.x, direction);
+        }
+    }
+
+    /**
+     * Handles pressed key
+     */
+    public static void handleKeyStroke(KeyStroke keyStroke) {
+        boolean ctrl = keyStroke.isCtrlDown();
+        boolean shift = keyStroke.isShiftDown();
+        if (keyStroke.getKeyType() == KeyType.Enter) {
+            if (currentWindow == taken)
+                AppLogic.currentGame.getHero().inventory.takeOffItemInTaken(currentWindow.cursorPosition.x);
+            if (currentWindow == armor) {
+                if (currentWindow.cursorPosition.x == 0)
+                    AppLogic.currentGame.getHero().inventory.takeOffWeapon();
+                else
+                    AppLogic.currentGame.getHero().inventory.takeOffShield();
+            }
+            if (currentWindow == baggage)
+                AppLogic.currentGame.getHero().inventory.putOnItemInBaggage(currentWindow.cursorPosition);
+            textWindow.setText(currentWindow.getText());
+        }
+        Direction direction = null;
+        switch (keyStroke.getKeyType()) {
+            case ArrowUp:
+                direction = UP;
+                break;
+            case ArrowDown:
+                direction = DOWN;
+                break;
+            case ArrowLeft:
+                direction = LEFT;
+                break;
+            case ArrowRight:
+                direction = RIGHT;
+                break;
+        }
+        if (direction == null) return;
+        if (ctrl) {
+            if (direction == UP) {
+                textWindow.pgUp();
+            } else if (direction == DOWN) {
+                textWindow.pgDn();
+            }
+        } else if (shift) {
+            moveItem(direction);
+            if (currentWindow.tryShift(direction)) {
+                textWindow.resetBias();
+                textWindow.setText(currentWindow.getText());
+            }
+        } else {
+            moveCursor(direction);
+        }
+
+    }
+}
+

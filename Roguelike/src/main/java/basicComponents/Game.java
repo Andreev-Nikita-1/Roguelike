@@ -5,10 +5,12 @@ import gameplayOptions.GameplayOption;
 import gameplayOptions.UseItemOption;
 import hero.Hero;
 import hero.Inventory;
-import hero.items.Candles;
+import items.Candles;
 import hero.stats.HeroStats;
+import mapGenerator.MapGenerator;
+import objects.Lighting;
 import org.json.JSONObject;
-import hero.items.Item;
+import items.Item;
 import hero.stats.StaminaRestorer;
 import mapGenerator.DefaultGenerator;
 import map.MapOfObjects;
@@ -23,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
- * Class, representong the game. Contains hero and map, and
+ * Class, representing the game. Contains hero and map
  */
 public class Game {
 
@@ -31,24 +33,46 @@ public class Game {
     /**
      * State of game
      */
-    public AtomicBoolean paused = new AtomicBoolean(true);
+    private AtomicBoolean paused = new AtomicBoolean(true);
+
+    public boolean isPaused() {
+        return paused.get();
+    }
+
     /**
      * Objects, which have to be paused, when pausing game
      */
-    public List<Pausable> pausables = new CopyOnWriteArrayList<>();
+    private List<Pausable> pausables = new CopyOnWriteArrayList<>();
+
+    public void addPausable(Pausable pausable) {
+        pausables.add(pausable);
+    }
+
+    public void removePausable(Pausable pausable) {
+        pausables.remove(pausable);
+    }
 
     /**
      * Current map
      */
-    public MapOfObjects map;
+    private MapOfObjects map;
     /**
      * Current map renderer
      */
-    public MapRenderer mapRenderer;
+    private MapRenderer mapRenderer;
+
+    public MapRenderer getMapRenderer() {
+        return mapRenderer;
+    }
+
     /**
      * Current hero
      */
-    public Hero hero;
+    private Hero hero;
+
+    public Hero getHero() {
+        return hero;
+    }
 
     /**
      * Method to start the game
@@ -92,17 +116,6 @@ public class Game {
     }
 
     /**
-     * Creates snapshot of new game
-     */
-    static JSONObject createNewGameSnapshot() {
-        Game game = new Game();
-        game.map = new DefaultGenerator(200, 200).generateMap();
-        game.hero = new Hero(new Inventory(), new HeroStats());
-        game.hero.inventory.taken[0] = new Candles();
-        return game.getSnapshot();
-    }
-
-    /**
      * Handles gameplay option
      */
     void handleOption(GameplayOption option, long eventTine) {
@@ -126,6 +139,33 @@ public class Game {
         }
     }
 
+
+    private static Game constructGame(Hero hero, MapOfObjects map) {
+        Game game = new Game();
+        game.hero = hero;
+        hero.inventory.includeToGame(game);
+        game.map = map;
+        map.lighting = (Lighting) new Lighting(3).attachToMap(map);
+        map.setGame(game);
+        map.includeToGame(game);
+        game.map.heroObject.setHero(game.hero);
+        game.hero.inventory.setMap(game.map);
+        new StaminaRestorer(game.hero.stats).includeToGame(game);
+        game.mapRenderer = new MapRenderer(game.map).fit();
+        return game;
+    }
+
+    /**
+     * Creates new game
+     */
+    static Game newGame(MapGenerator mapGenerator) {
+        Hero hero = new Hero(new Inventory(), new HeroStats());
+        hero.inventory.taken[0] = new Candles();
+        hero.inventory.taken[0].setOwnerInventory(hero.inventory);
+        MapOfObjects map = mapGenerator.generateMap();
+        return constructGame(hero, map);
+    }
+
     /**
      * Takes snapshot of game
      */
@@ -138,16 +178,20 @@ public class Game {
     /**
      * Returns game, restored from snapshot
      */
-    public static Game restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Game game = new Game();
-        game.hero = Hero.restoreFromSnapshot(jsonObject.getJSONObject("hero"));
-        game.hero.inventory.includeToGame(game);
-        game.map = MapOfObjects.restoreFromSnapshot(jsonObject.getJSONObject("map"), game);
-        game.map.heroObject.setHero(game.hero);
-        game.hero.inventory.setMap(game.map);
-        new StaminaRestorer(game.hero.stats).includeToGame(game);
-        game.mapRenderer = new MapRenderer(game.map).fit();
-        return game;
+    static Game restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        return constructGame(Hero.restoreFromSnapshot(jsonObject.getJSONObject("hero")),
+                MapOfObjects.restoreFromSnapshot(jsonObject.getJSONObject("map")));
+    }
+
+    /**
+     * Creates game, restored from map snapshot
+     */
+    static Game createFromMapSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Hero hero = new Hero(new Inventory(), new HeroStats());
+        hero.inventory.taken[0] = new Candles();
+        hero.inventory.taken[0].setOwnerInventory(hero.inventory);
+        return constructGame(hero,
+                MapOfObjects.restoreFromSnapshot(jsonObject));
     }
 }
 

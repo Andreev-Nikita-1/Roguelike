@@ -1,11 +1,12 @@
 package mapGenerator;
 
-import hero.items.Item;
-import hero.items.Shield;
-import hero.items.Weapon;
+import items.Item;
+import items.Shield;
+import items.Weapon;
 import map.MapOfObjects;
 import map.roomSystem.*;
 import map.roomSystem.textures.*;
+import objects.creatures.CowardImp;
 import objects.creatures.HeroObject;
 import objects.creatures.ScaryMonster;
 
@@ -46,14 +47,18 @@ public class DefaultGenerator extends MapGenerator {
                 rooms[(i - 2) / 8][(j - 2) / 8] = room;
                 roomSystem.addRoom(room);
                 if (Math.random() < 0.1) {
-                    ScaryMonster.Type type = Util.generate(ScaryMonster.Type.values());
-                    ScaryMonster.newMonster(new Coord(i + 1, j + 1), type).attachToMap(map);
+                    if (Math.random() < 0.6) {
+                        ScaryMonster.Type type = Util.generate(ScaryMonster.Type.values());
+                        ScaryMonster.newMonster(new Coord(i + 1, j + 1), type).attachToMap(map);
+                    } else {
+                        new CowardImp(new Coord(i + 1, j + 1)).attachToMap(map);
+                    }
                 }
                 if (Math.random() < 0.1) {
                     if (Math.random() < 0.4) {
                         new Candle(new Coord(i + 3, j + 3)).attachToMap(map);
                     } else {
-                        Item item = null;
+                        Item item;
                         if (Math.random() < 0.5) {
                             Weapon.Type type = Util.generate(Weapon.Type.values());
                             item = new Weapon((int) (50 * Math.random()),

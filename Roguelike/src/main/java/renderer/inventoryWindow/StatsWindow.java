@@ -65,7 +65,7 @@ public class StatsWindow extends CursorWindow {
             textGetter = protectionTextGetter;
         }
         if (textGetter != null) {
-            AppLogic.currentGame.hero.stats.accept(textGetter);
+            AppLogic.currentGame.getHero().stats.accept(textGetter);
             return textGetter.getText();
         }
         return InventoryText.EMPTY_TEXT;
@@ -92,16 +92,16 @@ public class StatsWindow extends CursorWindow {
             int n = 0;
             switch (i) {
                 case 0:
-                    n = AppLogic.currentGame.hero.stats.getLevel();
+                    n = AppLogic.currentGame.getHero().stats.getLevel();
                     break;
                 case 1:
-                    n = AppLogic.currentGame.hero.stats.getHealth();
+                    n = AppLogic.currentGame.getHero().stats.getHealth();
                     break;
                 case 2:
-                    n = AppLogic.currentGame.hero.stats.getPower();
+                    n = AppLogic.currentGame.getHero().stats.getPower();
                     break;
                 case 3:
-                    n = AppLogic.currentGame.hero.stats.getProtection();
+                    n = AppLogic.currentGame.getHero().stats.getProtection();
                     break;
             }
             String str = Util.tightNumber(n);

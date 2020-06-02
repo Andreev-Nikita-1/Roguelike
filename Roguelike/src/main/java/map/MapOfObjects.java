@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import util.AccessNeighbourhood;
 import util.Coord;
+import util.Pausable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -38,6 +39,7 @@ public class MapOfObjects {
     public List<StaticVisualObject> staticObjects = new CopyOnWriteArrayList<>();
     public List<DynamicVisualObject> dynamicObjects = new CopyOnWriteArrayList<>();
     public List<SnapshotableFromMap> snapshotableObjects = new CopyOnWriteArrayList<>();
+    public List<Pausable> pausableObjects = new CopyOnWriteArrayList<>();
     public HeroObject heroObject;
     public AccessNeighbourhood heroAccessNeighbourhood;
     public RoomSystem roomSystem;
@@ -181,7 +183,7 @@ public class MapOfObjects {
     /**
      * Returns true if object can be placed on given coordinate
      */
-    public boolean accesible(Coord coord) {
+    public boolean accessible(Coord coord) {
         return inside(coord) && !isTaken(coord);
     }
 
@@ -211,6 +213,24 @@ public class MapOfObjects {
     }
 
     /**
+     * Includes all pausable objects to the game
+     */
+    public void includeToGame(Game game) {
+        for (Pausable pausable : pausableObjects) {
+            pausable.includeToGame(game);
+        }
+        pausableObjects.clear();
+    }
+
+    /**
+     * Removes all pausable objects from the game
+     */
+    public void deleteFromGame(Game game) {
+        for (Pausable pausable : pausableObjects)
+            pausable.deleteFromGame(game);
+    }
+
+    /**
      * Returns snapshot of the map
      */
     public JSONObject getSnapshot() {
@@ -232,11 +252,10 @@ public class MapOfObjects {
     /**
      * Restores map from the snapshot. You must give Game object, for all dynamic objects be active when game starts
      */
-    public static MapOfObjects restoreFromSnapshot(JSONObject jsonObject, Game game) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static MapOfObjects restoreFromSnapshot(JSONObject jsonObject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         MapOfObjects map = new MapOfObjects(
                 jsonObject.getInt("xSize"),
                 jsonObject.getInt("ySize"));
-        map.setGame(game);
         map.heroObject = new HeroObject(
                 new Coord(jsonObject.getInt("xHero"),
                         jsonObject.getInt("yHero")))
@@ -248,7 +267,6 @@ public class MapOfObjects {
         for (int i = 0; i < snapshots.length(); i++) {
             ((MapObject) SnapshotableFromMap.restoreSnapshot(snapshots.getJSONObject(i))).attachToMap(map);
         }
-        map.lighting = (Lighting) new Lighting(7).attachToMap(map);
         return map;
     }
 }

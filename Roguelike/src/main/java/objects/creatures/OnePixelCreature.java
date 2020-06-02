@@ -50,10 +50,10 @@ public abstract class OnePixelCreature extends MapObject implements DynamicVisua
         }
         Coord shift = Coord.fromDirection(direction);
         Coord nextLocation = location.shifted(shift);
-        if (map.accesible(nextLocation)) {
+        if (map.accessible(nextLocation)) {
             map.getCoordLock(nextLocation).lock();
             try {
-                if (map.accesible(nextLocation)) {
+                if (map.accessible(nextLocation)) {
                     map.unsetObject(this, location);
                     location.shift(shift);
                     map.setObject(this, location);

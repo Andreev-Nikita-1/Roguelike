@@ -4,12 +4,36 @@ import gameplayOptions.GameplayOption;
 import objects.creatures.Mob;
 import util.Coord;
 
+import java.util.function.Function;
+
+/**
+ * Strategy, that combines several strategies, depending on hero accessibility and confused state
+ */
 public class CombinedStrategy extends Strategy {
     private Strategy currentStrategy;
+    private Function<Mob, Strategy> heroDependingStrategy;
 
-    public CombinedStrategy(Mob owner) {
+    public CombinedStrategy(Mob owner, HeroDependingStrategyType type) {
         super(owner);
+        switch (type) {
+            case AGRESSIVE:
+                heroDependingStrategy = PursueStrategy::new;
+                break;
+            case COWARD:
+                heroDependingStrategy = CowardStrategy::new;
+                break;
+        }
     }
+
+    public enum HeroDependingStrategyType {
+        AGRESSIVE, COWARD
+    }
+
+    public void setCurrentStrategy(Strategy strategy) {
+        currentStrategy = strategy;
+
+    }
+
 
     private int nothingCounter = 0;
 
@@ -18,10 +42,9 @@ public class CombinedStrategy extends Strategy {
         if (currentStrategy == null) {
             switchStrategy();
         }
-        if (owner.map.heroAccessNeighbourhood.accessible(owner.getLocation(), Coord::euqlidean, 5)) {
-            if (!(currentStrategy instanceof PursueStrategy)) {
-                currentStrategy = new PursueStrategy(owner);
-            }
+        if (owner.map.heroAccessNeighbourhood.accessible(owner.getLocation(), Coord::euqlidean, 5)
+                && !(currentStrategy instanceof ConfusedStrategy)) {
+            currentStrategy = heroDependingStrategy.apply(owner);
         }
         GameplayOption option = currentStrategy.getAction();
         if (option == GameplayOption.NOTHING) {
@@ -39,14 +62,10 @@ public class CombinedStrategy extends Strategy {
     }
 
     private void switchStrategy() {
-        if (currentStrategy instanceof PursueStrategy || currentStrategy == null) {
-            currentStrategy = new RoomRandomTravelingStrategy(owner);
+        if (Math.random() < 0.1) {
+            currentStrategy = new RoomPatrolStrategy(owner);
         } else {
-            if (Math.random() < 0.1) {
-                currentStrategy = new RoomPatrolStrategy(owner);
-            } else {
-                currentStrategy = new RoomRandomTravelingStrategy(owner);
-            }
+            currentStrategy = new RoomRandomTravelingStrategy(owner);
         }
     }
 }

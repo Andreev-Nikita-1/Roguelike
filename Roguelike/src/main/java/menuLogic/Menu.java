@@ -22,6 +22,7 @@ public class Menu {
      */
     public static void InitializeMenus() {
         mainMenu.addAction(loadGameAction);
+        mainMenu.addAction(loadMap);
         mainMenu.addAction(newGameAction);
         mainMenu.addAction(optionsAction);
         mainMenu.addAction(exit);
@@ -29,6 +30,7 @@ public class Menu {
         activeGameMainMenu.addAction(continueGameAction);
         activeGameMainMenu.addAction(saveGameAction);
         activeGameMainMenu.addAction(loadGameAction);
+        activeGameMainMenu.addAction(loadMap);
         activeGameMainMenu.addAction(newGameAction);
         activeGameMainMenu.addAction(optionsAction);
         activeGameMainMenu.addAction(exit);

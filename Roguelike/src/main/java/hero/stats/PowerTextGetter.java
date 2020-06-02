@@ -1,6 +1,6 @@
 package hero.stats;
 
-import hero.items.Weapon;
+import items.Weapon;
 import renderer.inventoryWindow.InventoryText;
 import util.Util;
 

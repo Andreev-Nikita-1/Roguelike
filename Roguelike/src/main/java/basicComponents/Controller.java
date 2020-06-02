@@ -13,15 +13,23 @@ import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
+import gameplayOptions.DirectedOption;
+import gameplayOptions.GameplayOption;
+import gameplayOptions.UseItemOption;
 import menuLogic.Menu;
 import menuLogic.MenuAction;
 import renderer.Renderer;
+import renderer.inventoryWindow.InventoryWindow;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import static basicComponents.AppLogic.GameplayState.*;
 import static java.lang.Thread.sleep;
 import static menuLogic.Menu.*;
 
@@ -56,7 +64,7 @@ public class Controller {
                         Font.createFont(Font.TRUETYPE_FONT, new File("src/main/resources/FONT.ttf")).deriveFont(fontSize)),
                 null,
                 TerminalEmulatorAutoCloseTrigger.CloseOnExitPrivateMode);
-        TerminalScreen screen = new TerminalScreen(terminal);
+        var screen = new TerminalScreen(terminal);
         screen.setCursorPosition(null);
         gui = new MultiWindowTextGUI(screen, TextColor.ANSI.BLACK);
         mainWindow = new BasicWindow();
@@ -107,6 +115,7 @@ public class Controller {
             gui.getScreen().startScreen();
             mainWindow.setComponent(component);
         } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
         }
     }
 
@@ -127,8 +136,13 @@ public class Controller {
         }
     }
 
-    public static Menu lastMenu;
-    static Menu currentMenu;
+    private static Menu lastMenu;
+    private static Menu currentMenu;
+
+
+    public static Menu getLastMenu() {
+        return lastMenu;
+    }
 
     /**
      * Draws menu
@@ -138,13 +152,13 @@ public class Controller {
             lastMenu = currentMenu;
             currentMenu = menu;
         }
-        ActionListDialogBuilder builder = new ActionListDialogBuilder();
+        var builder = new ActionListDialogBuilder();
         builder.setTitle(menu.getTitle());
         builder.setCanCancel(false);
         for (MenuAction action : menu.getActions()) {
             builder.addAction(action.getName(), action.getAction());
         }
-        DialogWindow dialog = builder.build();
+        var dialog = builder.build();
         dialog.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING));
         gui.addWindow(dialog);
     }
@@ -153,9 +167,9 @@ public class Controller {
      * Draws dialog for inputting save name
      */
     public static void drawSaveGameDialog() {
-        TextInputDialogBuilder builder = new TextInputDialogBuilder();
+        var builder = new TextInputDialogBuilder();
         builder.setTitle("SAVE GAME");
-        TextInputDialog dialog = builder.build();
+        var dialog = builder.build();
         dialog.setSize(new TerminalSize((int) (getTerminalSizeX() / 1.5), 5));
         dialog.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING, Window.Hint.FIXED_SIZE));
         new Thread(() -> {
@@ -172,32 +186,118 @@ public class Controller {
     /**
      * Draws dialog for choosing save game
      */
-    public static void drawFileDialog() {
-        var list = AppLogic.getSaves();
+    public static void drawSavesDialog() {
+        var list = AppLogic.getFiles(new File("src/main/resources/saves"));
         Table<String> table = new Table<>("save", "time");
+        drawFileDialog(list, table, AppLogic::loadGame);
+    }
+
+    /**
+     * Draws dialog for choosing map
+     */
+    public static void drawMapsDialog() {
+        var list = AppLogic.getFiles(new File("src/main/resources/maps"));
+        Table<String> table = new Table<>("map", "time");
+        drawFileDialog(list, table, AppLogic::loadMap);
+    }
+
+    private static void drawFileDialog(List<AppLogic.FileInfo> list, Table<String> table, Consumer<String> action) {
         table.getTableModel().addRow("back", "");
         for (var map : list) {
             table.getTableModel().addRow(map.name, map.date);
         }
-        BasicWindow window = new BasicWindow();
+        var window = new BasicWindow();
         window.setSize(new TerminalSize((int) (getTerminalSizeX() / 1.5), (int) (getTerminalSizeY() / 1.5)));
         window.setHints(Arrays.asList(Window.Hint.CENTERED, Window.Hint.NO_POST_RENDERING, Window.Hint.FIXED_SIZE));
         window.setComponent(table);
         gui.addWindow(window);
         table.setSelectAction(() -> {
             if (table.getSelectedRow() == 0) {
-                Controller.drawMenu(currentMenu);
+                drawMenu(currentMenu);
             } else {
-                AppLogic.loadGame(list.get(table.getSelectedRow() - 1).name);
+                action.accept(list.get(table.getSelectedRow() - 1).name);
             }
             gui.removeWindow(window);
         });
     }
 
+
     /**
      * Class for component with map
      */
     static class GameplayComponent extends AbstractInteractableComponent<GameplayComponent> {
+
+        private static final Consumer<KeyStroke> keyStrokeHandlerOnMap = new Consumer<>() {
+            @Override
+            public void accept(KeyStroke keyStroke) {
+                switch (keyStroke.getKeyType()) {
+                    case Escape:
+                        AppLogic.currentGame.pause();
+                        AppLogic.gameplayState = PAUSED;
+                        Controller.drawMenu(activeGameMainMenu);
+                        break;
+                    case Tab:
+                        AppLogic.openInventory();
+                        break;
+                    default:
+                        GameplayOption option = getGameplayOption(keyStroke);
+                        AppLogic.currentGame.handleOption(option, keyStroke.getEventTime());
+                        break;
+                }
+            }
+        };
+
+        private static final Consumer<KeyStroke> keyStrokeHandlerInInventory = new Consumer<>() {
+            @Override
+            public void accept(KeyStroke keyStroke) {
+                switch (keyStroke.getKeyType()) {
+                    case Escape:
+                    case Tab:
+                        AppLogic.closeInventory();
+                        break;
+                    default:
+                        InventoryWindow.handleKeyStroke(keyStroke);
+                        break;
+                }
+            }
+        };
+
+        /**
+         * Returns gameplay option from key
+         */
+        private static GameplayOption getGameplayOption(KeyStroke keyStroke) {
+            boolean alt = keyStroke.isAltDown();
+            boolean shift = keyStroke.isShiftDown();
+            switch (keyStroke.getKeyType()) {
+                case Character:
+                    char character = keyStroke.getCharacter();
+                    if (character == ' ') {
+                        return GameplayOption.INTERACT;
+                    }
+                    if (character >= '1' && character <= '4') {
+                        return new UseItemOption(character - '1');
+                    }
+                case ArrowDown:
+                    if (alt) return DirectedOption.ATTACK_DOWN;
+                    if (shift) return DirectedOption.RUN_DOWN;
+                    else return DirectedOption.WALK_DOWN;
+                case ArrowUp:
+                    if (alt) return DirectedOption.ATTACK_UP;
+                    if (shift) return DirectedOption.RUN_UP;
+                    else return DirectedOption.WALK_UP;
+                case ArrowLeft:
+                    if (alt) return DirectedOption.ATTACK_LEFT;
+                    if (shift) return DirectedOption.RUN_LEFT;
+                    else return DirectedOption.WALK_LEFT;
+                case ArrowRight:
+                    if (alt) return DirectedOption.ATTACK_RIGHT;
+                    if (shift) return DirectedOption.RUN_RIGHT;
+                    else return DirectedOption.WALK_RIGHT;
+                default:
+                    return GameplayOption.NOTHING;
+            }
+        }
+
 
         @Override
         protected InteractableRenderer<GameplayComponent> createDefaultRenderer() {
@@ -206,7 +306,11 @@ public class Controller {
 
         @Override
         protected Result handleKeyStroke(KeyStroke keyStroke) {
-            AppLogic.handleKeyStrokeOnMap(keyStroke);
+            if (AppLogic.gameplayState == PLAYING) {
+                keyStrokeHandlerOnMap.accept(keyStroke);
+            } else if (AppLogic.gameplayState == INVENTORY) {
+                keyStrokeHandlerInInventory.accept(keyStroke);
+            }
             return Result.HANDLED;
         }
     }

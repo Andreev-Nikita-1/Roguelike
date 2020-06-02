@@ -4,6 +4,7 @@ import basicComponents.Game;
 import gameplayOptions.DirectedOption;
 import gameplayOptions.GameplayOption;
 import map.strategies.CombinedStrategy;
+import map.strategies.ConfusedStrategy;
 import objects.DamageableObject;
 import objects.DynamicVisualObject;
 import objects.MapObject;
@@ -95,12 +96,12 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         return answer;
     }
 
-    public ScaryMonster(Coord coord,
-                        int speedDelay,
-                        int attackDelay,
-                        int maxHealth,
-                        int power,
-                        VisualPixel pixel) {
+    private ScaryMonster(Coord coord,
+                         int speedDelay,
+                         int attackDelay,
+                         int maxHealth,
+                         int power,
+                         VisualPixel pixel) {
         super(coord);
         this.speedDelay = speedDelay;
         this.attackDelay = attackDelay;
@@ -108,7 +109,7 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         this.health = new AtomicInteger(maxHealth);
         this.power = power;
         this.pixel = pixel;
-        strategy = new CombinedStrategy(this);
+        strategy = new CombinedStrategy(this, CombinedStrategy.HeroDependingStrategyType.AGRESSIVE);
     }
 
 
@@ -130,68 +131,14 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
 
 
     /**
-     * Die method
-     */
-    @Override
-    public synchronized void die() {
-        Lock lock = map.getCoordLock(location);
-        lock.lock();
-        try {
-            deleteFromMap();
-            generateItem().attachToMap(map);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
      * Stuff, that appears when mob is slayed
      */
-    private Stuff generateItem() {
+    @Override
+    protected Stuff generateItem() {
         if (Math.random() < 0.5) {
             return new Experience(location, (int) (Math.random() * 3 * power));
         } else {
             return new Health(location, (int) (Math.random() * 3 * power));
-        }
-    }
-
-    /**
-     * Acting, according to strategy
-     */
-    @Override
-    public int act() {
-        GameplayOption action = strategy.getAction();
-        if (action instanceof DirectedOption) {
-            switch (((DirectedOption) action).action) {
-                case WALK:
-                case RUN:
-                    if (move(((DirectedOption) action).direction)) {
-                        int d = (((DirectedOption) action).action == DirectedOption.Action.WALK) ? 1 : 2;
-                        return speedDelay / d;
-                    } else {
-                        return 10;
-                    }
-                case ATTACK:
-                    attack(((DirectedOption) action).direction);
-                    return attackDelay;
-            }
-        }
-        return 10;
-    }
-
-    @Override
-    public Game getGame() {
-        return map.game;
-    }
-
-    /**
-     * Taking damage method
-     */
-    @Override
-    public void takeDamage(int damage) {
-        health.addAndGet(-damage);
-        if (health.get() <= 0) {
-            die();
         }
     }
 
@@ -207,14 +154,15 @@ public class ScaryMonster extends Mob implements DynamicVisualObject {
         return new JSONObject()
                 .put("x", location.x)
                 .put("y", location.y)
+                .put("health", health)
                 .put("type", type.ordinal())
                 .put("class", this.getClass().getName());
     }
 
     public static ScaryMonster restoreFromSnapshot(JSONObject jsonObject) {
-        return newMonster(
+        return (ScaryMonster) newMonster(
                 new Coord(jsonObject.getInt("x"), jsonObject.getInt("y")),
                 Type.values()[jsonObject.getInt("type")]
-        );
+        ).setHealth(jsonObject.getInt("health"));
     }
 }

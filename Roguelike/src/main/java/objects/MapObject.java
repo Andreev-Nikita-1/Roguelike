@@ -14,8 +14,12 @@ public abstract class MapObject {
      */
     public MapObject attachToMap(MapOfObjects map) {
         this.map = map;
-        if (this instanceof Pausable && map.game != null) {
-            ((Pausable) this).includeToGame(map.game);
+        if (this instanceof Pausable) {
+            if (map.game != null) {
+                ((Pausable) this).includeToGame(map.game);
+            } else {
+                map.pausableObjects.add((Pausable) this);
+            }
         }
         if (this instanceof DynamicVisualObject) {
             map.dynamicObjects.add((DynamicVisualObject) this);
@@ -33,8 +37,11 @@ public abstract class MapObject {
      * Deletes object from map.
      */
     public void deleteFromMap() {
-        if (this instanceof Pausable && map.game != null) {
-            ((Pausable) this).deleteFromGame(map.game);
+        if (this instanceof Pausable) {
+            if (map.game != null) {
+                ((Pausable) this).deleteFromGame(map.game);
+            }
+            map.pausableObjects.remove(this);
         }
         if (this instanceof DynamicVisualObject) {
             map.dynamicObjects.remove(this);

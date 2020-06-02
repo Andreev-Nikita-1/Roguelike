@@ -19,8 +19,6 @@ import java.util.Random;
  */
 public class Renderer {
 
-    public static volatile int page = 0;
-
     /**
      * Draws picture
      */
@@ -32,12 +30,12 @@ public class Renderer {
                 drawStartPicture(graphics);
                 break;
             case INVENTORY:
-                AppLogic.currentGame.mapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                AppLogic.currentGame.getMapRenderer().drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
                 InventoryWindow.draw(graphics);
                 break;
             case PAUSED:
             case PLAYING:
-                AppLogic.currentGame.mapRenderer.drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
+                AppLogic.currentGame.getMapRenderer().drawMap(graphics, Controller.getTerminalSizeX(), Controller.getTerminalSizeY());
                 TopBar.draw(graphics);
                 break;
         }

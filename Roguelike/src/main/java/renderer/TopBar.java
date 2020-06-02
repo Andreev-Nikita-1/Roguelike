@@ -3,7 +3,7 @@ package renderer;
 import basicComponents.AppLogic;
 import basicComponents.Controller;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
-import hero.items.Item;
+import items.Item;
 import hero.stats.HeroStats;
 import renderer.inventoryWindow.TileWindow;
 import util.Util;
@@ -16,7 +16,7 @@ import static util.Util.convertColor;
 /**
  * This class draws the top bar
  */
-public class TopBar {
+class TopBar {
     private static final Color BACKGROUND_COLOR = Color.BLACK;
     private static final Color HEALTH_COLOR = new Color(150, 0, 0);
     private static final Color STAMINA_COLOR = new Color(0, 50, 150);
@@ -32,14 +32,14 @@ public class TopBar {
             graphics.setCharacter(i, 0, ' ');
         }
 
-        HeroStats stats = AppLogic.currentGame.hero.stats;
+        HeroStats stats = AppLogic.currentGame.getHero().stats;
         int health = stats.getHealth();
         String healthBar = Util.horizontalScale(13, Math.max(0, health / 1300.0));
         graphics.setForegroundColor(convertColor(HEALTH_COLOR));
         graphics.putString(0, 0, healthBar);
 
         for (int i = 0; i < 4; i++) {
-            Item item = AppLogic.currentGame.hero.inventory.taken[i];
+            Item item = AppLogic.currentGame.getHero().inventory.taken[i];
             if (item != null) {
                 graphics.setForegroundColor(convertColor(item.getColor()));
                 graphics.setCharacter(xMax / 2 - 1 + i, 0, item.getSymbol());

@@ -1,7 +1,7 @@
 package renderer.inventoryWindow;
 
 import basicComponents.AppLogic;
-import hero.items.Item;
+import items.Item;
 import util.Coord;
 
 
@@ -16,12 +16,12 @@ public class BaggageWindow extends TileWindow {
 
     @Override
     Item getItem(Coord position) {
-        return AppLogic.currentGame.hero.inventory.baggage[position.x][position.y];
+        return AppLogic.currentGame.getHero().inventory.baggage[position.x][position.y];
     }
 
     @Override
     public InventoryText getText() {
-        Item item = AppLogic.currentGame.hero.inventory.baggage[cursorPosition.x][cursorPosition.y];
+        Item item = AppLogic.currentGame.getHero().inventory.baggage[cursorPosition.x][cursorPosition.y];
         if (active && item != null) {
             return item.getText();
         }

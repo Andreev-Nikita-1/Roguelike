@@ -12,12 +12,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public interface Pausable {
 
+    void setGame(Game game);
+
+
     /**
      * introduces this to the game given
      */
     default void includeToGame(Game game) {
-        game.pausables.add(this);
-        if (!game.paused.get()) {
+        setGame(game);
+        game.addPausable(this);
+        if (!game.isPaused()) {
             start();
         }
     }
@@ -26,7 +30,7 @@ public interface Pausable {
      * deletes this from the game
      */
     default void deleteFromGame(Game game) {
-        game.pausables.remove(this);
+        game.removePausable(this);
         kill();
     }
 

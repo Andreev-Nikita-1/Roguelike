@@ -28,7 +28,7 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
     private SomeLightingCodeFromInternet code;
     private Set<Coord> visible = new HashSet<>();
 
-    public volatile boolean lighted = true;
+    public volatile boolean lighted = false;
 
     /**
      * @param radius - how far can the hero see
@@ -155,8 +155,15 @@ public class Lighting extends MapObject implements TimeIntervalActor, DynamicVis
         return paused.get();
     }
 
+    private Game game;
+
     @Override
     public Game getGame() {
-        return map.game;
+        return game;
+    }
+
+    @Override
+    public void setGame(Game game) {
+        this.game = game;
     }
 }

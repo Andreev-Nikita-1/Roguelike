@@ -1,7 +1,7 @@
 package renderer.inventoryWindow;
 
 import basicComponents.AppLogic;
-import hero.items.Item;
+import items.Item;
 import util.Coord;
 
 /**
@@ -14,7 +14,7 @@ public class TakenWindow extends TileWindow {
 
     @Override
     public InventoryText getText() {
-        Item item = AppLogic.currentGame.hero.inventory.taken[cursorPosition.x];
+        Item item = AppLogic.currentGame.getHero().inventory.taken[cursorPosition.x];
         if (active && item != null) {
             return item.getText();
         }
@@ -23,6 +23,6 @@ public class TakenWindow extends TileWindow {
 
     @Override
     Item getItem(Coord position) {
-        return AppLogic.currentGame.hero.inventory.taken[position.x];
+        return AppLogic.currentGame.getHero().inventory.taken[position.x];
     }
 }

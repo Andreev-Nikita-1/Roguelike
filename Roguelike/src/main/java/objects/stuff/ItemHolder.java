@@ -1,6 +1,6 @@
 package objects.stuff;
 
-import hero.items.Item;
+import items.Item;
 import org.json.JSONObject;
 import renderer.PixelData;
 import renderer.VisualPixel;
@@ -14,8 +14,8 @@ import java.util.Map;
  * Class, that contain item, that can be taken by hero
  */
 public class ItemHolder extends Stuff {
-    Item item;
-    VisualPixel pixel;
+    private Item item;
+    private VisualPixel pixel;
 
     public ItemHolder(Coord location, Item item) {
         super(location);

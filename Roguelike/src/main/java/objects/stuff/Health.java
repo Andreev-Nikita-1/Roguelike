@@ -87,9 +87,16 @@ public class Health extends Stuff implements TimeIntervalActor {
         return true;
     }
 
+    private Game game;
+
     @Override
     public Game getGame() {
-        return map.game;
+        return game;
+    }
+
+    @Override
+    public void setGame(Game game) {
+        this.game = game;
     }
 
 

@@ -1,7 +1,7 @@
 package hero;
 
 import basicComponents.Game;
-import hero.items.*;
+import items.*;
 import map.MapOfObjects;
 import org.json.JSONArray;
 import org.json.JSONObject;

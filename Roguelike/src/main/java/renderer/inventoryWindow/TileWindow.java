@@ -1,7 +1,7 @@
 package renderer.inventoryWindow;
 
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
-import hero.items.Item;
+import items.Item;
 import util.Coord;
 import util.Direction;
 

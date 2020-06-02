@@ -31,7 +31,7 @@ public interface TimeIntervalActor extends Runnable, Pausable {
 
     @Override
     default void run() {
-        if (isActive() && !getGame().paused.get()) {
+        if (isActive() && !getGame().isPaused()) {
             int delay = act();
             scheduler.schedule(this, delay, MILLISECONDS);
         }

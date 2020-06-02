@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class StaminaRestorer implements TimeIntervalActor {
     private AtomicBoolean active = new AtomicBoolean(true);
-    HeroStats stats;
+    private HeroStats stats;
 
     public StaminaRestorer(HeroStats stats) {
         this.stats = stats;
@@ -34,8 +34,15 @@ public class StaminaRestorer implements TimeIntervalActor {
         return active.get();
     }
 
+    private Game game;
+
     @Override
     public Game getGame() {
-        return stats.ownerInventory.heroMap.game;
+        return game;
+    }
+
+    @Override
+    public void setGame(Game game) {
+        this.game = game;
     }
 }

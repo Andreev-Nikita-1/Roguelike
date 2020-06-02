@@ -4,6 +4,7 @@ import basicComponents.AppLogic;
 import basicComponents.Controller;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import hero.Inventory;
 import util.Coord;
 import util.Direction;
@@ -196,9 +197,9 @@ public class InventoryWindow {
      */
     private static void moveItem(Direction direction) {
         if (currentWindow == baggage) {
-            AppLogic.currentGame.hero.inventory.shiftItemInBaggage(currentWindow.cursorPosition, direction);
+            AppLogic.currentGame.getHero().inventory.shiftItemInBaggage(currentWindow.cursorPosition, direction);
         } else if (currentWindow == taken) {
-            AppLogic.currentGame.hero.inventory.shiftTakenItems(currentWindow.cursorPosition.x, direction);
+            AppLogic.currentGame.getHero().inventory.shiftTakenItems(currentWindow.cursorPosition.x, direction);
         }
     }
 
@@ -207,71 +208,52 @@ public class InventoryWindow {
      */
     public static void handleKeyStroke(KeyStroke keyStroke) {
         boolean ctrl = keyStroke.isCtrlDown();
-        boolean alt = keyStroke.isAltDown();
         boolean shift = keyStroke.isShiftDown();
+        if (keyStroke.getKeyType() == KeyType.Enter) {
+            if (currentWindow == taken)
+                AppLogic.currentGame.getHero().inventory.takeOffItemInTaken(currentWindow.cursorPosition.x);
+            if (currentWindow == armor) {
+                if (currentWindow.cursorPosition.x == 0)
+                    AppLogic.currentGame.getHero().inventory.takeOffWeapon();
+                else
+                    AppLogic.currentGame.getHero().inventory.takeOffShield();
+            }
+            if (currentWindow == baggage)
+                AppLogic.currentGame.getHero().inventory.putOnItemInBaggage(currentWindow.cursorPosition);
+            textWindow.setText(currentWindow.getText());
+        }
+        Direction direction = null;
         switch (keyStroke.getKeyType()) {
-            case Enter:
-                if (currentWindow == taken)
-                    AppLogic.currentGame.hero.inventory.takeOffItemInTaken(currentWindow.cursorPosition.x);
-                if (currentWindow == armor) {
-                    if (currentWindow.cursorPosition.x == 0)
-                        AppLogic.currentGame.hero.inventory.takeOffWeapon();
-                    else
-                        AppLogic.currentGame.hero.inventory.takeOffShield();
-                }
-                if (currentWindow == baggage)
-                    AppLogic.currentGame.hero.inventory.putOnItemInBaggage(currentWindow.cursorPosition);
-                textWindow.setText(currentWindow.getText());
-                break;
             case ArrowUp:
-                if (ctrl) textWindow.pgUp();
-                else if (shift) {
-                    moveItem(UP);
-                    if (currentWindow.tryShift(UP)) {
-                        textWindow.resetBias();
-                        textWindow.setText(currentWindow.getText());
-                    }
-                } else {
-                    moveCursor(UP);
-                }
+                direction = UP;
                 break;
             case ArrowDown:
-                if (ctrl) textWindow.pgDn();
-                else if (shift) {
-                    moveItem(DOWN);
-                    if (currentWindow.tryShift(DOWN)) {
-                        textWindow.resetBias();
-                        textWindow.setText(currentWindow.getText());
-                    }
-                } else {
-                    moveCursor(DOWN);
-                }
+                direction = DOWN;
                 break;
             case ArrowLeft:
-                if (ctrl) ;
-                else if (shift) {
-                    moveItem(LEFT);
-                    if (currentWindow.tryShift(LEFT)) {
-                        textWindow.resetBias();
-                        textWindow.setText(currentWindow.getText());
-                    }
-                } else {
-                    moveCursor(LEFT);
-                }
+                direction = LEFT;
                 break;
             case ArrowRight:
-                if (ctrl) ;
-                else if (shift) {
-                    moveItem(RIGHT);
-                    if (currentWindow.tryShift(RIGHT)) {
-                        textWindow.resetBias();
-                        textWindow.setText(currentWindow.getText());
-                    }
-                } else {
-                    moveCursor(RIGHT);
-                }
+                direction = RIGHT;
                 break;
         }
+        if (direction == null) return;
+        if (ctrl) {
+            if (direction == UP) {
+                textWindow.pgUp();
+            } else if (direction == DOWN) {
+                textWindow.pgDn();
+            }
+        } else if (shift) {
+            moveItem(direction);
+            if (currentWindow.tryShift(direction)) {
+                textWindow.resetBias();
+                textWindow.setText(currentWindow.getText());
+            }
+        } else {
+            moveCursor(direction);
+        }
+
     }
 }
 
